@@ -11,14 +11,7 @@ const routineStore = createRoutineStore({ namespace: "gymapp" });
 const exerciseStore = createExerciseStore({ namespace: "gymapp" });
 
 // --- top toolbar actions (global) ---
-const btnSeed = document.getElementById("btnSeed");
 const btnClearAll = document.getElementById("btnClearAll");
-
-btnSeed.addEventListener("click", () => {
-    routineStore.seedDemo();
-    // refresh current route UI
-    onNavigate.emit();
-});
 
 btnClearAll.addEventListener("click", () => {
     const ok = confirm("This will delete ALL routines from this device. Continue?");

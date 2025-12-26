@@ -75,12 +75,5 @@ export function createRoutineStore() {
         writeIndex([]);
     }
 
-    function seedDemo() {
-        if (list().length > 0) return;
-        create({ name: "Push Day A", description: "Chest + shoulders + triceps" });
-        create({ name: "Pull Day A", description: "Back + biceps" });
-        create({ name: "Leg Day A", description: "Quads + hamstrings + calves" });
-    }
-
-    return { list, getById, create, update, remove, clearAll, seedDemo };
+    return { list, getById, create, update, remove, clearAll };
 }
