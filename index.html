@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Easy Gym Routine Tracker</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="titleBlock">
+        <h1>Easy Gym Routine Tracker</h1>
+        <p>Minimal routine list. Create and manage training plans locally.</p>
+      </div>
+      <div class="toolbar">
+        <button class="btn primary" data-nav="#/routine/new">+ New routine</button>
+        <button class="btn" id="btnSeed">Seed demo</button>
+        <button class="btn danger" id="btnClearAll">Clear all</button>
+      </div>
+    </header>
+
+    <!-- Routes -->
+    <section class="card route" data-route="routines" id="route-routines">
+      <div class="listHeader">
+        <h2>Your routines</h2>
+        <div class="count" id="routineCount">0</div>
+      </div>
+
+      <div class="routineList" id="routineList"></div>
+
+      <div class="empty" id="emptyState" style="display:none;">
+        No routines yet. Click <span class="chip">+ New routine</span> to create your first one.
+      </div>
+    </section>
+
+    <section class="card route" data-route="routine-new" id="route-new" style="display:none;">
+      <div class="pageHeader">
+        <h2>Create routine</h2>
+        <button class="btn" data-nav="#/routines">Back</button>
+      </div>
+
+      <div class="form">
+        <div class="field">
+          <label for="routineName">Name</label>
+          <input id="routineName" placeholder="e.g., Push Day A" maxlength="60" />
+        </div>
+
+        <div class="field">
+          <label for="routineDescription">Description (optional)</label>
+          <textarea id="routineDescription" placeholder="Quick notes: goals, intensity, focus..."></textarea>
+        </div>
+
+        <div class="actions">
+          <button class="btn" data-nav="#/routines">Cancel</button>
+          <button class="btn primary" id="btnCreateRoutine">Create</button>
+        </div>
+
+        <p class="note">Saved on this device (localStorage). You can add series later in the routine screen.</p>
+      </div>
+    </section>
+
+    <section class="card route" data-route="routine" id="route-routine" style="display:none;">
+      <div class="pageHeader">
+        <h2 id="routineTitle">Routine</h2>
+        <div class="toolbar">
+          <button class="btn" data-nav="#/routines">Back</button>
+          <button class="btn danger" id="btnDeleteRoutine">Delete</button>
+        </div>
+      </div>
+
+      <div class="routineDetail">
+        <p class="muted" id="routineDesc">—</p>
+
+        <div class="divider"></div>
+
+        <div class="placeholder">
+          <div class="chip">Next step</div>
+          <p>
+            Build the routine editor here: add <b>SetSeries</b> and <b>RepGroup</b>, set
+            <b>restSecondsAfter</b> at both levels, and track history per RepGroup.
+          </p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script type="module" src="./src/app.js"></script>
+</body>
+</html>
