@@ -6,15 +6,17 @@ import { mountRoutinesPage } from "./pages/routinesPage.js";
 import { mountRoutineNewPage } from "./pages/routineNewPage.js";
 import { mountRoutineDetailPage } from "./pages/routineDetailPage.js";
 
-// --- store ---
-const routineStore = createRoutineStore({ namespace: "gymapp" });
-const exerciseStore = createExerciseStore({ namespace: "gymapp" });
+import { t, translateDocument } from "./internationalization/i18n.js";
+
+// --- stores ---
+const routineStore = createRoutineStore();
+const exerciseStore = createExerciseStore();
 
 // --- top toolbar actions (global) ---
 const btnClearAll = document.getElementById("btnClearAll");
 
 btnClearAll.addEventListener("click", () => {
-    const ok = confirm("This will delete ALL routines from this device. Continue?");
+    const ok = confirm(t("confirm.clearAll"));
     if (!ok) return;
     routineStore.clearAll();
     navigate("#/routines");
@@ -38,6 +40,9 @@ startRouter({
     defaultHash: "#/routines",
     onRoute({ name, params }) {
         showRoute(name);
+
+        translateDocument(document);
+
         const page = pages[name];
         if (page?.render) page.render(params);
     },

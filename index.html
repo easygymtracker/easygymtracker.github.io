@@ -4,7 +4,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Easy Gym Routine Tracker</title>
+
+  <title data-i18n="app.title">Easy Gym Routine Tracker</title>
   <link rel="stylesheet" href="./styles.css" />
 </head>
 
@@ -12,164 +13,215 @@
   <div class="app">
     <header>
       <div class="titleBlock">
-        <h1>Easy Gym Routine Tracker</h1>
-        <p>Minimal routine list. Create and manage training plans locally.</p>
+        <h1 data-i18n="app.title">Easy Gym Routine Tracker</h1>
+        <p data-i18n="app.subtitle">Minimal routine list. Create and manage training plans locally.</p>
       </div>
       <div class="toolbar">
-        <button class="btn primary" data-nav="#/routine/new">+ New routine</button>
-        <button class="btn danger" id="btnClearAll">Clear all</button>
+        <button class="btn primary" data-nav="#/routine/new" data-i18n="routines.new">
+          + New routine
+        </button>
+        <button class="btn danger" id="btnClearAll" data-i18n="common.clearAll">
+          Clear all
+        </button>
       </div>
     </header>
 
     <!-- Routes -->
     <section class="card route" data-route="routines" id="route-routines">
       <div class="listHeader">
-        <h2>Your routines</h2>
+        <h2 data-i18n="routines.title">Your routines</h2>
         <div class="count" id="routineCount">0</div>
       </div>
 
       <div class="routineList" id="routineList"></div>
 
       <div class="empty" id="emptyState" style="display:none;">
-        No routines yet. Click <span class="chip">+ New routine</span> to create your first one.
+        <span data-i18n="routines.empty.prefix">No routines yet. Click</span>
+        <span class="chip" data-i18n="routines.empty.cta">+ New routine</span>
+        <span data-i18n="routines.empty.suffix">to create your first one.</span>
       </div>
     </section>
 
     <section class="card route" data-route="routine-new" id="route-new" style="display:none;">
       <div class="pageHeader">
-        <h2>Create routine</h2>
-        <button class="btn" data-nav="#/routines">Back</button>
+        <h2 data-i18n="routineNew.title">Create routine</h2>
+        <button class="btn" data-nav="#/routines" data-i18n="common.back">Back</button>
       </div>
 
       <div class="form">
         <div class="field">
-          <label for="routineName">Name</label>
-          <input id="routineName" placeholder="e.g., Push Day A" maxlength="60" />
+          <label for="routineName" data-i18n="routineNew.nameLabel">Name</label>
+          <input id="routineName" maxlength="60" data-i18n="routineNew.namePlaceholder" data-i18n-attr="placeholder"
+            placeholder="e.g., Push Day A" />
         </div>
 
         <div class="field">
-          <label for="routineDescription">Description (optional)</label>
-          <textarea id="routineDescription" placeholder="Quick notes: goals, intensity, focus..."></textarea>
+          <label for="routineDescription" data-i18n="routineNew.descriptionLabel">Description (optional)</label>
+          <textarea id="routineDescription" data-i18n="routineNew.descriptionPlaceholder" data-i18n-attr="placeholder"
+            placeholder="Quick notes: goals, intensity, focus..."></textarea>
         </div>
 
         <div class="actions">
-          <button class="btn" data-nav="#/routines">Cancel</button>
-          <button class="btn primary" id="btnCreateRoutine">Create</button>
+          <button class="btn" data-nav="#/routines" data-i18n="common.cancel">Cancel</button>
+          <button class="btn primary" id="btnCreateRoutine" data-i18n="common.create">Create</button>
         </div>
 
-        <p class="note">Saved on this device (localStorage). You can add series later in the routine screen.</p>
+        <p class="note" data-i18n="routineNew.note">
+          Saved on this device (localStorage). You can add series later in the routine screen.
+        </p>
       </div>
     </section>
 
     <section class="card route" data-route="routine" id="route-routine" style="display:none;">
       <div class="pageHeader">
+        <!-- This is set dynamically by JS; keep as-is (not translated here). -->
         <h2 id="routineTitle">Routine</h2>
+
         <div class="toolbar">
-          <button class="btn" data-nav="#/routines">Back</button>
-          <button class="btn danger" id="btnDeleteRoutine">Delete</button>
+          <button class="btn" data-nav="#/routines" data-i18n="common.back">Back</button>
+          <button class="btn danger" id="btnDeleteRoutine" data-i18n="common.delete">Delete</button>
         </div>
       </div>
 
       <div class="routineDetail">
+        <!-- This is set dynamically by JS; keep as-is. -->
         <p class="muted" id="routineDesc">—</p>
 
         <div class="divider"></div>
 
         <div class="form">
-          <h3 style="margin:0 0 10px 0; font-size:14px; color: var(--accent2);">Add series</h3>
+          <h3 style="margin:0 0 10px 0; font-size:14px; color: var(--accent2);" data-i18n="routine.addSeries.title">
+            Add series
+          </h3>
 
           <div class="field">
-            <label for="exerciseInput">Exercise</label>
-            <!-- datalist gives dropdown suggestions but still allows free text -->
-            <input id="exerciseInput" list="exerciseOptions" placeholder="Type or pick an exercise..." />
+            <label for="exerciseInput" data-i18n="routine.addSeries.exerciseLabel">Exercise</label>
+            <input id="exerciseInput" list="exerciseOptions" data-i18n="routine.addSeries.exercisePlaceholder"
+              data-i18n-attr="placeholder" placeholder="Type or pick an exercise..." />
             <datalist id="exerciseOptions"></datalist>
-            <div class="note">Type a new name to create an exercise automatically.</div>
+            <div class="note" data-i18n="routine.addSeries.exerciseHelp">
+              Type a new name to create an exercise automatically.
+            </div>
           </div>
 
           <div class="field">
-            <label for="seriesDescription">Series description (optional)</label>
-            <input id="seriesDescription" placeholder="e.g., Working sets, Warm-up..." />
+            <label for="seriesDescription" data-i18n="routine.addSeries.seriesDescriptionLabel">
+              Series description (optional)
+            </label>
+            <input id="seriesDescription" data-i18n="routine.addSeries.seriesDescriptionPlaceholder"
+              data-i18n-attr="placeholder" placeholder="e.g., Working sets, Warm-up..." />
           </div>
 
           <div class="actions">
-            <button class="btn primary" id="btnAddSeries">Add series</button>
+            <button class="btn primary" id="btnAddSeries" data-i18n="routine.addSeries.button">
+              Add series
+            </button>
           </div>
         </div>
 
         <div class="divider"></div>
 
         <div>
-          <h3 style="margin: 0 0 10px 0; font-size: 14px; color: var(--accent2);">Series in this routine</h3>
+          <h3 style="margin: 0 0 10px 0; font-size: 14px; color: var(--accent2);" data-i18n="routine.seriesList.title">
+            Series in this routine
+          </h3>
           <div id="seriesList"></div>
-          <p class="note" id="seriesEmpty" style="display: none;">No series yet. Add one above.</p>
+          <p class="note" id="seriesEmpty" style="display: none;" data-i18n="routine.seriesList.empty">
+            No series yet. Add one above.
+          </p>
         </div>
 
         <div class="divider"></div>
 
         <section id="seriesEditor" style="display: none;">
           <div class="pageHeader" style="border: none; padding: 0; margin-bottom: 10px;">
+            <!-- Title is dynamic (includes series # + exercise name); keep as-is. -->
             <h2 id="seriesEditorTitle">Edit series</h2>
-            <button class="btn" id="btnCloseSeriesEditor">Close</button>
+            <button class="btn" id="btnCloseSeriesEditor" data-i18n="common.close">Close</button>
           </div>
 
           <div class="form" style="padding: 0;">
             <div class="field">
-              <label for="editSeriesDescription">Series description</label>
-              <input id="editSeriesDescription" placeholder="e.g., Working sets" />
+              <label for="editSeriesDescription" data-i18n="seriesEditor.seriesDescriptionLabel">
+                Series description
+              </label>
+              <input id="editSeriesDescription" data-i18n="seriesEditor.seriesDescriptionPlaceholder"
+                data-i18n-attr="placeholder" placeholder="e.g., Working sets" />
             </div>
 
             <div class="field">
-              <label for="editSeriesRest">Rest after series (seconds)</label>
-              <input id="editSeriesRest" type="number" min="0" step="5" placeholder="0" />
+              <label for="editSeriesRest" data-i18n="seriesEditor.restAfterSeriesLabel">
+                Rest after series (seconds)
+              </label>
+              <input id="editSeriesRest" type="number" min="0" step="5"
+                data-i18n="seriesEditor.restAfterSeriesPlaceholder" data-i18n-attr="placeholder" placeholder="0" />
             </div>
 
             <div class="actions">
-              <button class="btn primary" id="btnSaveSeries">Save series</button>
+              <button class="btn primary" id="btnSaveSeries" data-i18n="seriesEditor.saveSeriesButton">
+                Save series
+              </button>
             </div>
 
             <div class="divider"></div>
 
-            <h3 style="margin: 0 0 10px 0; font-size: 14px; color: var(--accent2);">Rep groups</h3>
+            <h3 style="margin: 0 0 10px 0; font-size: 14px; color: var(--accent2);"
+              data-i18n="seriesEditor.repGroupsTitle">
+              Rep groups
+            </h3>
             <div id="repGroupList"></div>
-            <p class="note" id="repGroupEmpty" style="display: none;">No rep groups yet. Add one below.</p>
+            <p class="note" id="repGroupEmpty" style="display: none;" data-i18n="seriesEditor.repGroupsEmpty">
+              No rep groups yet. Add one below.
+            </p>
 
             <div class="divider"></div>
 
-            <h3 style="margin: 0 0 10px 0; font-size: 14px; color: var(--accent2);">Add rep group</h3>
+            <h3 style="margin: 0 0 10px 0; font-size: 14px; color: var(--accent2);"
+              data-i18n="seriesEditor.addRepGroupTitle">
+              Add rep group
+            </h3>
 
             <div class="field">
-              <label for="rgLaterality">Laterality</label>
+              <label for="rgLaterality" data-i18n="repGroup.lateralityLabel">Laterality</label>
               <select id="rgLaterality">
-                <option value="bilateral">Bilateral</option>
-                <option value="unilateral">Unilateral</option>
+                <option value="bilateral" data-i18n="repGroup.laterality.bilateral">Bilateral</option>
+                <option value="unilateral" data-i18n="repGroup.laterality.unilateral">Unilateral</option>
               </select>
             </div>
 
             <div class="field">
-              <label for="rgTargetReps">Target reps</label>
-              <input id="rgTargetReps" type="number" min="1" step="1" placeholder="e.g., 10" />
+              <label for="rgTargetReps" data-i18n="repGroup.targetRepsLabel">Target reps</label>
+              <input id="rgTargetReps" type="number" min="1" step="1" data-i18n="repGroup.targetRepsPlaceholder"
+                data-i18n-attr="placeholder" placeholder="e.g., 10" />
             </div>
 
             <div class="field" id="rgWeightSingleWrap">
-              <label for="rgWeightSingle">Target weight</label>
-              <input id="rgWeightSingle" type="number" min="0" step="0.5" placeholder="e.g., 30" />
+              <label for="rgWeightSingle" data-i18n="repGroup.targetWeightSingleLabel">Target weight</label>
+              <input id="rgWeightSingle" type="number" min="0" step="0.5"
+                data-i18n="repGroup.targetWeightSinglePlaceholder" data-i18n-attr="placeholder"
+                placeholder="e.g., 30" />
             </div>
 
             <div class="field" id="rgWeightTupleWrap" style="display: none;">
-              <label>Target weight (left / right)</label>
+              <label data-i18n="repGroup.targetWeightTupleLabel">Target weight (left / right)</label>
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                <input id="rgWeightLeft" type="number" min="0" step="0.5" placeholder="Left" />
-                <input id="rgWeightRight" type="number" min="0" step="0.5" placeholder="Right" />
+                <input id="rgWeightLeft" type="number" min="0" step="0.5"
+                  data-i18n="repGroup.targetWeightLeftPlaceholder" data-i18n-attr="placeholder" placeholder="Left" />
+                <input id="rgWeightRight" type="number" min="0" step="0.5"
+                  data-i18n="repGroup.targetWeightRightPlaceholder" data-i18n-attr="placeholder" placeholder="Right" />
               </div>
             </div>
 
             <div class="field">
-              <label for="rgRestAfter">Rest after rep group (seconds)</label>
-              <input id="rgRestAfter" type="number" min="0" step="5" placeholder="0" />
+              <label for="rgRestAfter" data-i18n="repGroup.restAfterLabel">Rest after rep group (seconds)</label>
+              <input id="rgRestAfter" type="number" min="0" step="5" data-i18n="repGroup.restAfterPlaceholder"
+                data-i18n-attr="placeholder" placeholder="0" />
             </div>
 
             <div class="actions">
-              <button class="btn primary" id="btnAddRepGroup">Add rep group</button>
+              <button class="btn primary" id="btnAddRepGroup" data-i18n="seriesEditor.addRepGroupButton">
+                Add rep group
+              </button>
             </div>
           </div>
         </section>
