@@ -1,11 +1,11 @@
 import { escapeHtml } from "../dom.js";
 
 export function routineListItem(routine) {
-  const name = escapeHtml(routine.name || "Untitled routine");
-  const desc = escapeHtml(routine.description || "");
-  const seriesCount = Array.isArray(routine.series) ? routine.series.length : 0;
+    const name = escapeHtml(routine.name || "Untitled routine");
+    const desc = escapeHtml(routine.description || "");
+    const seriesCount = Array.isArray(routine.series) ? routine.series.length : 0;
 
-  return `
+    return `
     <div class="routineRow" data-id="${routine.id}">
       <div class="routineMeta">
         <h3>${name}</h3>

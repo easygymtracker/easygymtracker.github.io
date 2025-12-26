@@ -4,7 +4,7 @@ import { DICTS } from './dicts.js';
 function getInitialLocale() {
     const meta = document.querySelector('meta[name="app:locale"]')?.getAttribute("content");
     if (meta && DICTS[meta]) return meta;
-    
+
     const params = new URLSearchParams(location.search);
     const fromQuery = params.get("lang");
     if (fromQuery && DICTS[fromQuery]) return fromQuery;

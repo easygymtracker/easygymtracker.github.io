@@ -15,37 +15,37 @@ const btnSeed = document.getElementById("btnSeed");
 const btnClearAll = document.getElementById("btnClearAll");
 
 btnSeed.addEventListener("click", () => {
-  routineStore.seedDemo();
-  // refresh current route UI
-  onNavigate.emit();
+    routineStore.seedDemo();
+    // refresh current route UI
+    onNavigate.emit();
 });
 
 btnClearAll.addEventListener("click", () => {
-  const ok = confirm("This will delete ALL routines from this device. Continue?");
-  if (!ok) return;
-  routineStore.clearAll();
-  navigate("#/routines");
+    const ok = confirm("This will delete ALL routines from this device. Continue?");
+    if (!ok) return;
+    routineStore.clearAll();
+    navigate("#/routines");
 });
 
 // --- mount pages once ---
 const pages = {
-  routines: mountRoutinesPage({ routineStore }),
-  "routine-new": mountRoutineNewPage({ routineStore }),
-  routine: mountRoutineDetailPage({ routineStore, exerciseStore }),
+    routines: mountRoutinesPage({ routineStore }),
+    "routine-new": mountRoutineNewPage({ routineStore }),
+    routine: mountRoutineDetailPage({ routineStore, exerciseStore }),
 };
 
 // --- route rendering ---
 function showRoute(name) {
-  document.querySelectorAll(".route").forEach((el) => {
-    el.style.display = (el.dataset.route === name) ? "" : "none";
-  });
+    document.querySelectorAll(".route").forEach((el) => {
+        el.style.display = (el.dataset.route === name) ? "" : "none";
+    });
 }
 
 startRouter({
-  defaultHash: "#/routines",
-  onRoute({ name, params }) {
-    showRoute(name);
-    const page = pages[name];
-    if (page?.render) page.render(params);
-  },
+    defaultHash: "#/routines",
+    onRoute({ name, params }) {
+        showRoute(name);
+        const page = pages[name];
+        if (page?.render) page.render(params);
+    },
 });
