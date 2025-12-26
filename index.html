@@ -1,11 +1,13 @@
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Easy Gym Routine Tracker</title>
   <link rel="stylesheet" href="./styles.css" />
 </head>
+
 <body>
   <div class="app">
     <header>
@@ -74,12 +76,33 @@
 
         <div class="divider"></div>
 
-        <div class="placeholder">
-          <div class="chip">Next step</div>
-          <p>
-            Build the routine editor here: add <b>SetSeries</b> and <b>RepGroup</b>, set
-            <b>restSecondsAfter</b> at both levels, and track history per RepGroup.
-          </p>
+        <div class="form">
+          <h3 style="margin:0 0 10px 0; font-size:14px; color: var(--accent2);">Add series</h3>
+
+          <div class="field">
+            <label for="exerciseInput">Exercise</label>
+            <!-- datalist gives dropdown suggestions but still allows free text -->
+            <input id="exerciseInput" list="exerciseOptions" placeholder="Type or pick an exercise..." />
+            <datalist id="exerciseOptions"></datalist>
+            <div class="note">Type a new name to create an exercise automatically.</div>
+          </div>
+
+          <div class="field">
+            <label for="seriesDescription">Series description (optional)</label>
+            <input id="seriesDescription" placeholder="e.g., Working sets, Warm-up..." />
+          </div>
+
+          <div class="actions">
+            <button class="btn primary" id="btnAddSeries">Add series</button>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div>
+          <h3 style="margin:0 0 10px 0; font-size:14px; color: var(--accent2);">Series in this routine</h3>
+          <div id="seriesList"></div>
+          <p class="note" id="seriesEmpty" style="display:none;">No series yet. Add one above.</p>
         </div>
       </div>
     </section>
@@ -87,4 +110,5 @@
 
   <script type="module" src="./src/app.js"></script>
 </body>
+
 </html>

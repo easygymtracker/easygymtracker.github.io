@@ -1,5 +1,6 @@
 import { startRouter, navigate, onNavigate } from "./router.js";
 import { createRoutineStore } from "./store/routineStore.js";
+import { createExerciseStore } from "./store/exerciseStore.js";
 
 import { mountRoutinesPage } from "./pages/routinesPage.js";
 import { mountRoutineNewPage } from "./pages/routineNewPage.js";
@@ -7,6 +8,7 @@ import { mountRoutineDetailPage } from "./pages/routineDetailPage.js";
 
 // --- store ---
 const routineStore = createRoutineStore({ namespace: "gymapp" });
+const exerciseStore = createExerciseStore({ namespace: "gymapp" });
 
 // --- top toolbar actions (global) ---
 const btnSeed = document.getElementById("btnSeed");
@@ -29,7 +31,7 @@ btnClearAll.addEventListener("click", () => {
 const pages = {
   routines: mountRoutinesPage({ routineStore }),
   "routine-new": mountRoutineNewPage({ routineStore }),
-  routine: mountRoutineDetailPage({ routineStore }),
+  routine: mountRoutineDetailPage({ routineStore, exerciseStore }),
 };
 
 // --- route rendering ---
