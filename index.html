@@ -100,10 +100,80 @@
         <div class="divider"></div>
 
         <div>
-          <h3 style="margin:0 0 10px 0; font-size:14px; color: var(--accent2);">Series in this routine</h3>
+          <h3 style="margin: 0 0 10px 0; font-size: 14px; color: var(--accent2);">Series in this routine</h3>
           <div id="seriesList"></div>
-          <p class="note" id="seriesEmpty" style="display:none;">No series yet. Add one above.</p>
+          <p class="note" id="seriesEmpty" style="display: none;">No series yet. Add one above.</p>
         </div>
+
+        <div class="divider"></div>
+
+        <section id="seriesEditor" style="display: none;">
+          <div class="pageHeader" style="border: none; padding: 0; margin-bottom: 10px;">
+            <h2 id="seriesEditorTitle">Edit series</h2>
+            <button class="btn" id="btnCloseSeriesEditor">Close</button>
+          </div>
+
+          <div class="form" style="padding: 0;">
+            <div class="field">
+              <label for="editSeriesDescription">Series description</label>
+              <input id="editSeriesDescription" placeholder="e.g., Working sets" />
+            </div>
+
+            <div class="field">
+              <label for="editSeriesRest">Rest after series (seconds)</label>
+              <input id="editSeriesRest" type="number" min="0" step="5" placeholder="0" />
+            </div>
+
+            <div class="actions">
+              <button class="btn primary" id="btnSaveSeries">Save series</button>
+            </div>
+
+            <div class="divider"></div>
+
+            <h3 style="margin: 0 0 10px 0; font-size: 14px; color: var(--accent2);">Rep groups</h3>
+            <div id="repGroupList"></div>
+            <p class="note" id="repGroupEmpty" style="display: none;">No rep groups yet. Add one below.</p>
+
+            <div class="divider"></div>
+
+            <h3 style="margin: 0 0 10px 0; font-size: 14px; color: var(--accent2);">Add rep group</h3>
+
+            <div class="field">
+              <label for="rgLaterality">Laterality</label>
+              <select id="rgLaterality">
+                <option value="bilateral">Bilateral</option>
+                <option value="unilateral">Unilateral</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="rgTargetReps">Target reps</label>
+              <input id="rgTargetReps" type="number" min="1" step="1" placeholder="e.g., 10" />
+            </div>
+
+            <div class="field" id="rgWeightSingleWrap">
+              <label for="rgWeightSingle">Target weight</label>
+              <input id="rgWeightSingle" type="number" min="0" step="0.5" placeholder="e.g., 30" />
+            </div>
+
+            <div class="field" id="rgWeightTupleWrap" style="display: none;">
+              <label>Target weight (left / right)</label>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <input id="rgWeightLeft" type="number" min="0" step="0.5" placeholder="Left" />
+                <input id="rgWeightRight" type="number" min="0" step="0.5" placeholder="Right" />
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="rgRestAfter">Rest after rep group (seconds)</label>
+              <input id="rgRestAfter" type="number" min="0" step="5" placeholder="0" />
+            </div>
+
+            <div class="actions">
+              <button class="btn primary" id="btnAddRepGroup">Add rep group</button>
+            </div>
+          </div>
+        </section>
       </div>
     </section>
   </div>

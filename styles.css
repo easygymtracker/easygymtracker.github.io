@@ -394,3 +394,18 @@ textarea {
     background: rgba(96, 165, 250, 0.04);
     animation: otherFlash 260ms ease-out;
 }
+
+select {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.03);
+    color: var(--text);
+    outline: none;
+}
+
+select:focus {
+    border-color: rgba(96,165,250,0.55);
+    box-shadow: 0 0 0 3px rgba(96,165,250,0.12);
+}
