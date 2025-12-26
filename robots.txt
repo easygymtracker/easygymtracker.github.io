@@ -1,0 +1,13 @@
+# robots.txt for 
+
+User-agent: *
+Allow: /
+
+Disallow: /*?lang=
+Disallow: /*&lang=
+Disallow: /src/
+Disallow: /vendor/
+Disallow: /assets/
+Disallow: /lang/
+
+Sitemap: 

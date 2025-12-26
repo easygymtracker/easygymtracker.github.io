@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <!-- Root (default app entry) -->
+  <url>
+    <loc>https://heictopng.github.io/</loc>
+  </url>
+
+  <!-- Default language page -->
+  <url>
+    <loc>https://heictopng.github.io/lang/en/</loc>
+  </url>
+
+  <!-- Localized pages -->
+  <url><loc>https://heictopng.github.io/lang/es/</loc></url>
+  <url><loc>https://heictopng.github.io/lang/pt/</loc></url>
+  <url><loc>https://heictopng.github.io/lang/ja/</loc></url>
+  <url><loc>https://heictopng.github.io/lang/zh/</loc></url>
+  <url><loc>https://heictopng.github.io/lang/ar/</loc></url>
+  <url><loc>https://heictopng.github.io/lang/hi/</loc></url>
+  <url><loc>https://heictopng.github.io/lang/de/</loc></url>
+  <url><loc>https://heictopng.github.io/lang/fr/</loc></url>
+  <url><loc>https://heictopng.github.io/lang/ru/</loc></url>
+  <url><loc>https://heictopng.github.io/lang/it/</loc></url>
+  <url><loc>https://heictopng.github.io/lang/nl/</loc></url>
+  <url><loc>https://heictopng.github.io/lang/pl/</loc></url>
+  <url><loc>https://heictopng.github.io/lang/tr/</loc></url>
+
+</urlset>
