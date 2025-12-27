@@ -6,7 +6,7 @@ import { mountRoutinesPage } from "./pages/routinesPage.js";
 import { mountRoutineNewPage } from "./pages/routineNewPage.js";
 import { mountRoutineDetailPage } from "./pages/routineDetailPage.js";
 
-import { t, translateDocument } from "./internationalization/i18n.js";
+import { setLocale, getLocale, getLocaleFromUrl, translateDocument } from "./internationalization/i18n.js";
 
 // --- stores ---
 const routineStore = createRoutineStore();
@@ -36,14 +36,24 @@ function showRoute(name) {
     });
 }
 
+function syncLocaleFromUrl() {
+    const locale = getLocaleFromUrl();
+    if (locale && locale !== getLocale()) {
+        setLocale(locale);
+    }
+}
+
 startRouter({
     defaultHash: "#/routines",
     onRoute({ name, params }) {
-        showRoute(name);
+        syncLocaleFromUrl();
 
+        showRoute(name);
         translateDocument(document);
 
         const page = pages[name];
-        if (page?.render) page.render(params);
+        if (page?.render) {
+            page.render(params);
+        }
     },
 });

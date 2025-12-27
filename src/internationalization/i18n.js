@@ -32,6 +32,28 @@ export function getLocale() {
     return state.locale;
 }
 
+export function getLocaleFromUrl() {
+    const params = new URLSearchParams(location.search);
+    const q = params.get("lang");
+    if (q && DICTS[q]) {
+        return q;
+    }
+
+    const hash = String(location.hash || "");
+    const idx = hash.indexOf("?");
+    if (idx === -1) {
+        return null;
+    }
+
+    const hashParams = new URLSearchParams(hash.slice(idx + 1));
+    const h = hashParams.get("lang");
+    if (h && DICTS[h]) {
+        return h;
+    }
+
+    return null;
+}
+
 export function t(key, vars = {}) {
     const dict = DICTS[state.locale] || DICTS.en;
     const fallback = DICTS.en || {};
