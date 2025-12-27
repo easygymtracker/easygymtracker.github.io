@@ -1,3 +1,4 @@
+import { t } from "../../internationalization/i18n.js";
 import { escapeHtml } from "./viewUtils.js";
 
 function moveItem(arr, from, to) {
@@ -12,6 +13,14 @@ function flashMoved(el, className) {
     void el.offsetWidth;
     el.classList.add(className);
     setTimeout(() => el.classList.remove(className), 350);
+}
+
+function restAfterLabel(seconds) {
+    return t("routine.seriesList.restAfter", { seconds });
+}
+
+function removeSeriesConfirmLabel(index1Based) {
+    return t("routine.seriesList.confirmRemoveSeries", { index: index1Based });
 }
 
 export function createSeriesListView({
@@ -40,8 +49,8 @@ export function createSeriesListView({
         for (let i = 0; i < items.length; i++) {
             const s = items[i];
             const ex = exById.get(s.exerciseId);
-            const exName = ex?.description ?? "(missing exercise)";
-            const desc = s.description || "—";
+            const exName = ex?.description ?? t("routine.seriesList.missingExercise");
+            const desc = s.description || t("common.dash");
             const rest = Number(s.restSecondsAfter ?? 0);
 
             const row = document.createElement("div");
@@ -53,14 +62,22 @@ export function createSeriesListView({
             row.innerHTML = `
                 <div class="routineMeta">
                     <h3>${escapeHtml(exName)}</h3>
-                    <p>${escapeHtml(desc)} · Rest after: ${rest}s</p>
+                    <p>${escapeHtml(desc)} · ${escapeHtml(restAfterLabel(rest))}</p>
                 </div>
                 <div class="rowActions">
                     <span class="chip">#${i + 1}</span>
-                    <button class="btn" data-action="edit-series" data-index="${i}">Edit</button>
-                    <button class="btn" data-action="move-up" data-index="${i}" ${i === 0 ? "disabled" : ""}>↑</button>
-                    <button class="btn" data-action="move-down" data-index="${i}" ${i === items.length - 1 ? "disabled" : ""}>↓</button>
-                    <button class="btn danger" data-action="remove-series" data-index="${i}">Remove</button>
+                    <button class="btn" data-action="edit-series" data-index="${i}">
+                        ${escapeHtml(t("common.edit"))}
+                    </button>
+                    <button class="btn" data-action="move-up" data-index="${i}" ${i === 0 ? "disabled" : ""}>
+                        ↑
+                    </button>
+                    <button class="btn" data-action="move-down" data-index="${i}" ${i === items.length - 1 ? "disabled" : ""}>
+                        ↓
+                    </button>
+                    <button class="btn danger" data-action="remove-series" data-index="${i}">
+                        ${escapeHtml(t("common.remove"))}
+                    </button>
                 </div>
             `;
             seriesListEl.appendChild(row);
@@ -90,7 +107,6 @@ export function createSeriesListView({
         });
     }
 
-    // Click actions: edit/remove/arrows
     seriesListEl.addEventListener("click", (e) => {
         const btn = e.target.closest("button[data-action]");
         if (!btn) return;
@@ -108,7 +124,7 @@ export function createSeriesListView({
             const routine = routineStore.getById(routineId);
             if (!routine) return;
 
-            const ok = confirm(`Remove series #${idx + 1}?`);
+            const ok = confirm(removeSeriesConfirmLabel(idx + 1));
             if (!ok) return;
 
             routine.series.splice(idx, 1);
@@ -130,7 +146,6 @@ export function createSeriesListView({
         }
     });
 
-    // Drag & drop reorder
     seriesListEl.addEventListener("dragstart", (e) => {
         const row = e.target.closest(".routineRow[data-index]");
         if (!row) return;

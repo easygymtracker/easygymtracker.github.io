@@ -1,5 +1,5 @@
 import { escapeHtml } from "../dom.js";
-import { t } from "../internationalization/i18n.js";
+import { t } from "../../internationalization/i18n.js";
 
 function seriesCountLabel(count) {
     if (count === 1) {

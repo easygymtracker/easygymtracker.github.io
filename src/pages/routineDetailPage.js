@@ -1,8 +1,9 @@
 import { navigate } from "../router.js";
+import { t } from "../internationalization/i18n.js";
 import { SetSeries } from "../models/setSeries.js";
 import { createSeriesListView } from "./routineDetail/seriesListView.js";
 import { createSeriesEditorView } from "./routineDetail/seriesEditorView.js";
-import { escapeHtmlAttr, flashInvalid } from "./routineDetail/viewUtils.js";
+import { escapeHtml, escapeHtmlAttr, flashInvalid } from "./routineDetail/viewUtils.js";
 
 export function mountRoutineDetailPage({ routineStore, exerciseStore }) {
     const routineTitle = document.getElementById("routineTitle");
@@ -59,17 +60,27 @@ export function mountRoutineDetailPage({ routineStore, exerciseStore }) {
     });
 
     btnDeleteRoutine.addEventListener("click", () => {
-        if (!currentId) return;
+        if (!currentId) {
+            return;
+        }
+
         const routine = routineStore.getById(currentId);
-        const ok = confirm(`Delete routine "${routine?.name ?? currentId}"?`);
-        if (!ok) return;
+        const nameOrId = routine?.name?.trim() ? routine.name.trim() : currentId;
+
+        const ok = confirm(t("routine.confirmDelete", { name: escapeHtml(nameOrId) }));
+        if (!ok) {
+            return;
+        }
+
         routineStore.remove(currentId);
         navigate("#/routines");
     });
 
     btnAddSeries.addEventListener("click", () => {
         const routine = routineStore.getById(currentId);
-        if (!routine) return;
+        if (!routine) {
+            return;
+        }
 
         const typed = String(exerciseInput.value ?? "").trim();
         if (!typed) {
@@ -106,8 +117,8 @@ export function mountRoutineDetailPage({ routineStore, exerciseStore }) {
             return;
         }
 
-        routineTitle.textContent = routine.name || "Routine";
-        routineDesc.textContent = routine.description || "—";
+        routineTitle.textContent = routine.name || t("routines.untitled");
+        routineDesc.textContent = routine.description || t("common.dash");
 
         renderExerciseOptions();
         seriesListView.renderSeries(routine);

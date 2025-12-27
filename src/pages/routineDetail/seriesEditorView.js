@@ -1,3 +1,4 @@
+import { t } from "../../internationalization/i18n.js";
 import { RepGroup, Laterality } from "../../models/repGroup.js";
 import {
     escapeHtml,
@@ -7,6 +8,31 @@ import {
     toPositiveInt,
     toNullableNumber,
 } from "./viewUtils.js";
+
+function editSeriesTitleLabel(index1Based, exerciseName) {
+    return t("seriesEditor.title", { index: index1Based, exercise: exerciseName });
+}
+
+function repGroupTitleLabel(index1Based) {
+    return t("seriesEditor.repGroup.title", { index: index1Based });
+}
+
+function repGroupSummaryLabel({ laterality, reps, weight, restSeconds }) {
+    return t("seriesEditor.repGroup.summary", {
+        laterality,
+        reps,
+        weight,
+        restSeconds,
+    });
+}
+
+function removeRepGroupConfirmLabel(index1Based) {
+    return t("seriesEditor.repGroup.confirmRemove", { index: index1Based });
+}
+
+function missingExerciseLabel() {
+    return t("routine.seriesList.missingExercise");
+}
 
 export function createSeriesEditorView({
     routineStore,
@@ -48,9 +74,6 @@ export function createSeriesEditorView({
     function syncLateralityUI() {
         const lat = String(rgLaterality.value);
 
-        // Rule:
-        // - UNILATERAL => left/right tuple
-        // - BILATERAL  => single weight
         if (lat === Laterality.UNILATERAL) {
             rgWeightSingleWrap.style.display = "none";
             rgWeightTupleWrap.style.display = "";
@@ -71,9 +94,9 @@ export function createSeriesEditorView({
         editingSeriesIndex = seriesIndex;
 
         const ex = exerciseStore.getById(s.exerciseId);
-        const exName = ex?.description ?? "(missing exercise)";
+        const exName = ex?.description ?? missingExerciseLabel();
 
-        seriesEditorTitle.textContent = `Edit series #${seriesIndex + 1} · ${exName}`;
+        seriesEditorTitle.textContent = editSeriesTitleLabel(seriesIndex + 1, exName);
         editSeriesDescription.value = s.description ?? "";
         editSeriesRest.value = String(Number(s.restSecondsAfter ?? 0));
 
@@ -143,9 +166,6 @@ export function createSeriesEditorView({
 
         let targetWeight = null;
 
-        // Rule:
-        // - UNILATERAL => left/right tuple
-        // - BILATERAL  => single weight
         if (laterality === Laterality.UNILATERAL) {
             const wl = toNullableNumber(rgWeightLeft.value);
             const wr = toNullableNumber(rgWeightRight.value);
@@ -204,7 +224,7 @@ export function createSeriesEditorView({
         const s = routine.series?.[editingSeriesIndex];
         if (!s) return;
 
-        const ok = confirm(`Remove rep group #${idx + 1}?`);
+        const ok = confirm(removeRepGroupConfirmLabel(idx + 1));
         if (!ok) return;
 
         s.repGroups.splice(idx, 1);
@@ -226,12 +246,12 @@ export function createSeriesEditorView({
         for (let i = 0; i < items.length; i++) {
             const g = items[i];
 
-            const reps = g.targetReps ?? "—";
-            const rest = Number(g.restSecondsAfter ?? 0);
+            const reps = g.targetReps ?? t("common.dash");
+            const restSeconds = Number(g.restSecondsAfter ?? 0);
 
-            let weightText = "—";
+            let weightText = t("common.dash");
             if (typeof g.targetWeight === "number") {
-                weightText = `${g.targetWeight}`;
+                weightText = String(g.targetWeight);
             } else if (g.targetWeight && typeof g.targetWeight === "object") {
                 weightText = `${g.targetWeight.left} / ${g.targetWeight.right}`;
             }
@@ -240,13 +260,22 @@ export function createSeriesEditorView({
             row.className = "routineRow";
             row.innerHTML = `
                 <div class="routineMeta">
-                    <h3>Rep group #${i + 1}</h3>
+                    <h3>${escapeHtml(repGroupTitleLabel(i + 1))}</h3>
                     <p>
-                        ${escapeHtml(g.laterality)} · reps: ${escapeHtml(reps)} · weight: ${escapeHtml(weightText)} · rest: ${rest}s
+                        ${escapeHtml(
+                            repGroupSummaryLabel({
+                                laterality: g.laterality,
+                                reps,
+                                weight: weightText,
+                                restSeconds,
+                            })
+                        )}
                     </p>
                 </div>
                 <div class="rowActions">
-                    <button class="btn danger" data-action="remove-repGroup" data-index="${i}">Remove</button>
+                    <button class="btn danger" data-action="remove-repGroup" data-index="${i}">
+                        ${escapeHtml(t("common.remove"))}
+                    </button>
                 </div>
             `;
             repGroupList.appendChild(row);
