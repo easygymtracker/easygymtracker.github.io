@@ -46,10 +46,10 @@ export const DICTS = {
         "seriesEditor.restAfterSeriesPlaceholder": "0",
         "seriesEditor.saveSeriesButton": "Save exercise",
 
-        "seriesEditor.repGroupsTitle": "Series",
-        "seriesEditor.repGroupsEmpty": "No series yet. Add one below.",
-        "seriesEditor.addRepGroupTitle": "Add serie",
-        "seriesEditor.addRepGroupButton": "Add serie",
+        "seriesEditor.repGroupsTitle": "Sets",
+        "seriesEditor.repGroupsEmpty": "No sets yet. Add one below.",
+        "seriesEditor.addRepGroupTitle": "Add set",
+        "seriesEditor.addRepGroupButton": "Add set",
 
         "repGroup.lateralityLabel": "Laterality",
         "repGroup.laterality.bilateral": "Bilateral",
@@ -61,7 +61,7 @@ export const DICTS = {
         "repGroup.targetWeightTupleLabel": "Target weight (left / right)",
         "repGroup.targetWeightLeftPlaceholder": "Left",
         "repGroup.targetWeightRightPlaceholder": "Right",
-        "repGroup.restAfterLabel": "Rest after serie (seconds)",
+        "repGroup.restAfterLabel": "Rest after set (seconds)",
         "repGroup.restAfterPlaceholder": "0",
 
         "common.open": "Open",
@@ -69,8 +69,8 @@ export const DICTS = {
         "routines.untitled": "Untitled routine",
         "routines.exercisesCount.one": "{count} exercise",
         "routines.exercisesCount.other": "{count} exercises",
-        "routines.seriesCount.one": "{count} series",
-        "routines.seriesCount.other": "{count} series",
+        "routines.seriesCount.one": "{count} set",
+        "routines.seriesCount.other": "{count} sets",
         "routines.count.one": "{count} routine",
         "routines.count.other": "{count} routines",
         "routines.confirmDelete": "Delete routine \"{name}\"?",
@@ -81,13 +81,13 @@ export const DICTS = {
         "routine.seriesList.confirmRemoveSeries": "Remove exercise #{index}?",
         "routine.seriesList.missingExercise": "(missing exercise)",
         "seriesEditor.title": "Edit exercise #{index} · {exercise}",
-        "seriesEditor.repGroup.title": "Serie #{index}",
+        "seriesEditor.repGroup.title": "Set #{index}",
         "seriesEditor.repGroup.summary": "{laterality} · reps: {reps} · weight: {weight} · rest: {restSeconds}s",
-        "seriesEditor.repGroup.confirmRemove": "Remove serie #{index}?",
+        "seriesEditor.repGroup.confirmRemove": "Remove set #{index}?",
 
         "common.download": "Download",
         "routines.downloadHelp": "Download this routine in a fixed format you can use to import your routines",
-        "routines.upload": "Upload routine"
+        "routines.upload": "Upload routine",
     },
 
     es: {
