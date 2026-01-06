@@ -3,6 +3,7 @@
 import { startRouter, navigate, onNavigate } from "./router.js";
 import { createRoutineStore } from "./store/routineStore.js";
 import { createExerciseStore } from "./store/exerciseStore.js";
+import { importRoutineFromExport } from "./import/routineImport.js";
 
 import { mountRoutinesPage } from "./pages/routinesPage.js";
 import { mountRoutineNewPage } from "./pages/routineNewPage.js";
@@ -22,6 +23,46 @@ btnClearAll.addEventListener("click", () => {
     if (!ok) return;
     routineStore.clearAll();
     navigate("#/routines");
+});
+
+const btnUploadRoutine = document.getElementById("btnUploadRoutine");
+
+const uploadInput = document.createElement("input");
+uploadInput.type = "file";
+uploadInput.accept = ".json,.gymroutine.json";
+uploadInput.style.display = "none";
+document.body.appendChild(uploadInput);
+
+btnUploadRoutine?.addEventListener("click", () => {
+    uploadInput.value = "";
+    uploadInput.click();
+});
+
+btnUploadRoutine?.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        uploadInput.value = "";
+        uploadInput.click();
+    }
+});
+
+uploadInput.addEventListener("change", async () => {
+    const file = uploadInput.files?.[0];
+    if (!file) return;
+
+    try {
+        const text = await file.text();
+
+        const routine = importRoutineFromExport({
+            rawText: text,
+            routineStore,
+            exerciseStore,
+        });
+
+        navigate(`#/routine/${routine.id}`);
+    } catch (err) {
+        alert(err?.message || "Failed to import routine");
+    }
 });
 
 // --- mount pages once ---
