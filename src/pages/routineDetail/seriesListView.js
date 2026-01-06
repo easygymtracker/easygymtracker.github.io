@@ -110,11 +110,12 @@ export function createSeriesListView({
     }
 
     seriesListEl.addEventListener("click", (e) => {
-        const btn = e.target.closest("button[data-action]");
-        if (!btn) return;
+        const row = e.target.closest(".routineRow[data-index]");
+        if (!row) return;
 
-        const action = btn.getAttribute("data-action");
-        const idx = Number(btn.getAttribute("data-index"));
+        const btn = e.target.closest("button[data-action]");
+        const idx = Number(row.getAttribute("data-index"));
+        const action = btn ? btn.getAttribute("data-action") : "edit-series";
 
         if (action === "edit-series") {
             onEditSeries(idx);

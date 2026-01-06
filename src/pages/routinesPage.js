@@ -13,13 +13,13 @@ export function mountRoutinesPage({ routineStore, exerciseStore }) {
 
     elList.addEventListener("click", (e) => {
         const row = e.target.closest(".routineRow");
-        const btn = e.target.closest("button[data-action]");
-        if (!row || !btn) {
+        if (!row) {
             return;
         }
 
+        const btn = e.target.closest("button[data-action]");
         const id = row.getAttribute("data-id");
-        const action = btn.getAttribute("data-action");
+        const action = btn ? btn.getAttribute("data-action") : "open";
 
         if (action === "open") {
             navigate(`#/routine/${id}`);
