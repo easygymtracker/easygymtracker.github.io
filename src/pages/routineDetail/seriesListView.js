@@ -25,6 +25,13 @@ function removeSeriesConfirmLabel(index1Based) {
     return t("routine.seriesList.confirmRemoveSeries", { index: index1Based });
 }
 
+function repGroupCountLabel(count) {
+    if (count === 1) {
+        return t("routines.seriesCount.one", { count });
+    }
+    return t("routines.seriesCount.other", { count });
+}
+
 export function createSeriesListView({
     seriesListEl,
     seriesEmptyEl,
@@ -55,6 +62,8 @@ export function createSeriesListView({
             const desc = s.description || t("common.dash");
             const rest = Number(s.restSecondsAfter ?? 0);
 
+            const repGroupCount = Array.isArray(s.repGroups) ? s.repGroups.length : 0;
+
             const row = document.createElement("div");
             row.className = "routineRow";
             row.setAttribute("data-index", String(i));
@@ -63,11 +72,11 @@ export function createSeriesListView({
 
             row.innerHTML = `
                 <div class="routineMeta">
-                    <h3>${escapeHtml(exName)}</h3>
+                    <h3>${escapeHtml(`#${i + 1} ${exName}`)}</h3>
                     <p>${escapeHtml(desc)} · ${escapeHtml(restAfterLabel(rest))}</p>
                 </div>
                 <div class="rowActions">
-                    <span class="chip">#${i + 1}</span>
+                    <span class="chip">${escapeHtml(repGroupCountLabel(repGroupCount))}</span>
                     <button class="btn" data-action="edit-series" data-index="${i}">
                         ${escapeHtml(t("common.edit"))}
                     </button>

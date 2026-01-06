@@ -5,9 +5,9 @@ import { t } from "../../internationalization/i18n.js";
 
 function seriesCountLabel(count) {
     if (count === 1) {
-        return t("routines.seriesCount.one", { count });
+        return t("routines.exercisesCount.one", { count });
     }
-    return t("routines.seriesCount.other", { count });
+    return t("routines.exercisesCount.other", { count });
 }
 
 export function routineListItem(routine) {
