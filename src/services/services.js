@@ -1,3 +1,5 @@
+// services/services.js
+
 import { LocalStorageAdapter } from "../storage/localStorageAdapter.js";
 import { JsonSerializer } from "../storage/jsonSerializer.js";
 import { StorageService } from "../storage/storageService.js";

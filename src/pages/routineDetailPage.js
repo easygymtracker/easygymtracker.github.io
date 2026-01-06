@@ -1,3 +1,5 @@
+// pages/routineDetailPage.js
+
 import { navigate } from "../router.js";
 import { t } from "../internationalization/i18n.js";
 import { SetSeries } from "../models/setSeries.js";

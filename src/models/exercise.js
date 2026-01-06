@@ -1,3 +1,5 @@
+// models/exercise.js
+
 import { newId } from "../utils/id.js";
 import { assert, asStringOrEmpty } from "../utils/validate.js";
 

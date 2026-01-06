@@ -1,3 +1,5 @@
+// repositories/baseRepository.js
+
 export class BaseRepository {
     constructor({ entityName, storage }) {
         this.entity = entityName;   // e.g. "exercise"

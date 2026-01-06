@@ -1,3 +1,5 @@
+// pages/routineDetail/seriesEditorView.js
+
 import { t } from "../../internationalization/i18n.js";
 import { RepGroup, Laterality } from "../../models/repGroup.js";
 import {

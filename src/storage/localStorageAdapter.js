@@ -1,3 +1,5 @@
+// storage/localStorageAdapter.js
+
 export class LocalStorageAdapter {
     constructor(namespace = "gymapp") {
         this.ns = namespace;

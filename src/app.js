@@ -1,3 +1,5 @@
+// app.js
+
 import { startRouter, navigate, onNavigate } from "./router.js";
 import { createRoutineStore } from "./store/routineStore.js";
 import { createExerciseStore } from "./store/exerciseStore.js";

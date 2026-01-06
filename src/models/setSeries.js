@@ -1,3 +1,5 @@
+// models/setSeries.js
+
 import { newId } from "../utils/id.js";
 import { assert, asStringOrEmpty, isFiniteNumber } from "../utils/validate.js";
 import { RepGroup } from "./repGroup.js";

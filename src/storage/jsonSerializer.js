@@ -1,4 +1,4 @@
-// src/storage/jsonserializer.js
+// storage/jsonserializer.js
 // Centralizes JSON stringify/parse + optional versioning and type revival.
 
 export class JsonSerializer {

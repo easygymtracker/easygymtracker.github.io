@@ -1,4 +1,5 @@
 // internationalization/read_dicts.mjs
+
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 

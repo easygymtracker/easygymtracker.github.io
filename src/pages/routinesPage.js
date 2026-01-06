@@ -1,3 +1,5 @@
+// pages/routinesPage.js
+
 import { navigate } from "../router.js";
 import { t } from "../internationalization/i18n.js";
 import { escapeHtml } from "../ui/dom.js";

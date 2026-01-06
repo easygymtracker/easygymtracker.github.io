@@ -1,8 +1,8 @@
-// storageService.js
+// storage/storageService.js
+
 // Combines a string-based storage adapter (e.g. LocalStorageAdapter)
 // with a JsonSerializer (serialize/deserialize), so the rest of the app
 // reads/writes objects/models instead of raw JSON strings.
-
 export class StorageService {
     /**
      * @param {object} adapter  Must implement: get(key)->string|null, set(key,string), remove(key), keys(prefix)->string[]

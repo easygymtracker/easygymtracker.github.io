@@ -1,4 +1,5 @@
 // stores/exerciseStore.js
+
 import { storage } from "../services/services.js";
 import { Exercise } from "../models/exercise.js";
 

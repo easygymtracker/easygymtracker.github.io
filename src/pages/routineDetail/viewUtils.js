@@ -1,3 +1,5 @@
+// pages/routineDetail/viewUtils.js
+
 export function escapeHtml(s) {
     return String(s)
         .replaceAll("&", "&amp;")

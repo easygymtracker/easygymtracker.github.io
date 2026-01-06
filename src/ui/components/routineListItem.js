@@ -1,3 +1,5 @@
+// ui/components/routineListItem.js
+
 import { escapeHtml } from "../dom.js";
 import { t } from "../../internationalization/i18n.js";
 

@@ -1,3 +1,5 @@
+// pages/routineDetail/seriesListView.js
+
 import { t } from "../../internationalization/i18n.js";
 import { escapeHtml } from "./viewUtils.js";
 
