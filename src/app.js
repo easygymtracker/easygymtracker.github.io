@@ -9,7 +9,7 @@ import { mountRoutinesPage } from "./pages/routinesPage.js";
 import { mountRoutineNewPage } from "./pages/routineNewPage.js";
 import { mountRoutineDetailPage } from "./pages/routineDetailPage.js";
 
-import { setLocale, getLocale, getLocaleFromUrl, translateDocument } from "./internationalization/i18n.js";
+import { setLocale, getLocale, getLocaleFromUrl, translateDocument, t } from "./internationalization/i18n.js";
 
 // --- stores ---
 const routineStore = createRoutineStore();
