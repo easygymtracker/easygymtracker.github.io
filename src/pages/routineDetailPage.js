@@ -6,11 +6,14 @@ import { SetSeries } from "../models/setSeries.js";
 import { createSeriesListView } from "./routineDetail/seriesListView.js";
 import { createSeriesEditorView } from "./routineDetail/seriesEditorView.js";
 import { escapeHtml, escapeHtmlAttr, flashInvalid } from "./routineDetail/viewUtils.js";
+import { buildRoutineExportV1, downloadJson, routineExportFilename } from "../export/routineExport.js";
 
 export function mountRoutineDetailPage({ routineStore, exerciseStore }) {
     const routineTitle = document.getElementById("routineTitle");
     const routineDesc = document.getElementById("routineDesc");
     const btnDeleteRoutine = document.getElementById("btnDeleteRoutine");
+
+    const btnDownloadRoutine = document.querySelector('#route-routine .pageHeader button[data-action="download"]');
 
     const exerciseInput = document.getElementById("exerciseInput");
     const exerciseOptions = document.getElementById("exerciseOptions");
@@ -59,6 +62,23 @@ export function mountRoutineDetailPage({ routineStore, exerciseStore }) {
             seriesEditorView.adjustIndexAfterSeriesRemoved(removedIdx);
             renderExerciseOptions();
         },
+    });
+
+    btnDownloadRoutine?.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (!currentId) {
+            return;
+        }
+
+        const routine = routineStore.getById(currentId);
+        if (!routine) {
+            return;
+        }
+
+        const payload = buildRoutineExportV1({ routine, exerciseStore });
+        downloadJson({ filename: routineExportFilename(routine), data: payload });
     });
 
     btnDeleteRoutine.addEventListener("click", () => {

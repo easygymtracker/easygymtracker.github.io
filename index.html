@@ -74,8 +74,19 @@
 
     <section class="card route" data-route="routine" id="route-routine" style="display:none;">
       <div class="pageHeader">
-        <!-- This is set dynamically by JS; keep as-is (not translated here). -->
         <h2 id="routineTitle">Routine</h2>
+
+        <button class="iconBtn pageHeaderIconBtn" type="button" data-action="download" data-i18n="routines.downloadHelp"
+          data-i18n-attr="title,aria-label"
+          title="Download this routine in a fixed format you can use to import your routines"
+          aria-label="Download this routine in a fixed format you can use to import your routines">
+          <svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 3v12"></path>
+            <path d="M8 11l4 4 4-4"></path>
+            <path d="M5 21h14"></path>
+          </svg>
+        </button>
 
         <div class="toolbar">
           <button class="btn" data-nav="#/routines" data-i18n="common.back">Back</button>

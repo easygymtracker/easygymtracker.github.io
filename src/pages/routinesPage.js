@@ -4,8 +4,9 @@ import { navigate } from "../router.js";
 import { t } from "../internationalization/i18n.js";
 import { escapeHtml } from "../ui/dom.js";
 import { routineListItem } from "../ui/components/routineListItem.js";
+import { buildRoutineExportV1, downloadJson, routineExportFilename } from "../export/routineExport.js";
 
-export function mountRoutinesPage({ routineStore }) {
+export function mountRoutinesPage({ routineStore, exerciseStore }) {
     const elList = document.getElementById("routineList");
     const elCount = document.getElementById("routineCount");
     const elEmpty = document.getElementById("emptyState");
@@ -34,6 +35,19 @@ export function mountRoutinesPage({ routineStore }) {
             }
             routineStore.remove(id);
             render();
+        }
+
+        if (action === "download") {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const routine = routineStore.getById(id);
+            if (!routine) {
+                return;
+            }
+
+            const payload = buildRoutineExportV1({ routine, exerciseStore });
+            downloadJson({ filename: routineExportFilename(routine), data: payload });
         }
     });
 

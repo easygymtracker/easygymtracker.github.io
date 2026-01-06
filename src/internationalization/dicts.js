@@ -1,5 +1,7 @@
 // internationalization/dicts.js
 
+// AVAILABLE LANGUAGES: en, es, pt, ja, zh, hi, ar, de, fr, ru, it, nl, pl, tr
+
 export const DICTS = {
     en: {
         "app.title": "Easy Gym Routine Tracker",
@@ -79,6 +81,9 @@ export const DICTS = {
         "seriesEditor.repGroup.title": "Rep group #{index}",
         "seriesEditor.repGroup.summary": "{laterality} · reps: {reps} · weight: {weight} · rest: {restSeconds}s",
         "seriesEditor.repGroup.confirmRemove": "Remove rep group #{index}?",
+
+        "common.download": "Download",
+        "routines.downloadHelp": "Download this routine in a fixed format you can use to import your routines"
     },
 
     es: {
@@ -159,6 +164,9 @@ export const DICTS = {
         "seriesEditor.repGroup.title": "Grupo de repeticiones #{index}",
         "seriesEditor.repGroup.summary": "{laterality} · repeticiones: {reps} · peso: {weight} · descanso: {restSeconds}s",
         "seriesEditor.repGroup.confirmRemove": "¿Quitar el grupo de repeticiones #{index}?",
+
+        "common.download": "Descargar",
+        "routines.downloadHelp": "Descarga esta rutina en un formato fijo que puedes usar para importar tus rutinas"
     },
 
     pt: {
@@ -239,6 +247,9 @@ export const DICTS = {
         "seriesEditor.repGroup.title": "Grupo de repetições #{index}",
         "seriesEditor.repGroup.summary": "{laterality} · repetições: {reps} · peso: {weight} · descanso: {restSeconds}s",
         "seriesEditor.repGroup.confirmRemove": "Remover grupo de repetições #{index}?",
+
+        "common.download": "Baixar",
+        "routines.downloadHelp": "Baixe esta rotina em um formato fixo que você pode usar para importar suas rotinas"
     },
 
     ja: {
@@ -319,6 +330,9 @@ export const DICTS = {
         "seriesEditor.repGroup.title": "レップグループ #{index}",
         "seriesEditor.repGroup.summary": "{laterality} · 回数: {reps} · 重量: {weight} · 休憩: {restSeconds}s",
         "seriesEditor.repGroup.confirmRemove": "レップグループ #{index} を削除しますか？",
+
+        "common.download": "ダウンロード",
+        "routines.downloadHelp": "このルーティンをインポート可能な固定フォーマットでダウンロードします"
     },
 
     zh: {
@@ -399,6 +413,9 @@ export const DICTS = {
         "seriesEditor.repGroup.title": "重复组 #{index}",
         "seriesEditor.repGroup.summary": "{laterality} · 次数: {reps} · 重量: {weight} · 休息: {restSeconds}s",
         "seriesEditor.repGroup.confirmRemove": "移除重复组 #{index}？",
+
+        "common.download": "下载",
+        "routines.downloadHelp": "以固定格式下载此训练计划，你可以使用该格式导入你的训练计划"
     },
 
     ar: {
@@ -479,6 +496,9 @@ export const DICTS = {
         "seriesEditor.repGroup.title": "مجموعة التكرار #{index}",
         "seriesEditor.repGroup.summary": "{laterality} · التكرارات: {reps} · الوزن: {weight} · الراحة: {restSeconds}ث",
         "seriesEditor.repGroup.confirmRemove": "هل تريد إزالة مجموعة التكرار #{index}؟",
+
+        "common.download": "تنزيل",
+        "routines.downloadHelp": "قم بتنزيل هذا الروتين بتنسيق ثابت يمكنك استخدامه لاستيراد روتيناتك"
     },
 
     hi: {
@@ -559,6 +579,9 @@ export const DICTS = {
         "seriesEditor.repGroup.title": "रेप ग्रुप #{index}",
         "seriesEditor.repGroup.summary": "{laterality} · रेप्स: {reps} · वजन: {weight} · आराम: {restSeconds}s",
         "seriesEditor.repGroup.confirmRemove": "रेप ग्रुप #{index} हटाएं?",
+
+        "common.download": "डाउनलोड करें",
+        "routines.downloadHelp": "इस रूटीन को एक स्थिर फॉर्मेट में डाउनलोड करें जिसका उपयोग आप अपनी रूटीन आयात करने के लिए कर सकते हैं"
     },
 
     de: {
@@ -639,6 +662,9 @@ export const DICTS = {
         "seriesEditor.repGroup.title": "Wiederholungsgruppe #{index}",
         "seriesEditor.repGroup.summary": "{laterality} · Wiederholungen: {reps} · Gewicht: {weight} · Pause: {restSeconds}s",
         "seriesEditor.repGroup.confirmRemove": "Wiederholungsgruppe #{index} entfernen?",
+
+        "common.download": "Herunterladen",
+        "routines.downloadHelp": "Lade diese Routine in einem festen Format herunter, das du zum Importieren deiner Routinen verwenden kannst"
     },
 
     fr: {
@@ -719,6 +745,9 @@ export const DICTS = {
         "seriesEditor.repGroup.title": "Groupe de répétitions n°{index}",
         "seriesEditor.repGroup.summary": "{laterality} · répétitions : {reps} · charge : {weight} · repos : {restSeconds}s",
         "seriesEditor.repGroup.confirmRemove": "Retirer le groupe de répétitions n°{index} ?",
+
+        "common.download": "Télécharger",
+        "routines.downloadHelp": "Téléchargez cette routine dans un format fixe que vous pouvez utiliser pour importer vos routines"
     },
 
     ru: {
@@ -799,6 +828,9 @@ export const DICTS = {
         "seriesEditor.repGroup.title": "Группа повторений №{index}",
         "seriesEditor.repGroup.summary": "{laterality} · повторы: {reps} · вес: {weight} · отдых: {restSeconds}s",
         "seriesEditor.repGroup.confirmRemove": "Удалить группу повторений №{index}?",
+
+        "common.download": "Скачать",
+        "routines.downloadHelp": "Скачать эту тренировку в фиксированном формате, который вы можете использовать для импорта ваших тренировок"
     },
 
     it: {
@@ -879,6 +911,9 @@ export const DICTS = {
         "seriesEditor.repGroup.title": "Gruppo di ripetizioni n. {index}",
         "seriesEditor.repGroup.summary": "{laterality} · ripetizioni: {reps} · peso: {weight} · recupero: {restSeconds}s",
         "seriesEditor.repGroup.confirmRemove": "Rimuovere il gruppo di ripetizioni n. {index}?",
+
+        "common.download": "Scarica",
+        "routines.downloadHelp": "Scarica questa routine in un formato fisso che puoi utilizzare per importare le tue routine"
     },
 
     nl: {
@@ -959,6 +994,9 @@ export const DICTS = {
         "seriesEditor.repGroup.title": "Herhalingsgroep #{index}",
         "seriesEditor.repGroup.summary": "{laterality} · herhalingen: {reps} · gewicht: {weight} · rust: {restSeconds}s",
         "seriesEditor.repGroup.confirmRemove": "Herhalingsgroep #{index} verwijderen?",
+
+        "common.download": "Downloaden",
+        "routines.downloadHelp": "Download deze routine in een vast formaat dat je kunt gebruiken om je routines te importeren"
     },
 
     pl: {
@@ -1021,7 +1059,7 @@ export const DICTS = {
         "repGroup.targetWeightRightPlaceholder": "Prawa",
         "repGroup.restAfterLabel": "Odpoczynek po grupie (sekundy)",
         "repGroup.restAfterPlaceholder": "0",
-         "common.open": "Otwórz",
+        "common.open": "Otwórz",
         "common.dash": "—",
         "routines.untitled": "Plan bez tytułu",
         "routines.seriesCount.one": "{count} seria",
@@ -1039,6 +1077,9 @@ export const DICTS = {
         "seriesEditor.repGroup.title": "Grupa powtórzeń nr {index}",
         "seriesEditor.repGroup.summary": "{laterality} · powtórzenia: {reps} · ciężar: {weight} · odpoczynek: {restSeconds}s",
         "seriesEditor.repGroup.confirmRemove": "Usunąć grupę powtórzeń nr {index}?",
+
+        "common.download": "Pobierz",
+        "routines.downloadHelp": "Pobierz ten plan w stałym formacie, którego możesz użyć do importowania swoich planów"
     },
 
     tr: {
@@ -1119,5 +1160,8 @@ export const DICTS = {
         "seriesEditor.repGroup.title": "Tekrar grubu #{index}",
         "seriesEditor.repGroup.summary": "{laterality} · tekrarlar: {reps} · ağırlık: {weight} · dinlenme: {restSeconds}s",
         "seriesEditor.repGroup.confirmRemove": "Tekrar grubu #{index} kaldırılsın mı?",
+        
+        "common.download": "İndir",
+        "routines.downloadHelp": "Rutinlerinizi içe aktarmak için kullanabileceğiniz sabit bir formatta bu rutini indirin"
     },
 };

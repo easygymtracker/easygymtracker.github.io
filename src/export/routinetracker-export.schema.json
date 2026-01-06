@@ -1,0 +1,209 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://dimple-gym.app/schemas/gymapp-routine-export-v1.schema.json",
+    "title": "GymApp Routine Export",
+    "description": "Portable export format for Dimple Gym Routine Tracker routines",
+    "type": "object",
+    "required": [
+        "format",
+        "formatVersion",
+        "exportedAt",
+        "app",
+        "routine"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "format": {
+            "const": "GymAppRoutineExport"
+        },
+        "formatVersion": {
+            "const": 1
+        },
+        "exportedAt": {
+            "type": "string",
+            "format": "date-time"
+        },
+        "app": {
+            "type": "object",
+            "required": [
+                "name",
+                "storageNamespace"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "storageNamespace": {
+                    "type": "string",
+                    "minLength": 1
+                }
+            }
+        },
+        "routine": {
+            "$ref": "#/$defs/routine"
+        }
+    },
+    "$defs": {
+        "routine": {
+            "type": "object",
+            "required": [
+                "name",
+                "description",
+                "series"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "description": {
+                    "type": "string"
+                },
+                "series": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/setSeries"
+                    }
+                }
+            }
+        },
+        "setSeries": {
+            "type": "object",
+            "required": [
+                "description",
+                "restSecondsAfter",
+                "exercise",
+                "repGroups"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "restSecondsAfter": {
+                    "type": "number",
+                    "minimum": 0
+                },
+                "exercise": {
+                    "type": "object",
+                    "required": [
+                        "description"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                        "description": {
+                            "type": "string",
+                            "minLength": 1
+                        }
+                    }
+                },
+                "repGroups": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/repGroup"
+                    }
+                }
+            }
+        },
+        "repGroup": {
+            "type": "object",
+            "required": [
+                "laterality",
+                "targetReps",
+                "targetWeight",
+                "restSecondsAfter",
+                "history"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "laterality": {
+                    "type": "string",
+                    "enum": [
+                        "bilateral",
+                        "unilateral"
+                    ]
+                },
+                "targetReps": {
+                    "type": [
+                        "number",
+                        "null"
+                    ],
+                    "minimum": 1
+                },
+                "targetWeight": {
+                    "$ref": "#/$defs/weight"
+                },
+                "restSecondsAfter": {
+                    "type": "number",
+                    "minimum": 0
+                },
+                "history": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/historyEntry"
+                    }
+                }
+            }
+        },
+        "historyEntry": {
+            "type": "object",
+            "required": [
+                "dateTime",
+                "reps",
+                "weight"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "dateTime": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "reps": {
+                    "type": "number",
+                    "minimum": 1
+                },
+                "weight": {
+                    "$ref": "#/$defs/weight"
+                }
+            }
+        },
+        "weight": {
+            "oneOf": [
+                {
+                    "type": "null"
+                },
+                {
+                    "type": "number",
+                    "minimum": 0
+                },
+                {
+                    "type": "object",
+                    "required": [
+                        "left",
+                        "right"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                        "left": {
+                            "type": [
+                                "number",
+                                "null"
+                            ],
+                            "minimum": 0
+                        },
+                        "right": {
+                            "type": [
+                                "number",
+                                "null"
+                            ],
+                            "minimum": 0
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

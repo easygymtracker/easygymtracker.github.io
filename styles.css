@@ -414,3 +414,105 @@ select:focus {
     border-color: rgba(96, 165, 250, 0.55);
     box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.12);
 }
+
+/* Routine row: allow absolute-positioned icon button */
+.routineRow {
+    position: relative;
+    /* NEW */
+}
+
+/* Top-right icon button inside a routine row */
+.iconBtn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+
+    width: 40px;
+    height: 40px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text);
+
+    border-radius: 999px;
+    cursor: pointer;
+
+    transition: transform 0.06s ease, background 0.2s ease, border-color 0.2s ease;
+    user-select: none;
+    touch-action: manipulation;
+}
+
+.iconBtn:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(96, 165, 250, 0.35);
+}
+
+.iconBtn:active {
+    transform: translateY(1px);
+}
+
+.iconBtn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.iconBtn .icon {
+    font-size: 18px;
+    line-height: 1;
+}
+
+@media (min-width: 720px) {
+    .iconBtn {
+        width: 36px;
+        height: 36px;
+        top: 8px;
+        right: 8px;
+    }
+
+    .iconBtn .icon {
+        font-size: 16px;
+    }
+}
+
+@media (min-width: 720px) {
+    .routineRow {
+        padding-right: 54px;
+        padding-top: 14px;
+    }
+
+    .iconBtn {
+        top: 10px;
+        right: 10px;
+        z-index: 2;
+    }
+}
+
+.pageHeader {
+  position: relative;
+}
+
+.pageHeader .pageHeaderIconBtn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+}
+
+.pageHeader .toolbar {
+  padding-right: 54px;
+}
+
+@media (min-width: 720px) {
+  .pageHeader .pageHeaderIconBtn {
+    top: 8px;
+    right: 8px;
+  }
+
+  .pageHeader .toolbar {
+    padding-right: 52px;
+  }
+}

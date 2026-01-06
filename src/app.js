@@ -26,7 +26,7 @@ btnClearAll.addEventListener("click", () => {
 
 // --- mount pages once ---
 const pages = {
-    routines: mountRoutinesPage({ routineStore }),
+    routines: mountRoutinesPage({ routineStore, exerciseStore }),
     "routine-new": mountRoutineNewPage({ routineStore }),
     routine: mountRoutineDetailPage({ routineStore, exerciseStore }),
 };
