@@ -36,6 +36,26 @@ function missingExerciseLabel() {
     return t("routine.seriesList.missingExercise");
 }
 
+function upsertPerformedHistory(repGroup, reps, weight) {
+    const dateTime = new Date().toISOString();
+
+    if (repGroup && typeof repGroup.upsertHistory === "function") {
+        repGroup.upsertHistory(dateTime, { reps, weight });
+        return;
+    }
+
+    if (!repGroup) return;
+    if (!Array.isArray(repGroup.history)) repGroup.history = [];
+
+    const entry = { dateTime, reps, weight };
+    const idx = repGroup.history.findIndex((e) => e.dateTime === dateTime);
+    if (idx >= 0) repGroup.history[idx] = entry;
+    else repGroup.history.push(entry);
+
+    repGroup.history.sort((a, b) => Date.parse(a.dateTime) - Date.parse(b.dateTime));
+}
+
+
 export function createSeriesEditorView({
     routineStore,
     exerciseStore,
@@ -265,6 +285,8 @@ export function createSeriesEditorView({
             g.targetWeight = targetWeight;
             g.restSecondsAfter = restSecondsAfter;
 
+            upsertPerformedHistory(g, targetReps, targetWeight);
+
             routineStore.update(routine);
             renderRepGroups(s);
             if (onRoutineChanged) onRoutineChanged(routine);
@@ -280,7 +302,7 @@ export function createSeriesEditorView({
             targetReps,
             targetWeight,
             restSecondsAfter,
-            history: [],
+            history: [{ dateTime: now, reps: targetReps, weight: targetWeight }],
         });
 
         s.repGroups.push(rg);
@@ -297,7 +319,7 @@ export function createSeriesEditorView({
         flashOk(btnAddRepGroup);
     });
 
-        repGroupList.addEventListener("click", (e) => {
+    repGroupList.addEventListener("click", (e) => {
         const row = e.target.closest(".routineRow");
         if (!row) return;
 
