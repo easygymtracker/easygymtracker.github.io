@@ -297,14 +297,15 @@ export function createSeriesEditorView({
         flashOk(btnAddRepGroup);
     });
 
-    repGroupList.addEventListener("click", (e) => {
+        repGroupList.addEventListener("click", (e) => {
+        const row = e.target.closest(".routineRow");
+        if (!row) return;
+
         const btn = e.target.closest("button[data-action][data-index]");
-        if (!btn) return;
+        const idx = Number((btn || row).getAttribute("data-index"));
+        const action = btn ? btn.getAttribute("data-action") : "edit-repGroup";
 
-        const action = btn.getAttribute("data-action");
-        const idx = Number(btn.getAttribute("data-index"));
         if (!Number.isInteger(idx)) return;
-
         if (editingSeriesIndex === null) return;
 
         const routineId = getCurrentRoutineId();
@@ -365,6 +366,7 @@ export function createSeriesEditorView({
 
             const row = document.createElement("div");
             row.className = "routineRow";
+            row.setAttribute("data-index", String(i));
             row.innerHTML = `
                 <div class="routineMeta">
                     <h3>${escapeHtml(repGroupTitleLabel(i + 1))}</h3>
