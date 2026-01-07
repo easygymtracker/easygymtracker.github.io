@@ -64,10 +64,20 @@ export function createSeriesEditorView({
     const btnAddRepGroup = document.getElementById("btnAddRepGroup");
 
     let editingSeriesIndex = null;
+    let editingRepGroupIndex = null;
+    const defaultAddRepGroupBtnLabel = btnAddRepGroup.textContent;
+    const btnCancelRepGroupEdit = document.getElementById("btnCancelRepGroupEdit");
+
 
     btnCloseSeriesEditor.addEventListener("click", () => {
         close();
     });
+
+    if (btnCancelRepGroupEdit) {
+        btnCancelRepGroupEdit.addEventListener("click", () => {
+            exitRepGroupEditMode();
+        });
+    }
 
     rgLaterality.addEventListener("change", () => {
         syncLateralityUI();
@@ -83,6 +93,58 @@ export function createSeriesEditorView({
             rgWeightSingleWrap.style.display = "";
             rgWeightTupleWrap.style.display = "none";
         }
+    }
+
+    function enterRepGroupEditMode(setSeries, repGroupIndex) {
+        const g = setSeries.repGroups?.[repGroupIndex];
+        if (!g) return;
+
+        editingRepGroupIndex = repGroupIndex;
+
+        // Laterality drives the UI; keep it consistent with the repGroup being edited.
+        rgLaterality.value = String(g.laterality);
+        syncLateralityUI();
+
+        rgTargetReps.value = String(g.targetReps ?? "");
+
+        if (typeof g.targetWeight === "number") {
+            rgWeightSingle.value = String(g.targetWeight);
+            rgWeightLeft.value = "";
+            rgWeightRight.value = "";
+        } else if (g.targetWeight && typeof g.targetWeight === "object") {
+            rgWeightSingle.value = "";
+            rgWeightLeft.value = String(g.targetWeight.left ?? "");
+            rgWeightRight.value = String(g.targetWeight.right ?? "");
+        } else {
+            rgWeightSingle.value = "";
+            rgWeightLeft.value = "";
+            rgWeightRight.value = "";
+        }
+
+        rgRestAfter.value = String(Number(g.restSecondsAfter ?? 0));
+
+        // Keep editing simple: don't allow switching laterality while editing.
+        rgLaterality.disabled = true;
+
+        btnAddRepGroup.textContent = escapeHtml(t("common.save"));
+        if (btnCancelRepGroupEdit) btnCancelRepGroupEdit.style.display = "";
+    }
+
+    function exitRepGroupEditMode() {
+        editingRepGroupIndex = null;
+        rgLaterality.disabled = false;
+
+        btnAddRepGroup.textContent = defaultAddRepGroupBtnLabel;
+        if (btnCancelRepGroupEdit) btnCancelRepGroupEdit.style.display = "none";
+
+        // Clear form
+        rgTargetReps.value = "";
+        rgWeightSingle.value = "";
+        rgWeightLeft.value = "";
+        rgWeightRight.value = "";
+        rgRestAfter.value = "";
+
+        syncLateralityUI();
     }
 
     function open(seriesIndex) {
@@ -105,6 +167,7 @@ export function createSeriesEditorView({
         seriesEditor.style.display = "";
         renderRepGroups(s);
         syncLateralityUI();
+        exitRepGroupEditMode();
     }
 
     function close() {
@@ -112,6 +175,7 @@ export function createSeriesEditorView({
         seriesEditor.style.display = "none";
         repGroupList.innerHTML = "";
         repGroupEmpty.style.display = "none";
+        exitRepGroupEditMode();
     }
 
     function isOpenForIndex(idx) {
@@ -159,7 +223,13 @@ export function createSeriesEditorView({
         const s = routine.series?.[editingSeriesIndex];
         if (!s) return;
 
-        const laterality = String(rgLaterality.value);
+        const isEditing = Number.isInteger(editingRepGroupIndex);
+
+        // When editing, keep laterality fixed to the repGroup being edited.
+        const laterality = isEditing
+            ? String(s.repGroups?.[editingRepGroupIndex]?.laterality)
+            : String(rgLaterality.value);
+
         const targetReps = toPositiveInt(rgTargetReps.value);
         if (!targetReps) {
             flashInvalid(rgTargetReps);
@@ -187,6 +257,23 @@ export function createSeriesEditorView({
 
         const restSecondsAfter = toNonNegativeNumber(rgRestAfter.value, 0);
 
+        if (isEditing) {
+            const g = s.repGroups?.[editingRepGroupIndex];
+            if (!g) return;
+
+            g.targetReps = targetReps;
+            g.targetWeight = targetWeight;
+            g.restSecondsAfter = restSecondsAfter;
+
+            routineStore.update(routine);
+            renderRepGroups(s);
+            if (onRoutineChanged) onRoutineChanged(routine);
+            flashOk(btnAddRepGroup);
+
+            exitRepGroupEditMode();
+            return;
+        }
+
         const rg = new RepGroup({
             exerciseId: s.exerciseId,
             laterality,
@@ -211,9 +298,10 @@ export function createSeriesEditorView({
     });
 
     repGroupList.addEventListener("click", (e) => {
-        const btn = e.target.closest("button[data-action='remove-repGroup']");
+        const btn = e.target.closest("button[data-action][data-index]");
         if (!btn) return;
 
+        const action = btn.getAttribute("data-action");
         const idx = Number(btn.getAttribute("data-index"));
         if (!Number.isInteger(idx)) return;
 
@@ -226,13 +314,30 @@ export function createSeriesEditorView({
         const s = routine.series?.[editingSeriesIndex];
         if (!s) return;
 
-        const ok = confirm(removeRepGroupConfirmLabel(idx + 1));
-        if (!ok) return;
+        if (action === "edit-repGroup") {
+            enterRepGroupEditMode(s, idx);
+            return;
+        }
 
-        s.repGroups.splice(idx, 1);
-        routineStore.update(routine);
-        renderRepGroups(s);
-        if (onRoutineChanged) onRoutineChanged(routine);
+        if (action === "remove-repGroup") {
+            const ok = confirm(removeRepGroupConfirmLabel(idx + 1));
+            if (!ok) return;
+
+            s.repGroups.splice(idx, 1);
+
+            // Keep edit index stable if we removed something before it
+            if (Number.isInteger(editingRepGroupIndex)) {
+                if (idx === editingRepGroupIndex) {
+                    exitRepGroupEditMode();
+                } else if (idx < editingRepGroupIndex) {
+                    editingRepGroupIndex -= 1;
+                }
+            }
+
+            routineStore.update(routine);
+            renderRepGroups(s);
+            if (onRoutineChanged) onRoutineChanged(routine);
+        }
     });
 
     function renderRepGroups(setSeries) {
@@ -275,6 +380,9 @@ export function createSeriesEditorView({
                     </p>
                 </div>
                 <div class="rowActions">
+                    <button class="btn" data-action="edit-repGroup" data-index="${i}">
+                        ${escapeHtml(t("common.edit"))}
+                    </button>
                     <button class="btn danger" data-action="remove-repGroup" data-index="${i}">
                         ${escapeHtml(t("common.remove"))}
                     </button>
