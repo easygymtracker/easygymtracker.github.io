@@ -71,7 +71,7 @@
         </div>
 
         <p class="note" data-i18n="routineNew.note">
-          Saved on this device (localStorage). You can add series later in the routine screen.
+          Saved on this device (localStorage). You can add exercises later in the routine screen.
         </p>
       </div>
     </section>
@@ -106,7 +106,7 @@
 
         <div class="form">
           <h3 style="margin:0 0 10px 0; font-size:14px; color: var(--accent2);" data-i18n="routine.addSeries.title">
-            Add series
+            Add exercise
           </h3>
 
           <div class="field">
@@ -121,7 +121,7 @@
 
           <div class="field">
             <label for="seriesDescription" data-i18n="routine.addSeries.seriesDescriptionLabel">
-              Series description (optional)
+              Exercise description (optional)
             </label>
             <input id="seriesDescription" data-i18n="routine.addSeries.seriesDescriptionPlaceholder"
               data-i18n-attr="placeholder" placeholder="e.g., Working sets, Warm-up..." />
@@ -129,7 +129,7 @@
 
           <div class="actions">
             <button class="btn primary" id="btnAddSeries" data-i18n="routine.addSeries.button">
-              Add series
+              Add exercise
             </button>
           </div>
         </div>
@@ -138,11 +138,11 @@
 
         <div>
           <h3 style="margin: 0 0 10px 0; font-size: 14px; color: var(--accent2);" data-i18n="routine.seriesList.title">
-            Series in this routine
+            Exercises in this routine
           </h3>
           <div id="seriesList"></div>
           <p class="note" id="seriesEmpty" style="display: none;" data-i18n="routine.seriesList.empty">
-            No series yet. Add one above.
+            No exercise yet. Add one above.
           </p>
         </div>
 
@@ -150,15 +150,15 @@
 
         <section id="seriesEditor" style="display: none;">
           <div class="pageHeader" style="border: none; padding: 0; margin-bottom: 10px;">
-            <!-- Title is dynamic (includes series # + exercise name); keep as-is. -->
-            <h2 id="seriesEditorTitle">Edit series</h2>
+            <!-- Title is dynamic (includes exercise # + exercise name); keep as-is. -->
+            <h2 id="seriesEditorTitle">Edit exercise</h2>
             <button class="btn" id="btnCloseSeriesEditor" data-i18n="common.close">Close</button>
           </div>
 
           <div class="form" style="padding: 0;">
             <div class="field">
               <label for="editSeriesDescription" data-i18n="seriesEditor.seriesDescriptionLabel">
-                Series description
+                Exercise description
               </label>
               <input id="editSeriesDescription" data-i18n="seriesEditor.seriesDescriptionPlaceholder"
                 data-i18n-attr="placeholder" placeholder="e.g., Working sets" />
@@ -166,7 +166,7 @@
 
             <div class="field">
               <label for="editSeriesRest" data-i18n="seriesEditor.restAfterSeriesLabel">
-                Rest after series (seconds)
+                Rest after exercise (seconds)
               </label>
               <input id="editSeriesRest" type="number" min="0" step="5"
                 data-i18n="seriesEditor.restAfterSeriesPlaceholder" data-i18n-attr="placeholder" placeholder="0" />
@@ -174,7 +174,7 @@
 
             <div class="actions">
               <button class="btn primary" id="btnSaveSeries" data-i18n="seriesEditor.saveSeriesButton">
-                Save series
+                Save exercise
               </button>
             </div>
 
@@ -182,18 +182,18 @@
 
             <h3 style="margin: 0 0 10px 0; font-size: 14px; color: var(--accent2);"
               data-i18n="seriesEditor.repGroupsTitle">
-              Rep groups
+              Sets
             </h3>
             <div id="repGroupList"></div>
             <p class="note" id="repGroupEmpty" style="display: none;" data-i18n="seriesEditor.repGroupsEmpty">
-              No rep groups yet. Add one below.
+              No sets yet. Add one below.
             </p>
 
             <div class="divider"></div>
 
             <h3 style="margin: 0 0 10px 0; font-size: 14px; color: var(--accent2);"
               data-i18n="seriesEditor.addRepGroupTitle">
-              Add rep group
+              Add set
             </h3>
 
             <div class="field">
@@ -228,14 +228,14 @@
             </div>
 
             <div class="field">
-              <label for="rgRestAfter" data-i18n="repGroup.restAfterLabel">Rest after rep group (seconds)</label>
+              <label for="rgRestAfter" data-i18n="repGroup.restAfterLabel">Rest after set (seconds)</label>
               <input id="rgRestAfter" type="number" min="0" step="5" data-i18n="repGroup.restAfterPlaceholder"
                 data-i18n-attr="placeholder" placeholder="0" />
             </div>
 
             <div class="actions">
               <button class="btn primary" id="btnAddRepGroup" data-i18n="seriesEditor.addRepGroupButton">
-                Add rep group
+                Add set
               </button>
             </div>
           </div>
