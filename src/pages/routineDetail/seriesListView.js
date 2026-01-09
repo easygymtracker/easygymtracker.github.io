@@ -2,20 +2,7 @@
 
 import { t } from "../../internationalization/i18n.js";
 import { escapeHtml } from "./viewUtils.js";
-
-function moveItem(arr, from, to) {
-    if (from === to) return;
-    const item = arr.splice(from, 1)[0];
-    arr.splice(to, 0, item);
-}
-
-function flashMoved(el, className) {
-    if (!el) return;
-    el.classList.remove(className);
-    void el.offsetWidth;
-    el.classList.add(className);
-    setTimeout(() => el.classList.remove(className), 350);
-}
+import { flashMoved, moveItem, attachDragReorder } from "/src/ui/common/reorderUtils.js";
 
 function restAfterLabel(seconds) {
     return t("routine.seriesList.restAfter", { seconds });
@@ -41,8 +28,6 @@ export function createSeriesListView({
     onEditSeries,
     onSeriesRemoved,
 }) {
-    let dragFromIndex = null;
-
     function renderSeries(routine) {
         const items = Array.isArray(routine.series) ? routine.series : [];
         seriesListEl.innerHTML = "";
@@ -158,42 +143,9 @@ export function createSeriesListView({
         }
     });
 
-    seriesListEl.addEventListener("dragstart", (e) => {
-        const row = e.target.closest(".routineRow[data-index]");
-        if (!row) return;
-
-        dragFromIndex = Number(row.getAttribute("data-index"));
-        e.dataTransfer.effectAllowed = "move";
-        e.dataTransfer.setData("text/plain", String(dragFromIndex));
-        row.style.opacity = "0.7";
-    });
-
-    seriesListEl.addEventListener("dragend", (e) => {
-        const row = e.target.closest(".routineRow[data-index]");
-        if (row) row.style.opacity = "";
-        dragFromIndex = null;
-    });
-
-    seriesListEl.addEventListener("dragover", (e) => {
-        const row = e.target.closest(".routineRow[data-index]");
-        if (!row) return;
-        e.preventDefault();
-        e.dataTransfer.dropEffect = "move";
-    });
-
-    seriesListEl.addEventListener("drop", (e) => {
-        const targetRow = e.target.closest(".routineRow[data-index]");
-        if (!targetRow) return;
-        e.preventDefault();
-
-        const toIdx = Number(targetRow.getAttribute("data-index"));
-        let fromIdx = dragFromIndex;
-        if (!Number.isInteger(fromIdx)) {
-            fromIdx = Number(e.dataTransfer.getData("text/plain"));
-        }
-        if (!Number.isInteger(fromIdx) || !Number.isInteger(toIdx)) return;
-
-        reorderAndSave(fromIdx, toIdx);
+    attachDragReorder(seriesListEl, {
+        rowSelector: '.routineRow[data-index]',
+        onReorder: (fromIdx, toIdx) => reorderAndSave(fromIdx, toIdx),
     });
 
     return {

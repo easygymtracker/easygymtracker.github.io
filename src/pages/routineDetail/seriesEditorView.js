@@ -2,6 +2,7 @@
 
 import { t } from "../../internationalization/i18n.js";
 import { RepGroup, Laterality } from "../../models/repGroup.js";
+import { flashMoved, moveItem, attachDragReorder } from "/src/ui/common/reorderUtils.js";
 import {
     escapeHtml,
     flashInvalid,
@@ -55,7 +56,6 @@ function upsertPerformedHistory(repGroup, reps, weight) {
     repGroup.history.sort((a, b) => Date.parse(a.dateTime) - Date.parse(b.dateTime));
 }
 
-
 export function createSeriesEditorView({
     routineStore,
     exerciseStore,
@@ -85,9 +85,9 @@ export function createSeriesEditorView({
 
     let editingSeriesIndex = null;
     let editingRepGroupIndex = null;
+
     const defaultAddRepGroupBtnLabel = btnAddRepGroup.textContent;
     const btnCancelRepGroupEdit = document.getElementById("btnCancelRepGroupEdit");
-
 
     btnCloseSeriesEditor.addEventListener("click", () => {
         close();
@@ -215,6 +215,51 @@ export function createSeriesEditorView({
         }
     }
 
+    function reorderRepGroupsAndSave(fromIdx, toIdx) {
+        if (editingSeriesIndex === null) return;
+
+        const routineId = getCurrentRoutineId();
+        const routine = routineStore.getById(routineId);
+        if (!routine) return;
+
+        const s = routine.series?.[editingSeriesIndex];
+        if (!s) return;
+
+        const n = s.repGroups?.length ?? 0;
+        if (
+            !Number.isInteger(fromIdx) || !Number.isInteger(toIdx) ||
+            fromIdx < 0 || toIdx < 0 || fromIdx >= n || toIdx >= n
+        ) return;
+
+        moveItem(s.repGroups, fromIdx, toIdx);
+
+        if (Number.isInteger(editingRepGroupIndex)) {
+            if (editingRepGroupIndex === fromIdx) {
+                editingRepGroupIndex = toIdx;
+            } else if (fromIdx < editingRepGroupIndex && editingRepGroupIndex <= toIdx) {
+                editingRepGroupIndex -= 1;
+            } else if (toIdx <= editingRepGroupIndex && editingRepGroupIndex < fromIdx) {
+                editingRepGroupIndex += 1;
+            }
+        }
+
+        routineStore.update(routine);
+        renderRepGroups(s);
+        if (onRoutineChanged) onRoutineChanged(routine);
+
+        requestAnimationFrame(() => {
+            const movedRow = repGroupList.querySelector(`.routineRow[data-index="${toIdx}"]`);
+            const otherRow = repGroupList.querySelector(`.routineRow[data-index="${fromIdx}"]`);
+            flashMoved(movedRow, "moved");
+            flashMoved(otherRow, "movedOther");
+        });
+    }
+
+    attachDragReorder(repGroupList, {
+        rowSelector: '.routineRow[data-index]',
+        onReorder: reorderRepGroupsAndSave,
+    });
+
     btnSaveSeries.addEventListener("click", () => {
         if (editingSeriesIndex === null) return;
 
@@ -302,7 +347,13 @@ export function createSeriesEditorView({
             targetReps,
             targetWeight,
             restSecondsAfter,
-            history: [{ dateTime: now, reps: targetReps, weight: targetWeight }],
+            history: [
+                {
+                    dateTime: new Date().toISOString(),
+                    reps: targetReps,
+                    weight: targetWeight,
+                },
+            ],
         });
 
         s.repGroups.push(rg);
@@ -339,6 +390,16 @@ export function createSeriesEditorView({
 
         if (action === "edit-repGroup") {
             enterRepGroupEditMode(s, idx);
+            return;
+        }
+
+        if (action === "move-up") {
+            reorderRepGroupsAndSave(idx, idx - 1);
+            return;
+        }
+
+        if (action === "move-down") {
+            reorderRepGroupsAndSave(idx, idx + 1);
             return;
         }
 
@@ -389,6 +450,9 @@ export function createSeriesEditorView({
             const row = document.createElement("div");
             row.className = "routineRow";
             row.setAttribute("data-index", String(i));
+            row.setAttribute("draggable", "true");
+            row.style.cursor = "grab";
+
             row.innerHTML = `
                 <div class="routineMeta">
                     <h3>${escapeHtml(repGroupTitleLabel(i + 1))}</h3>
@@ -406,6 +470,12 @@ export function createSeriesEditorView({
                 <div class="rowActions">
                     <button class="btn" data-action="edit-repGroup" data-index="${i}">
                         ${escapeHtml(t("common.edit"))}
+                    </button>
+                    <button class="btn" data-action="move-up" data-index="${i}" ${i === 0 ? "disabled" : ""}>
+                        ↑
+                    </button>
+                    <button class="btn" data-action="move-down" data-index="${i}" ${i === items.length - 1 ? "disabled" : ""}>
+                        ↓
                     </button>
                     <button class="btn danger" data-action="remove-repGroup" data-index="${i}">
                         ${escapeHtml(t("common.remove"))}
