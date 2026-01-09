@@ -78,7 +78,21 @@
 
     <section class="card route" data-route="routine" id="route-routine" style="display:none;">
       <div class="pageHeader">
-        <h2 id="routineTitle">Routine</h2>
+        <div style="display:flex; align-items:center; gap:10px; min-width: 0;">
+          <h2 id="routineTitle" style="margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Routine
+          </h2>
+
+          <button class="btn" id="btnEditRoutine" type="button" data-i18n="routine.edit"
+            data-i18n-attr="title,aria-label" title="Edit routine name and description"
+            aria-label="Edit routine name and description"
+            style="padding: 8px 10px; min-height: 36px; display:inline-flex; align-items:center; gap:8px;">
+            <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 20h9"></path>
+              <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path>
+            </svg>
+          </button>
+        </div>
 
         <button class="iconBtn pageHeaderIconBtn" type="button" data-action="download" data-i18n="routines.downloadHelp"
           data-i18n-attr="title,aria-label"
@@ -99,8 +113,26 @@
       </div>
 
       <div class="routineDetail">
-        <!-- This is set dynamically by JS; keep as-is. -->
         <p class="muted" id="routineDesc">—</p>
+
+        <div id="routineMetaEditor" class="form" style="display:none; padding: 10px 0 0;">
+          <div class="field">
+            <label for="editRoutineName" data-i18n="routine.edit.nameLabel">Name</label>
+            <input id="editRoutineName" maxlength="60" data-i18n="routine.edit.namePlaceholder"
+              data-i18n-attr="placeholder" placeholder="e.g., Push Day A" />
+          </div>
+
+          <div class="field">
+            <label for="editRoutineDescription" data-i18n="routine.edit.descLabel">Description</label>
+            <textarea id="editRoutineDescription" data-i18n="routine.edit.descPlaceholder" data-i18n-attr="placeholder"
+              placeholder="Quick notes: goals, intensity, focus..."></textarea>
+          </div>
+
+          <div class="actions" style="justify-content:flex-start;">
+            <button class="btn primary" id="btnSaveRoutineMeta" type="button" data-i18n="common.save">Save</button>
+            <button class="btn" id="btnCancelRoutineMeta" type="button" data-i18n="common.cancel">Cancel</button>
+          </div>
+        </div>
 
         <div class="divider"></div>
 

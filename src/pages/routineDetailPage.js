@@ -9,9 +9,16 @@ import { escapeHtml, escapeHtmlAttr, flashInvalid } from "./routineDetail/viewUt
 import { buildRoutineExportV1, downloadJson, routineExportFilename } from "../export/routineExport.js";
 
 export function mountRoutineDetailPage({ routineStore, exerciseStore }) {
+
     const routineTitle = document.getElementById("routineTitle");
     const routineDesc = document.getElementById("routineDesc");
     const btnDeleteRoutine = document.getElementById("btnDeleteRoutine");
+    const btnEditRoutine = document.getElementById("btnEditRoutine");
+    const routineMetaEditor = document.getElementById("routineMetaEditor");
+    const editRoutineName = document.getElementById("editRoutineName");
+    const editRoutineDescription = document.getElementById("editRoutineDescription");
+    const btnSaveRoutineMeta = document.getElementById("btnSaveRoutineMeta");
+    const btnCancelRoutineMeta = document.getElementById("btnCancelRoutineMeta");
 
     const btnDownloadRoutine = document.querySelector('#route-routine .pageHeader button[data-action="download"]');
 
@@ -24,6 +31,21 @@ export function mountRoutineDetailPage({ routineStore, exerciseStore }) {
     const seriesEmptyEl = document.getElementById("seriesEmpty");
 
     let currentId = null;
+    let editingMeta = false;
+
+    function setMetaEditorOpen(open, routine) {
+        editingMeta = !!open;
+
+        if (routineMetaEditor) routineMetaEditor.style.display = open ? "" : "none";
+        if (btnEditRoutine) btnEditRoutine.disabled = open; // prevent double-open
+
+        if (open && routine) {
+            editRoutineName.value = routine.name ?? "";
+            editRoutineDescription.value = routine.description ?? "";
+            editRoutineName.focus();
+            editRoutineName.select?.();
+        }
+    }
 
     function getCurrentRoutineId() {
         return currentId;
@@ -79,6 +101,45 @@ export function mountRoutineDetailPage({ routineStore, exerciseStore }) {
 
         const payload = buildRoutineExportV1({ routine, exerciseStore });
         downloadJson({ filename: routineExportFilename(routine), data: payload });
+    });
+
+    btnEditRoutine?.addEventListener("click", () => {
+        if (!currentId) return;
+
+        const routine = routineStore.getById(currentId);
+        if (!routine) return;
+
+        setMetaEditorOpen(true, routine);
+    });
+
+    btnCancelRoutineMeta?.addEventListener("click", () => {
+        const routine = currentId ? routineStore.getById(currentId) : null;
+        setMetaEditorOpen(false, routine);
+    });
+
+    btnSaveRoutineMeta?.addEventListener("click", () => {
+        if (!currentId) return;
+
+        const routine = routineStore.getById(currentId);
+        if (!routine) return;
+
+        const name = String(editRoutineName.value ?? "").trim();
+        const desc = String(editRoutineDescription.value ?? "").trim();
+
+        if (!name) {
+            flashInvalid(editRoutineName);
+            return;
+        }
+
+        routine.name = name;
+        routine.description = desc;
+
+        routineStore.update(routine);
+
+        routineTitle.textContent = routine.name || t("routines.untitled");
+        routineDesc.textContent = routine.description || t("common.dash");
+
+        setMetaEditorOpen(false, routine);
     });
 
     btnDeleteRoutine.addEventListener("click", () => {
@@ -141,6 +202,7 @@ export function mountRoutineDetailPage({ routineStore, exerciseStore }) {
 
         routineTitle.textContent = routine.name || t("routines.untitled");
         routineDesc.textContent = routine.description || t("common.dash");
+        setMetaEditorOpen(false, routine);
 
         renderExerciseOptions();
         seriesListView.renderSeries(routine);
