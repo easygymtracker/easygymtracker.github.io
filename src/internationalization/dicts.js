@@ -88,6 +88,12 @@ export const DICTS = {
         "common.download": "Download",
         "routines.downloadHelp": "Download this routine in a fixed format you can use to import your routines",
         "routines.upload": "Upload routine",
+
+        "common.save": "Save",
+        "routine.edit.nameLabel": "Name",
+        "routine.edit.descLabel": "Description",
+        "routine.edit.namePlaceholder": "e.g., Push Day A",
+        "routine.edit.descPlaceholder": "Quick notes: goals, intensity, focus...",
     },
 
     es: {
@@ -174,7 +180,13 @@ export const DICTS = {
 
         "common.download": "Descargar",
         "routines.downloadHelp": "Descarga esta rutina en un formato fijo que puedes usar para importar tus rutinas",
-        "routines.upload": "Subir rutina"
+        "routines.upload": "Subir rutina",
+
+        "common.save": "Guardar",
+        "routine.edit.nameLabel": "Nombre",
+        "routine.edit.descLabel": "Descripción",
+        "routine.edit.namePlaceholder": "p. ej., Empuje Día A",
+        "routine.edit.descPlaceholder": "Notas rápidas: objetivos, intensidad, enfoque...",
     },
 
     pt: {
@@ -261,7 +273,13 @@ export const DICTS = {
 
         "common.download": "Baixar",
         "routines.downloadHelp": "Baixe esta rotina em um formato fixo que você pode usar para importar suas rotinas",
-        "routines.upload": "Enviar rotina"
+        "routines.upload": "Enviar rotina",
+
+        "common.save": "Salvar",
+        "routine.edit.nameLabel": "Nome",
+        "routine.edit.descLabel": "Descrição",
+        "routine.edit.namePlaceholder": "ex.: Dia de Empurrar A",
+        "routine.edit.descPlaceholder": "Notas rápidas: objetivos, intensidade, foco...",
     },
 
     ja: {
@@ -348,7 +366,13 @@ export const DICTS = {
 
         "common.download": "ダウンロード",
         "routines.downloadHelp": "このルーティンをインポート可能な固定フォーマットでダウンロードします",
-        "routines.upload": "ルーティンをアップロード"
+        "routines.upload": "ルーティンをアップロード",
+
+        "common.save": "保存",
+        "routine.edit.nameLabel": "名前",
+        "routine.edit.descLabel": "説明",
+        "routine.edit.namePlaceholder": "例：プッシュ Day A",
+        "routine.edit.descPlaceholder": "メモ：目標、強度、重点など...",
     },
 
     zh: {
@@ -435,7 +459,13 @@ export const DICTS = {
 
         "common.download": "下载",
         "routines.downloadHelp": "以固定格式下载此训练计划，你可以使用该格式导入你的训练计划",
-        "routines.upload": "上传训练计划"
+        "routines.upload": "上传训练计划",
+
+        "common.save": "保存",
+        "routine.edit.nameLabel": "名称",
+        "routine.edit.descLabel": "描述",
+        "routine.edit.namePlaceholder": "例如：推日 A",
+        "routine.edit.descPlaceholder": "简要记录：目标、强度、重点...",
     },
 
     ar: {
@@ -522,7 +552,13 @@ export const DICTS = {
 
         "common.download": "تنزيل",
         "routines.downloadHelp": "قم بتنزيل هذا الروتين بتنسيق ثابت يمكنك استخدامه لاستيراد روتيناتك",
-        "routines.upload": "رفع روتين"
+        "routines.upload": "رفع روتين",
+
+        "common.save": "حفظ",
+        "routine.edit.nameLabel": "الاسم",
+        "routine.edit.descLabel": "الوصف",
+        "routine.edit.namePlaceholder": "مثال: يوم الدفع A",
+        "routine.edit.descPlaceholder": "ملاحظات سريعة: الأهداف، الشدة، التركيز...",
     },
 
     hi: {
@@ -609,7 +645,13 @@ export const DICTS = {
 
         "common.download": "डाउनलोड करें",
         "routines.downloadHelp": "इस रूटीन को एक स्थिर फॉर्मेट में डाउनलोड करें जिसका उपयोग आप अपनी रूटीन आयात करने के लिए कर सकते हैं",
-        "routines.upload": "रूटीन अपलोड करें"
+        "routines.upload": "रूटीन अपलोड करें",
+
+        "common.save": "सहेजें",
+        "routine.edit.nameLabel": "नाम",
+        "routine.edit.descLabel": "विवरण",
+        "routine.edit.namePlaceholder": "जैसे, पुश डे A",
+        "routine.edit.descPlaceholder": "त्वरित नोट्स: लक्ष्य, तीव्रता, फोकस...",
     },
 
     de: {
@@ -696,7 +738,13 @@ export const DICTS = {
 
         "common.download": "Herunterladen",
         "routines.downloadHelp": "Lade diese Routine in einem festen Format herunter, das du zum Importieren deiner Routinen verwenden kannst",
-        "routines.upload": "Routine hochladen"
+        "routines.upload": "Routine hochladen",
+
+        "common.save": "Speichern",
+        "routine.edit.nameLabel": "Name",
+        "routine.edit.descLabel": "Beschreibung",
+        "routine.edit.namePlaceholder": "z. B. Push Day A",
+        "routine.edit.descPlaceholder": "Kurze Notizen: Ziele, Intensität, Fokus...",
     },
 
     fr: {
@@ -783,7 +831,13 @@ export const DICTS = {
 
         "common.download": "Télécharger",
         "routines.downloadHelp": "Téléchargez cette routine dans un format fixe que vous pouvez utiliser pour importer vos routines",
-        "routines.upload": "Téléverser une routine"
+        "routines.upload": "Téléverser une routine",
+
+        "common.save": "Enregistrer",
+        "routine.edit.nameLabel": "Nom",
+        "routine.edit.descLabel": "Description",
+        "routine.edit.namePlaceholder": "ex. : Push Day A",
+        "routine.edit.descPlaceholder": "Notes rapides : objectifs, intensité, focus...",
     },
 
     ru: {
@@ -870,7 +924,13 @@ export const DICTS = {
 
         "common.download": "Скачать",
         "routines.downloadHelp": "Скачать эту тренировку в фиксированном формате, который вы можете использовать для импорта ваших тренировок",
-        "routines.upload": "Загрузить тренировку"
+        "routines.upload": "Загрузить тренировку",
+
+        "common.save": "Сохранить",
+        "routine.edit.nameLabel": "Название",
+        "routine.edit.descLabel": "Описание",
+        "routine.edit.namePlaceholder": "например, Жимовой день A",
+        "routine.edit.descPlaceholder": "Короткие заметки: цели, интенсивность, фокус...",
     },
 
     it: {
@@ -957,7 +1017,13 @@ export const DICTS = {
 
         "common.download": "Scarica",
         "routines.downloadHelp": "Scarica questa routine in un formato fisso che puoi utilizzare per importare le tue routine",
-        "routines.upload": "Carica routine"
+        "routines.upload": "Carica routine",
+
+        "common.save": "Salva",
+        "routine.edit.nameLabel": "Nome",
+        "routine.edit.descLabel": "Descrizione",
+        "routine.edit.namePlaceholder": "es.: Push Day A",
+        "routine.edit.descPlaceholder": "Note rapide: obiettivi, intensità, focus...",
     },
 
     nl: {
@@ -1044,7 +1110,13 @@ export const DICTS = {
 
         "common.download": "Downloaden",
         "routines.downloadHelp": "Download deze routine in een vast formaat dat je kunt gebruiken om je routines te importeren",
-        "routines.upload": "Upload routine"
+        "routines.upload": "Upload routine",
+
+        "common.save": "Opslaan",
+        "routine.edit.nameLabel": "Naam",
+        "routine.edit.descLabel": "Beschrijving",
+        "routine.edit.namePlaceholder": "bijv. Push Day A",
+        "routine.edit.descPlaceholder": "Korte notities: doelen, intensiteit, focus..."
     },
 
     pl: {
@@ -1131,7 +1203,13 @@ export const DICTS = {
 
         "common.download": "Pobierz",
         "routines.downloadHelp": "Pobierz ten plan w stałym formacie, którego możesz użyć do importowania swoich planów",
-        "routines.upload": "Prześlij plan"
+        "routines.upload": "Prześlij plan",
+
+        "common.save": "Zapisz",
+        "routine.edit.nameLabel": "Nazwa",
+        "routine.edit.descLabel": "Opis",
+        "routine.edit.namePlaceholder": "np. Dzień Push A",
+        "routine.edit.descPlaceholder": "Szybkie notatki: cele, intensywność, fokus...",
     },
 
     tr: {
@@ -1218,6 +1296,12 @@ export const DICTS = {
 
         "common.download": "İndir",
         "routines.downloadHelp": "Rutinlerinizi içe aktarmak için kullanabileceğiniz sabit bir formatta bu rutini indirin",
-        "routines.upload": "Rutin yükle"
+        "routines.upload": "Rutin yükle",
+
+        "common.save": "Kaydet",
+        "routine.edit.nameLabel": "Ad",
+        "routine.edit.descLabel": "Açıklama",
+        "routine.edit.namePlaceholder": "örn. İtiş Günü A",
+        "routine.edit.descPlaceholder": "Kısa notlar: hedefler, yoğunluk, odak...",
     }
 };
