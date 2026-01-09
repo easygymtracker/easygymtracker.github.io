@@ -6,7 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <title data-i18n="app.title">Easy Gym Routine Tracker</title>
-  <link rel="stylesheet" href="./styles.css" />
+  <link rel="stylesheet" href="./styles/base.css" />
+  <link rel="stylesheet" href="./styles/components/routineListItem.css" />
 </head>
 
 <body>
@@ -77,38 +78,50 @@
     </section>
 
     <section class="card route" data-route="routine" id="route-routine" style="display:none;">
-      <div class="pageHeader">
-        <div style="display:flex; align-items:center; gap:10px; min-width: 0;">
-          <h2 id="routineTitle" style="margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Routine
-          </h2>
-
-          <button class="btn" id="btnEditRoutine" type="button" data-i18n="routine.edit"
-            data-i18n-attr="title,aria-label" title="Edit routine name and description"
-            aria-label="Edit routine name and description"
-            style="padding: 8px 10px; min-height: 36px; display:inline-flex; align-items:center; gap:8px;">
-            <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-              stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M12 20h9"></path>
-              <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path>
-            </svg>
-          </button>
-        </div>
-
-        <button class="iconBtn pageHeaderIconBtn" type="button" data-action="download" data-i18n="routines.downloadHelp"
-          data-i18n-attr="title,aria-label"
-          title="Download this routine in a fixed format you can use to import your routines"
-          aria-label="Download this routine in a fixed format you can use to import your routines">
-          <svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      <div class="pageHeader routineHeader">
+        <button class="startSessionBtn" id="btnStartSession" type="button" data-action="start-session"
+          data-i18n="routine.session.startHelp" data-i18n-attr="title,aria-label"
+          title="Start a session using this routine" aria-label="Start a session using this routine">
+          <svg class="icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M12 3v12"></path>
-            <path d="M8 11l4 4 4-4"></path>
-            <path d="M5 21h14"></path>
+            <polygon points="8 5 19 12 8 19 8 5"></polygon>
           </svg>
         </button>
 
-        <div class="toolbar">
-          <button class="btn" data-nav="#/routines" data-i18n="common.back">Back</button>
-          <button class="btn danger" id="btnDeleteRoutine" data-i18n="common.delete">Delete</button>
+        <div class="routineHeaderBody">
+          <div style="display:flex; align-items:center; gap:10px; min-width: 0;">
+            <h2 id="routineTitle" style="margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+              Routine
+            </h2>
+
+            <button class="btn" id="btnEditRoutine" type="button" data-i18n="routine.edit"
+              data-i18n-attr="title,aria-label" title="Edit routine name and description"
+              aria-label="Edit routine name and description"
+              style="padding: 8px 10px; min-height: 36px; display:inline-flex; align-items:center; gap:8px;">
+              <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M12 20h9"></path>
+                <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path>
+              </svg>
+            </button>
+          </div>
+
+          <button class="iconBtn pageHeaderIconBtn pageHeaderDownloadBtn" type="button" data-action="download"
+            data-i18n="routines.downloadHelp" data-i18n-attr="title,aria-label"
+            title="Download this routine in a fixed format you can use to import your routines"
+            aria-label="Download this routine in a fixed format you can use to import your routines">
+            <svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 3v12"></path>
+              <path d="M8 11l4 4 4-4"></path>
+              <path d="M5 21h14"></path>
+            </svg>
+          </button>
+
+          <div class="toolbar">
+            <button class="btn" data-nav="#/routines" data-i18n="common.back">Back</button>
+            <button class="btn danger" id="btnDeleteRoutine" data-i18n="common.delete">Delete</button>
+          </div>
         </div>
       </div>
 
