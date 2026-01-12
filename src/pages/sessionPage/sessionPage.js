@@ -5,7 +5,6 @@ import { t } from "/src/internationalization/i18n.js";
 import { escapeHtml } from "/src/ui/dom.js";
 import { formatMs } from "/src/utils/numberFormat.js";
 
-
 export function mountSessionPage({ routineStore, exerciseStore }) {
     const titleEl = document.getElementById("sessionTitle");
     const metaEl = document.getElementById("sessionRoutineMeta");
@@ -24,10 +23,14 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
     let elapsedMs = 0;
     let tickHandle = null;
 
-    // --- session progress state (series status) ---
+    // --- session progress state (series + repGroups status) ---
     let currentRoutineId = null;
-    let currentSeriesIndex = 0; // "in progress"
-    let completedSeries = new Set(); // indices marked completed
+
+    let currentSeriesIndex = 0; // active exercise
+    let currentRepGroupIndex = 0; // active set within exercise
+
+    let completedSeries = new Set(); // indices marked completed (derived/optional)
+    let completedRepGroups = new Map(); // seriesIdx -> Set(repIdx)
 
     function stopTick() {
         if (tickHandle) {
@@ -92,97 +95,280 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         btnReset.setAttribute("aria-label", resetLabel);
     });
 
-    listEl.addEventListener("click", (e) => {
-        const item = e.target.closest(".seriesItem");
-        if (!item) return;
+    function isRepDone(seriesIdx, repIdx) {
+        return completedRepGroups.get(seriesIdx)?.has(repIdx) === true;
+    }
 
-        const idx = Number(item.dataset.seriesIdx);
-        if (!Number.isFinite(idx)) return;
+    function markRepDone(seriesIdx, repIdx) {
+        if (!completedRepGroups.has(seriesIdx)) completedRepGroups.set(seriesIdx, new Set());
+        completedRepGroups.get(seriesIdx).add(repIdx);
+    }
 
-        const completeBtn = e.target.closest('[data-action="complete-series"]');
-        if (completeBtn) {
-            completedSeries.add(idx);
+    function statusForRep(seriesIdx, repIdx) {
+        if (isRepDone(seriesIdx, repIdx)) return "done";
+        if (seriesIdx === currentSeriesIndex && repIdx === currentRepGroupIndex) return "active";
+        return "todo";
+    }
 
-            const routine = currentRoutineId ? routineStore.getById(currentRoutineId) : null;
-            const max = routine?.series?.length ?? 0;
+    function statusForSeries(seriesIdx, routine) {
+        const groups = routine?.series?.[seriesIdx]?.repGroups ?? [];
+        if (!groups.length) return seriesIdx === currentSeriesIndex ? "active" : "todo";
 
-            let next = idx + 1;
-            while (next < max && completedSeries.has(next)) next += 1;
+        const allDone = groups.every((_, i) => isRepDone(seriesIdx, i));
+        if (allDone) return "done";
+        if (seriesIdx === currentSeriesIndex) return "active";
+        return "todo";
+    }
 
-            if (next < max) {
-                currentSeriesIndex = next;
-            }
+    function recomputeCompletedSeries(routine) {
+        const series = routine?.series ?? [];
+        const nextCompleted = new Set();
 
-            renderCurrent();
+        for (let s = 0; s < series.length; s += 1) {
+            const groups = Array.isArray(series[s]?.repGroups) ? series[s].repGroups : [];
+            if (!groups.length) continue;
+
+            const allDone = groups.every((_, i) => isRepDone(s, i));
+            if (allDone) nextCompleted.add(s);
+        }
+
+        completedSeries = nextCompleted;
+    }
+
+    function advanceToNext(routine) {
+        const series = routine?.series ?? [];
+        const sMax = series.length;
+
+        // 1) next rep in same series
+        const groups = Array.isArray(series[currentSeriesIndex]?.repGroups)
+            ? series[currentSeriesIndex].repGroups
+            : [];
+
+        let r = currentRepGroupIndex + 1;
+        while (r < groups.length && isRepDone(currentSeriesIndex, r)) r += 1;
+
+        if (r < groups.length) {
+            currentRepGroupIndex = r;
             return;
         }
 
-        currentSeriesIndex = idx;
-        renderCurrent();
-    });
+        // 2) next series that has an incomplete rep
+        let s = currentSeriesIndex + 1;
+        while (s < sMax) {
+            const g = Array.isArray(series[s]?.repGroups) ? series[s].repGroups : [];
+            let first = 0;
+            while (first < g.length && isRepDone(s, first)) first += 1;
+
+            if (first < g.length) {
+                currentSeriesIndex = s;
+                currentRepGroupIndex = first;
+                return;
+            }
+            s += 1;
+        }
+        // If we're here, everything after is done; keep position as-is.
+    }
 
     function resolveExerciseName(seriesItem) {
         const id = seriesItem?.exerciseId;
         if (!id) return t("session.exercise.unknown");
 
         const ex =
-            (exerciseStore?.getById?.(id)) ||
-            (exerciseStore?.list?.()?.find?.((e) => e.id === id)) ||
+            exerciseStore?.getById?.(id) ||
+            exerciseStore?.list?.()?.find?.((e) => e.id === id) ||
             null;
 
         return ex?.name || ex?.description || id;
     }
 
-    function statusForIndex(idx) {
-        if (completedSeries.has(idx)) return "done";
-        if (idx === currentSeriesIndex) return "active";
-        return "todo";
+    function formatSideValue(v) {
+        if (v == null) return "—";
+        if (typeof v === "number") return String(v);
+        if (typeof v === "object") {
+            const left = v.left ?? "—";
+            const right = v.right ?? "—";
+            return `${left}/${right}`;
+        }
+        return String(v);
     }
+
+    // Uses last history entry if present; otherwise uses target fields.
+    // Supports number (bilateral) or {left,right} (unilateral).
+    function resolveRepValue(repGroup, field /* "targetWeight" | "targetReps" */) {
+        const hist = Array.isArray(repGroup?.history) ? repGroup.history : [];
+        const last = hist.length ? hist[hist.length - 1] : null;
+
+        if (field === "targetWeight") return last?.weight ?? repGroup?.targetWeight ?? null;
+        if (field === "targetReps") return last?.reps ?? repGroup?.targetReps ?? null;
+
+        return null;
+    }
+
+    function renderRepGroupList(seriesIdx, s) {
+        const groups = Array.isArray(s?.repGroups) ? s.repGroups : [];
+        if (!groups.length) return "";
+
+        const weightLabel = t("session.weight") || "Weight";
+        const repsLabel = t("session.reps") || "Reps";
+
+        return `
+      <div class="repGroupList" role="list">
+        ${groups
+                .map((rg, repIdx) => {
+                    const weight = resolveRepValue(rg, "targetWeight");
+                    const reps = resolveRepValue(rg, "targetReps");
+
+                    const weightTxt = formatSideValue(weight);
+                    const repsTxt = formatSideValue(reps);
+
+                    const rest = typeof rg?.restSecondsAfter === "number" && rg.restSecondsAfter > 0
+                        ? `<span class="chip">${escapeHtml(t("session.rest"))} ${rg.restSecondsAfter}s</span>`
+                        : "";
+
+                    const st = statusForRep(seriesIdx, repIdx);
+                    const icon = st === "done" ? "✓" : st === "active" ? "▶" : "•";
+
+                    return `
+              <div class="repGroupItem repGroupItem--${st}"
+                   role="listitem"
+                   data-series-idx="${seriesIdx}"
+                   data-rep-idx="${repIdx}">
+                <div class="repGroupMain">
+                  <span class="repGroupIdx">${repIdx + 1}</span>
+
+                  <span class="repGroupMetric">
+                    <span class="muted">${escapeHtml(weightLabel)}:</span>
+                    ${escapeHtml(weightTxt)}
+                  </span>
+
+                  <span class="repGroupMetric">
+                    <span class="muted">${escapeHtml(repsLabel)}:</span>
+                    ${escapeHtml(repsTxt)}
+                  </span>
+
+                  ${rest}
+                </div>
+
+                <div class="repGroupActions">
+                  <span class="seriesStatus" aria-hidden="true">${icon}</span>
+                </div>
+              </div>
+            `;
+                })
+                .join("")}
+      </div>
+    `;
+    }
+
+    listEl.addEventListener("click", (e) => {
+        const repItem = e.target.closest(".repGroupItem");
+        const seriesItem = e.target.closest(".seriesItem");
+
+        // Complete a rep group
+        const completeRepBtn = e.target.closest('[data-action="complete-rep"]');
+        if (completeRepBtn && repItem) {
+            const sIdx = Number(repItem.dataset.seriesIdx);
+            const rIdx = Number(repItem.dataset.repIdx);
+            if (!Number.isFinite(sIdx) || !Number.isFinite(rIdx)) return;
+
+            markRepDone(sIdx, rIdx);
+
+            const routine = currentRoutineId ? routineStore.getById(currentRoutineId) : null;
+            if (routine) {
+                currentSeriesIndex = sIdx;
+                currentRepGroupIndex = rIdx;
+
+                recomputeCompletedSeries(routine);
+                advanceToNext(routine);
+            }
+
+            renderCurrent();
+            return;
+        }
+
+        // Click a rep group to focus it
+        if (repItem) {
+            const sIdx = Number(repItem.dataset.seriesIdx);
+            const rIdx = Number(repItem.dataset.repIdx);
+            if (!Number.isFinite(sIdx) || !Number.isFinite(rIdx)) return;
+
+            currentSeriesIndex = sIdx;
+            currentRepGroupIndex = rIdx;
+            renderCurrent();
+            return;
+        }
+
+        // Click a series to focus its first incomplete rep (or first rep)
+        if (seriesItem) {
+            const sIdx = Number(seriesItem.dataset.seriesIdx);
+            if (!Number.isFinite(sIdx)) return;
+
+            const routine = currentRoutineId ? routineStore.getById(currentRoutineId) : null;
+            const groups = routine?.series?.[sIdx]?.repGroups ?? [];
+
+            let first = 0;
+            while (first < groups.length && isRepDone(sIdx, first)) first += 1;
+
+            currentSeriesIndex = sIdx;
+            currentRepGroupIndex = groups.length ? Math.min(first, groups.length - 1) : 0;
+            renderCurrent();
+        }
+    });
 
     function renderSeriesList(routine) {
         const series = Array.isArray(routine?.series) ? routine.series : [];
 
         emptyEl.style.display = series.length ? "none" : "";
         listEl.innerHTML = "";
-
         if (!series.length) return;
 
-        listEl.innerHTML = series.map((s, idx) => {
-            const name = resolveExerciseName(s);
-            const desc = s.description ? ` — <span class="muted">${escapeHtml(s.description)}</span>` : "";
+        recomputeCompletedSeries(routine);
 
-            const setCount = Array.isArray(s.repGroups) ? s.repGroups.length : 0;
+        listEl.innerHTML = series
+            .map((s, idx) => {
+                const name = resolveExerciseName(s);
+                const desc = s.description
+                    ? ` — <span class="muted">${escapeHtml(s.description)}</span>`
+                    : "";
 
-            const restAfter = (typeof s.restSecondsAfter === "number" && s.restSecondsAfter > 0)
-                ? `<span class="chip" style="margin-left:8px;">${escapeHtml(t("session.rest"))} ${s.restSecondsAfter}s</span>`
-                : "";
+                const seriesRestAfter =
+                    typeof s.restSecondsAfter === "number" && s.restSecondsAfter > 0
+                        ? `<span class="chip" style="margin-left:8px;">${escapeHtml(
+                            t("session.rest")
+                        )} ${s.restSecondsAfter}s</span>`
+                        : "";
 
-            const status = statusForIndex(idx);
+                const status = statusForSeries(idx, routine);
+                const statusIcon = status === "done" ? "✓" : status === "active" ? "▶" : "•";
 
-            const statusIcon = status === "done" ? "✓" : status === "active" ? "▶" : "•";
+                // Only show sublist for the selected/current series (recommended UX)
+                const showSublist = idx === currentSeriesIndex;
 
-            return `
-                <div class="seriesItem seriesItem--${status}" data-series-idx="${idx}">
-                    <div class="seriesItemMeta">
-                        <h4>${idx + 1}. ${escapeHtml(name)}${desc}</h4>
-                        <p>
-                            ${setCount} ${escapeHtml(setCount === 1 ? t("session.set") : t("session.sets"))}
-                            ${restAfter}
-                        </p>
-                    </div>
+                return `
+        <div class="seriesBlock" data-series-idx="${idx}">
+          <div class="seriesItem seriesItem--${status}" data-series-idx="${idx}">
+            <div class="seriesItemMeta">
+              <h4>${idx + 1}. ${escapeHtml(name)}${desc}</h4>
+              <p style="margin-top:8px;">${seriesRestAfter}</p>
+            </div>
 
-                    <div class="seriesItemActions">
-                        <span class="seriesStatus" aria-hidden="true">${statusIcon}</span>
-                    ` +
-                     //   <button class="seriesMiniBtn done" type="button" data-action="complete-series" aria-label="✓" title="✓">✓</button>
-                     + `
-                     </div>
-                </div>
-            `;
-        }).join("");
+            <div class="seriesItemActions">
+              <span class="seriesStatus" aria-hidden="true">${statusIcon}</span>
+            </div>
+          </div>
+
+          <div class="seriesSublist ${showSublist ? "" : "is-collapsed"}">
+            ${showSublist ? renderRepGroupList(idx, s) : ""}
+          </div>
+        </div>
+      `;
+            })
+            .join("");
 
         requestAnimationFrame(() => {
-            const active = listEl.querySelector(".seriesItem--active");
+            const active =
+                listEl.querySelector(".repGroupItem--active") ||
+                listEl.querySelector('.seriesBlock[data-series-idx="' + currentSeriesIndex + '"]');
             active?.scrollIntoView?.({ block: "nearest" });
         });
     }
@@ -210,7 +396,10 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
             currentRoutineId = routineId;
 
             currentSeriesIndex = 0;
+            currentRepGroupIndex = 0;
+
             completedSeries = new Set();
+            completedRepGroups = new Map();
 
             const routine = routineId ? routineStore.getById(routineId) : null;
 

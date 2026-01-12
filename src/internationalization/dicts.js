@@ -107,6 +107,9 @@ export const DICTS = {
         "session.set": "set",
         "session.sets": "sets",
         "session.rest": "Rest",
+        "session.restAfterExercise": "Rest after exercise",
+        "session.exercise.set": "set",
+        "session.exercise.sets": "sets"
     },
 
     es: {
@@ -213,6 +216,9 @@ export const DICTS = {
         "session.set": "serie",
         "session.sets": "series",
         "session.rest": "Descanso",
+        "session.restAfterExercise": "Descanso tras el ejercicio",
+        "session.exercise.set": "serie",
+        "session.exercise.sets": "series"
     },
 
     pt: {
@@ -319,6 +325,9 @@ export const DICTS = {
         "session.set": "série",
         "session.sets": "séries",
         "session.rest": "Descanso",
+        "session.restAfterExercise": "Descanso após o exercício",
+        "session.exercise.set": "série",
+        "session.exercise.sets": "séries"
     },
 
     ja: {
@@ -425,6 +434,9 @@ export const DICTS = {
         "session.set": "セット",
         "session.sets": "セット",
         "session.rest": "休憩",
+        "session.restAfterExercise": "エクササイズ後の休憩",
+        "session.exercise.set": "セット",
+        "session.exercise.sets": "セット"
     },
 
     zh: {
@@ -531,6 +543,9 @@ export const DICTS = {
         "session.set": "组",
         "session.sets": "组",
         "session.rest": "休息",
+        "session.restAfterExercise": "动作后休息",
+        "session.exercise.set": "组",
+        "session.exercise.sets": "组"
     },
 
     ar: {
@@ -637,6 +652,9 @@ export const DICTS = {
         "session.set": "مجموعة",
         "session.sets": "مجموعات",
         "session.rest": "راحة",
+        "session.restAfterExercise": "راحة بعد التمرين",
+        "session.exercise.set": "مجموعة",
+        "session.exercise.sets": "مجموعات"
     },
 
     hi: {
@@ -743,6 +761,9 @@ export const DICTS = {
         "session.set": "सेट",
         "session.sets": "सेट",
         "session.rest": "आराम",
+        "session.restAfterExercise": "एक्सरसाइज़ के बाद आराम",
+        "session.exercise.set": "सेट",
+        "session.exercise.sets": "सेट"
     },
 
     de: {
@@ -849,6 +870,9 @@ export const DICTS = {
         "session.set": "Satz",
         "session.sets": "Sätze",
         "session.rest": "Pause",
+        "session.restAfterExercise": "Pause nach der Übung",
+        "session.exercise.set": "Satz",
+        "session.exercise.sets": "Sätze"
     },
 
     fr: {
@@ -955,6 +979,9 @@ export const DICTS = {
         "session.set": "série",
         "session.sets": "séries",
         "session.rest": "Repos",
+        "session.restAfterExercise": "Repos après l’exercice",
+        "session.exercise.set": "série",
+        "session.exercise.sets": "séries"
     },
 
     ru: {
@@ -1061,6 +1088,9 @@ export const DICTS = {
         "session.set": "подход",
         "session.sets": "подходы",
         "session.rest": "Отдых",
+        "session.restAfterExercise": "Отдых после упражнения",
+        "session.exercise.set": "подход",
+        "session.exercise.sets": "подходы"
     },
 
     it: {
@@ -1167,6 +1197,9 @@ export const DICTS = {
         "session.set": "serie",
         "session.sets": "serie",
         "session.rest": "Recupero",
+        "session.restAfterExercise": "Recupero dopo l’esercizio",
+        "session.exercise.set": "serie",
+        "session.exercise.sets": "serie"
     },
 
     nl: {
@@ -1273,6 +1306,9 @@ export const DICTS = {
         "session.set": "set",
         "session.sets": "sets",
         "session.rest": "Rust",
+        "session.restAfterExercise": "Rust na oefening",
+        "session.exercise.set": "set",
+        "session.exercise.sets": "sets"
     },
 
     pl: {
@@ -1379,6 +1415,9 @@ export const DICTS = {
         "session.set": "seria",
         "session.sets": "serie",
         "session.rest": "Przerwa",
+        "session.restAfterExercise": "Przerwa po ćwiczeniu",
+        "session.exercise.set": "seria",
+        "session.exercise.sets": "serie"
     },
 
     tr: {
@@ -1485,5 +1524,8 @@ export const DICTS = {
         "session.set": "set",
         "session.sets": "set",
         "session.rest": "Dinlenme",
+        "session.restAfterExercise": "Egzersiz sonrası dinlenme",
+        "session.exercise.set": "set",
+        "session.exercise.sets": "set"
     }
 };

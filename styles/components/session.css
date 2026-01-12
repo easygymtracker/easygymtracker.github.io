@@ -103,3 +103,162 @@
     border-color: rgba(34, 197, 94, 0.45);
     background: rgba(34, 197, 94, 0.14);
 }
+
+/* =========================
+   Session master/detail layout
+   ========================= */
+
+.sessionLayout {
+    display: grid;
+    grid-template-columns: minmax(280px, 1fr) minmax(320px, 420px);
+    gap: 14px;
+    align-items: start;
+}
+
+/* Mobile: stack */
+@media (max-width: 900px) {
+    .sessionLayout {
+        grid-template-columns: 1fr;
+    }
+
+    .sessionRight {
+        position: static;
+    }
+}
+
+/* Optional: keep right panel visible while scrolling (desktop) */
+@media (min-width: 901px) {
+    .sessionRight {
+        position: sticky;
+        top: 12px;
+    }
+}
+
+.sessionDetailCard {
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 14px;
+    padding: 12px;
+}
+
+.sessionDetailHeader {
+    margin-bottom: 10px;
+}
+
+.sessionDetailTitle {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.2;
+}
+
+.sessionDetailSubtitle {
+    margin: 6px 0 0;
+    font-size: 13px;
+    color: var(--muted);
+}
+
+/* =========================
+   Rep groups (right panel)
+   ========================= */
+
+.repGroupPanel {
+    display: grid;
+    gap: 8px;
+}
+
+.repGroupItem {
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 12px;
+    padding: 10px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+    align-items: center;
+}
+
+.repGroupMain {
+    display: flex;
+    gap: 10px;
+    align-items: baseline;
+    flex-wrap: wrap;
+}
+
+.repGroupIdx {
+    font-weight: 800;
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.repGroupMetric {
+    font-size: 13px;
+}
+
+.repGroupActions {
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+}
+
+/* Rep states */
+.repGroupItem--todo {
+    opacity: 0.92;
+}
+
+.repGroupItem--active {
+    border-color: rgba(96, 165, 250, 0.55);
+    background: rgba(96, 165, 250, 0.10);
+}
+
+.repGroupItem--active .seriesStatus {
+    border-color: rgba(96, 165, 250, 0.55);
+    background: rgba(96, 165, 250, 0.18);
+}
+
+.repGroupItem--done {
+    border-color: rgba(34, 197, 94, 0.45);
+    background: rgba(34, 197, 94, 0.08);
+    opacity: 0.9;
+}
+
+.repGroupItem--done .seriesStatus {
+    border-color: rgba(34, 197, 94, 0.55);
+    background: rgba(34, 197, 94, 0.18);
+}
+
+.repGroupFooter {
+    margin-top: 10px;
+    font-size: 13px;
+    color: var(--muted);
+}
+
+/* Wrapper for one exercise + its sets */
+.seriesBlock {
+    margin-bottom: 12px;
+    /* replaces seriesItem margin if you want */
+}
+
+/* Optional: remove margin-bottom on seriesItem since wrapper handles spacing */
+.seriesItem {
+    margin-bottom: 0;
+}
+
+/* The sublist sits visually "outside" the card */
+.seriesSublist {
+    margin-top: 8px;
+    padding-left: 12px;
+    /* indents sets under exercise */
+    border-left: 2px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Collapse behavior (only show sublist for active series) */
+.seriesSublist.is-collapsed {
+    display: none;
+}
+
+.seriesSublist {
+    margin-top: 6px;
+}
