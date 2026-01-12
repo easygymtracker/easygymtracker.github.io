@@ -5,9 +5,10 @@ import { createRoutineStore } from "./store/routineStore.js";
 import { createExerciseStore } from "./store/exerciseStore.js";
 import { importRoutineFromExport } from "./import/routineImport.js";
 
-import { mountRoutinesPage } from "./pages/routinesPage.js";
-import { mountRoutineNewPage } from "./pages/routineNewPage.js";
-import { mountRoutineDetailPage } from "./pages/routineDetailPage.js";
+import { mountSessionPage } from "./pages/sessionPage/sessionPage.js";
+import { mountRoutinesPage } from "./pages/routinesPage/routinesPage.js";
+import { mountRoutineNewPage } from "./pages/routinesPage/routineNewPage.js";
+import { mountRoutineDetailPage } from "./pages/routinesPage/routineDetailPage.js";
 
 import { setLocale, getLocale, getLocaleFromUrl, translateDocument, t } from "./internationalization/i18n.js";
 
@@ -70,6 +71,7 @@ const pages = {
     routines: mountRoutinesPage({ routineStore, exerciseStore }),
     "routine-new": mountRoutineNewPage({ routineStore }),
     routine: mountRoutineDetailPage({ routineStore, exerciseStore }),
+    session: mountSessionPage({ routineStore, exerciseStore }),
 };
 
 // --- route rendering ---

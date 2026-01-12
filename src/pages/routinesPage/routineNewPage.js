@@ -1,6 +1,6 @@
 // pages/routineNewPage.js
 
-import { navigate } from "../router.js";
+import { navigate } from "../../router.js";
 
 export function mountRoutineNewPage({ routineStore }) {
     const routineName = document.getElementById("routineName");

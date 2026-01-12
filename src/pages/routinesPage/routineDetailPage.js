@@ -1,12 +1,12 @@
 // pages/routineDetailPage.js
 
-import { navigate } from "../router.js";
-import { t } from "../internationalization/i18n.js";
-import { SetSeries } from "../models/setSeries.js";
+import { navigate } from "../../router.js";
+import { t } from "/src/internationalization/i18n.js";
+import { SetSeries } from "../../models/setSeries.js";
 import { createSeriesListView } from "./routineDetail/seriesListView.js";
 import { createSeriesEditorView } from "./routineDetail/seriesEditorView.js";
 import { escapeHtml, escapeHtmlAttr, flashInvalid } from "./routineDetail/viewUtils.js";
-import { buildRoutineExportV1, downloadJson, routineExportFilename } from "../export/routineExport.js";
+import { buildRoutineExportV1, downloadJson, routineExportFilename } from "../../export/routineExport.js";
 
 export function mountRoutineDetailPage({ routineStore, exerciseStore }) {
 
@@ -20,6 +20,7 @@ export function mountRoutineDetailPage({ routineStore, exerciseStore }) {
     const btnSaveRoutineMeta = document.getElementById("btnSaveRoutineMeta");
     const btnCancelRoutineMeta = document.getElementById("btnCancelRoutineMeta");
 
+    const btnStartSession = document.getElementById("btnStartSession");
     const btnDownloadRoutine = document.querySelector('#route-routine .pageHeader button[data-action="download"]');
 
     const exerciseInput = document.getElementById("exerciseInput");
@@ -189,6 +190,17 @@ export function mountRoutineDetailPage({ routineStore, exerciseStore }) {
 
         renderExerciseOptions();
         seriesListView.renderSeries(routine);
+    });
+
+    btnStartSession?.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (!currentId) {
+            return;
+        }
+
+        navigate(`#/session/${currentId}`);
     });
 
     function render(params) {

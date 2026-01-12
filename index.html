@@ -7,7 +7,6 @@
 
   <title data-i18n="app.title">Easy Gym Routine Tracker</title>
   <link rel="stylesheet" href="./styles/base.css" />
-  <link rel="stylesheet" href="./styles/components/routineListItem.css" />
 </head>
 
 <body>
@@ -290,6 +289,56 @@
         </section>
       </div>
     </section>
+
+    <section class="card route" data-route="session" id="route-session" style="display:none;">
+      <div class="pageHeader">
+        <h2 id="sessionTitle" data-i18n="session.title">Workout session</h2>
+        <div class="toolbar">
+          <button class="btn" data-nav="#/routines" data-i18n="common.back">Back</button>
+        </div>
+      </div>
+
+      <div class="routineDetail">
+        <p class="muted" id="sessionRoutineMeta">—</p>
+
+        <div class="divider"></div>
+
+        <div class="form" style="padding-top: 0;">
+          <div style="display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap;">
+            <div>
+              <div style="font-size:12px; color: var(--muted); margin-bottom:6px;" data-i18n="session.timer.label">Timer
+              </div>
+
+              <div id="sessionTimer" style="font-size: 34px; font-weight: 800; letter-spacing: 0.6px;">00:00</div>
+            </div>
+
+            <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:flex-end;">
+              <button class="btn primary" id="btnSessionStartPause" type="button" data-i18n="session.timer.start"
+                data-i18n-attr="title,aria-label" title="Start" aria-label="Start">Start</button>
+
+              <button class="btn" id="btnSessionReset" type="button" data-i18n="session.timer.reset"
+                data-i18n-attr="title,aria-label" title="Reset" aria-label="Reset">Reset</button>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <h3 style="margin: 0 0 10px 0; font-size: 14px; color: var(--accent2);" data-i18n="session.series.title">
+            Ordered exercises</h3>
+
+          <div id="sessionSeriesList"></div>
+
+          <p class="note" id="sessionEmpty" style="display:none;" data-i18n="session.series.empty">
+            This routine has no exercises yet.
+          </p>
+
+          <p class="note" id="sessionNotFound" style="display:none;" data-i18n="session.routineNotFound">
+            Routine not found.
+          </p>
+        </div>
+      </div>
+    </section>
+
   </div>
 
   <script type="module" src="./src/app.js"></script>

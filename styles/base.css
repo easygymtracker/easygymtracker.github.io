@@ -153,14 +153,6 @@ header {
 }
 
 /* Smartphone-first routine row: stacked layout */
-.routineRow {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 10px;
-    align-items: start;
-    padding: 14px 12px;
-    border-radius: 12px;
-}
 
 .routineRow:hover {
     background: rgba(255, 255, 255, 0.03);

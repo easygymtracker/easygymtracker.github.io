@@ -17,6 +17,10 @@ function parseHash() {
         return { name: "routine", params: { id: parts[1] } };
     }
 
+    if (parts[0] === "session" && parts[1]) {
+        return { name: "session", params: { routineId: parts[1] } };
+    }
+
     return { name: "routines", params: {} };
 }
 

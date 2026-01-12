@@ -1,16 +1,18 @@
 // pages/routineDetail/seriesEditorView.js
 
-import { t } from "../../internationalization/i18n.js";
-import { RepGroup, Laterality } from "../../models/repGroup.js";
+import { t } from "/src/internationalization/i18n.js";
+import { RepGroup, Laterality } from "../../../models/repGroup.js";
 import { flashMoved, moveItem, attachDragReorder } from "/src/ui/common/reorderUtils.js";
 import {
     escapeHtml,
     flashInvalid,
     flashOk,
+} from "./viewUtils.js";
+import {
     toNonNegativeNumber,
     toPositiveInt,
     toNullableNumber,
-} from "./viewUtils.js";
+} from "/src/utils/numberFormat.js";
 
 function editSeriesTitleLabel(index1Based, exerciseName) {
     return t("seriesEditor.title", { index: index1Based, exercise: exerciseName });
@@ -458,13 +460,13 @@ export function createSeriesEditorView({
                     <h3>${escapeHtml(repGroupTitleLabel(i + 1))}</h3>
                     <p>
                         ${escapeHtml(
-                            repGroupSummaryLabel({
-                                laterality: g.laterality,
-                                reps,
-                                weight: weightText,
-                                restSeconds,
-                            })
-                        )}
+                repGroupSummaryLabel({
+                    laterality: g.laterality,
+                    reps,
+                    weight: weightText,
+                    restSeconds,
+                })
+            )}
                     </p>
                 </div>
                 <div class="rowActions">

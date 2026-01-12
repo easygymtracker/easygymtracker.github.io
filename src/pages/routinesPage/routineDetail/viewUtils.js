@@ -25,21 +25,3 @@ export function flashOk(el) {
     el.style.borderColor = "rgba(96,165,250,0.75)";
     setTimeout(() => (el.style.borderColor = prev), 350);
 }
-
-export function toNonNegativeNumber(value, fallback) {
-    const n = Number(value);
-    if (!Number.isFinite(n) || n < 0) return fallback;
-    return n;
-}
-
-export function toPositiveInt(value) {
-    const n = Number(value);
-    if (!Number.isFinite(n) || n <= 0) return null;
-    return Math.round(n);
-}
-
-export function toNullableNumber(value) {
-    const n = Number(value);
-    if (!Number.isFinite(n)) return null;
-    return n;
-}

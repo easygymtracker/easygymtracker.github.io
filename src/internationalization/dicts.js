@@ -94,6 +94,19 @@ export const DICTS = {
         "routine.edit.descLabel": "Description",
         "routine.edit.namePlaceholder": "e.g., Push Day A",
         "routine.edit.descPlaceholder": "Quick notes: goals, intensity, focus...",
+
+        "session.title": "Workout session",
+        "session.timer.label": "Timer",
+        "session.timer.start": "Start",
+        "session.timer.pause": "Pause",
+        "session.timer.reset": "Reset",
+        "session.series.title": "Ordered exercises",
+        "session.series.empty": "This routine has no exercises yet.",
+        "session.routineNotFound": "Routine not found.",
+        "session.exercise.unknown": "Exercise",
+        "session.set": "set",
+        "session.sets": "sets",
+        "session.rest": "Rest",
     },
 
     es: {
@@ -187,6 +200,19 @@ export const DICTS = {
         "routine.edit.descLabel": "Descripción",
         "routine.edit.namePlaceholder": "p. ej., Empuje Día A",
         "routine.edit.descPlaceholder": "Notas rápidas: objetivos, intensidad, enfoque...",
+
+        "session.title": "Sesión de entrenamiento",
+        "session.timer.label": "Temporizador",
+        "session.timer.start": "Iniciar",
+        "session.timer.pause": "Pausar",
+        "session.timer.reset": "Reiniciar",
+        "session.series.title": "Ejercicios en orden",
+        "session.series.empty": "Esta rutina no tiene ejercicios todavía.",
+        "session.routineNotFound": "Rutina no encontrada.",
+        "session.exercise.unknown": "Ejercicio",
+        "session.set": "serie",
+        "session.sets": "series",
+        "session.rest": "Descanso",
     },
 
     pt: {
@@ -280,6 +306,19 @@ export const DICTS = {
         "routine.edit.descLabel": "Descrição",
         "routine.edit.namePlaceholder": "ex.: Dia de Empurrar A",
         "routine.edit.descPlaceholder": "Notas rápidas: objetivos, intensidade, foco...",
+
+        "session.title": "Sessão de treino",
+        "session.timer.label": "Temporizador",
+        "session.timer.start": "Iniciar",
+        "session.timer.pause": "Pausar",
+        "session.timer.reset": "Reiniciar",
+        "session.series.title": "Exercícios em ordem",
+        "session.series.empty": "Esta rotina ainda não tem exercícios.",
+        "session.routineNotFound": "Rotina não encontrada.",
+        "session.exercise.unknown": "Exercício",
+        "session.set": "série",
+        "session.sets": "séries",
+        "session.rest": "Descanso",
     },
 
     ja: {
@@ -373,6 +412,19 @@ export const DICTS = {
         "routine.edit.descLabel": "説明",
         "routine.edit.namePlaceholder": "例：プッシュ Day A",
         "routine.edit.descPlaceholder": "メモ：目標、強度、重点など...",
+
+        "session.title": "トレーニングセッション",
+        "session.timer.label": "タイマー",
+        "session.timer.start": "開始",
+        "session.timer.pause": "一時停止",
+        "session.timer.reset": "リセット",
+        "session.series.title": "実行順のエクササイズ",
+        "session.series.empty": "このルーティンにはまだエクササイズがありません。",
+        "session.routineNotFound": "ルーティンが見つかりません。",
+        "session.exercise.unknown": "エクササイズ",
+        "session.set": "セット",
+        "session.sets": "セット",
+        "session.rest": "休憩",
     },
 
     zh: {
@@ -466,6 +518,19 @@ export const DICTS = {
         "routine.edit.descLabel": "描述",
         "routine.edit.namePlaceholder": "例如：推日 A",
         "routine.edit.descPlaceholder": "简要记录：目标、强度、重点...",
+
+        "session.title": "训练会话",
+        "session.timer.label": "计时器",
+        "session.timer.start": "开始",
+        "session.timer.pause": "暂停",
+        "session.timer.reset": "重置",
+        "session.series.title": "训练顺序",
+        "session.series.empty": "该训练计划尚无练习。",
+        "session.routineNotFound": "未找到训练计划。",
+        "session.exercise.unknown": "练习",
+        "session.set": "组",
+        "session.sets": "组",
+        "session.rest": "休息",
     },
 
     ar: {
@@ -559,6 +624,19 @@ export const DICTS = {
         "routine.edit.descLabel": "الوصف",
         "routine.edit.namePlaceholder": "مثال: يوم الدفع A",
         "routine.edit.descPlaceholder": "ملاحظات سريعة: الأهداف، الشدة، التركيز...",
+
+        "session.title": "جلسة تمرين",
+        "session.timer.label": "المؤقت",
+        "session.timer.start": "ابدأ",
+        "session.timer.pause": "إيقاف مؤقت",
+        "session.timer.reset": "إعادة ضبط",
+        "session.series.title": "التمارين بالترتيب",
+        "session.series.empty": "لا تحتوي هذه الخطة على تمارين بعد.",
+        "session.routineNotFound": "لم يتم العثور على الخطة.",
+        "session.exercise.unknown": "تمرين",
+        "session.set": "مجموعة",
+        "session.sets": "مجموعات",
+        "session.rest": "راحة",
     },
 
     hi: {
@@ -652,6 +730,19 @@ export const DICTS = {
         "routine.edit.descLabel": "विवरण",
         "routine.edit.namePlaceholder": "जैसे, पुश डे A",
         "routine.edit.descPlaceholder": "त्वरित नोट्स: लक्ष्य, तीव्रता, फोकस...",
+
+        "session.title": "वर्कआउट सत्र",
+        "session.timer.label": "टाइमर",
+        "session.timer.start": "शुरू करें",
+        "session.timer.pause": "रोकें",
+        "session.timer.reset": "रीसेट",
+        "session.series.title": "क्रमबद्ध अभ्यास",
+        "session.series.empty": "इस रूटीन में अभी कोई अभ्यास नहीं है।",
+        "session.routineNotFound": "रूटीन नहीं मिली।",
+        "session.exercise.unknown": "अभ्यास",
+        "session.set": "सेट",
+        "session.sets": "सेट",
+        "session.rest": "आराम",
     },
 
     de: {
@@ -745,6 +836,19 @@ export const DICTS = {
         "routine.edit.descLabel": "Beschreibung",
         "routine.edit.namePlaceholder": "z. B. Push Day A",
         "routine.edit.descPlaceholder": "Kurze Notizen: Ziele, Intensität, Fokus...",
+
+        "session.title": "Trainingseinheit",
+        "session.timer.label": "Timer",
+        "session.timer.start": "Start",
+        "session.timer.pause": "Pause",
+        "session.timer.reset": "Zurücksetzen",
+        "session.series.title": "Geordnete Übungen",
+        "session.series.empty": "Diese Routine enthält noch keine Übungen.",
+        "session.routineNotFound": "Routine nicht gefunden.",
+        "session.exercise.unknown": "Übung",
+        "session.set": "Satz",
+        "session.sets": "Sätze",
+        "session.rest": "Pause",
     },
 
     fr: {
@@ -838,6 +942,19 @@ export const DICTS = {
         "routine.edit.descLabel": "Description",
         "routine.edit.namePlaceholder": "ex. : Push Day A",
         "routine.edit.descPlaceholder": "Notes rapides : objectifs, intensité, focus...",
+
+        "session.title": "Séance d'entraînement",
+        "session.timer.label": "Minuteur",
+        "session.timer.start": "Démarrer",
+        "session.timer.pause": "Pause",
+        "session.timer.reset": "Réinitialiser",
+        "session.series.title": "Exercices dans l'ordre",
+        "session.series.empty": "Cette routine ne contient pas encore d'exercices.",
+        "session.routineNotFound": "Routine introuvable.",
+        "session.exercise.unknown": "Exercice",
+        "session.set": "série",
+        "session.sets": "séries",
+        "session.rest": "Repos",
     },
 
     ru: {
@@ -931,6 +1048,19 @@ export const DICTS = {
         "routine.edit.descLabel": "Описание",
         "routine.edit.namePlaceholder": "например, Жимовой день A",
         "routine.edit.descPlaceholder": "Короткие заметки: цели, интенсивность, фокус...",
+
+        "session.title": "Тренировочная сессия",
+        "session.timer.label": "Таймер",
+        "session.timer.start": "Старт",
+        "session.timer.pause": "Пауза",
+        "session.timer.reset": "Сброс",
+        "session.series.title": "Упражнения по порядку",
+        "session.series.empty": "В этой тренировке пока нет упражнений.",
+        "session.routineNotFound": "Тренировка не найдена.",
+        "session.exercise.unknown": "Упражнение",
+        "session.set": "подход",
+        "session.sets": "подходы",
+        "session.rest": "Отдых",
     },
 
     it: {
@@ -1024,6 +1154,19 @@ export const DICTS = {
         "routine.edit.descLabel": "Descrizione",
         "routine.edit.namePlaceholder": "es.: Push Day A",
         "routine.edit.descPlaceholder": "Note rapide: obiettivi, intensità, focus...",
+
+        "session.title": "Sessione di allenamento",
+        "session.timer.label": "Timer",
+        "session.timer.start": "Avvia",
+        "session.timer.pause": "Pausa",
+        "session.timer.reset": "Reimposta",
+        "session.series.title": "Esercizi in ordine",
+        "session.series.empty": "Questa routine non ha ancora esercizi.",
+        "session.routineNotFound": "Routine non trovata.",
+        "session.exercise.unknown": "Esercizio",
+        "session.set": "serie",
+        "session.sets": "serie",
+        "session.rest": "Recupero",
     },
 
     nl: {
@@ -1116,7 +1259,20 @@ export const DICTS = {
         "routine.edit.nameLabel": "Naam",
         "routine.edit.descLabel": "Beschrijving",
         "routine.edit.namePlaceholder": "bijv. Push Day A",
-        "routine.edit.descPlaceholder": "Korte notities: doelen, intensiteit, focus..."
+        "routine.edit.descPlaceholder": "Korte notities: doelen, intensiteit, focus...",
+
+        "session.title": "Trainingssessie",
+        "session.timer.label": "Timer",
+        "session.timer.start": "Start",
+        "session.timer.pause": "Pauze",
+        "session.timer.reset": "Reset",
+        "session.series.title": "Oefeningen op volgorde",
+        "session.series.empty": "Deze routine heeft nog geen oefeningen.",
+        "session.routineNotFound": "Routine niet gevonden.",
+        "session.exercise.unknown": "Oefening",
+        "session.set": "set",
+        "session.sets": "sets",
+        "session.rest": "Rust",
     },
 
     pl: {
@@ -1210,6 +1366,19 @@ export const DICTS = {
         "routine.edit.descLabel": "Opis",
         "routine.edit.namePlaceholder": "np. Dzień Push A",
         "routine.edit.descPlaceholder": "Szybkie notatki: cele, intensywność, fokus...",
+
+        "session.title": "Sesja treningowa",
+        "session.timer.label": "Minutnik",
+        "session.timer.start": "Start",
+        "session.timer.pause": "Pauza",
+        "session.timer.reset": "Resetuj",
+        "session.series.title": "Ćwiczenia w kolejności",
+        "session.series.empty": "Ta rutyna nie zawiera jeszcze ćwiczeń.",
+        "session.routineNotFound": "Nie znaleziono rutyny.",
+        "session.exercise.unknown": "Ćwiczenie",
+        "session.set": "seria",
+        "session.sets": "serie",
+        "session.rest": "Przerwa",
     },
 
     tr: {
@@ -1303,5 +1472,18 @@ export const DICTS = {
         "routine.edit.descLabel": "Açıklama",
         "routine.edit.namePlaceholder": "örn. İtiş Günü A",
         "routine.edit.descPlaceholder": "Kısa notlar: hedefler, yoğunluk, odak...",
+
+        "session.title": "Antrenman oturumu",
+        "session.timer.label": "Zamanlayıcı",
+        "session.timer.start": "Başlat",
+        "session.timer.pause": "Duraklat",
+        "session.timer.reset": "Sıfırla",
+        "session.series.title": "Sıralı egzersizler",
+        "session.series.empty": "Bu rutin henüz egzersiz içermiyor.",
+        "session.routineNotFound": "Rutin bulunamadı.",
+        "session.exercise.unknown": "Egzersiz",
+        "session.set": "set",
+        "session.sets": "set",
+        "session.rest": "Dinlenme",
     }
 };

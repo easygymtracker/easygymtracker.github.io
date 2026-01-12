@@ -1,6 +1,6 @@
 // pages/routineDetail/seriesListView.js
 
-import { t } from "../../internationalization/i18n.js";
+import { t } from "/src/internationalization/i18n.js";
 import { escapeHtml } from "./viewUtils.js";
 import { flashMoved, moveItem, attachDragReorder } from "/src/ui/common/reorderUtils.js";
 

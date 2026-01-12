@@ -1,10 +1,10 @@
 // pages/routinesPage.js
 
-import { navigate } from "../router.js";
-import { t } from "../internationalization/i18n.js";
-import { escapeHtml } from "../ui/dom.js";
-import { routineListItem } from "../ui/components/routineListItem.js";
-import { buildRoutineExportV1, downloadJson, routineExportFilename } from "../export/routineExport.js";
+import { navigate } from "../../router.js";
+import { t } from "/src/internationalization/i18n.js";
+import { escapeHtml } from "../../ui/dom.js";
+import { routineListItem } from "../../ui/components/routineListItem.js";
+import { buildRoutineExportV1, downloadJson, routineExportFilename } from "../../export/routineExport.js";
 
 export function mountRoutinesPage({ routineStore, exerciseStore }) {
     const elList = document.getElementById("routineList");
@@ -48,6 +48,13 @@ export function mountRoutinesPage({ routineStore, exerciseStore }) {
 
             const payload = buildRoutineExportV1({ routine, exerciseStore });
             downloadJson({ filename: routineExportFilename(routine), data: payload });
+        }
+
+        if (action === "start-session") {
+            e.preventDefault();
+            e.stopPropagation();
+            navigate(`#/session/${id}`);
+            return;
         }
     });
 
