@@ -1,0 +1,105 @@
+/* =========================
+   Session Series Item States
+   ========================= */
+
+.seriesItem {
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 14px;
+    padding: 12px 12px;
+    margin-bottom: 10px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+    align-items: center;
+}
+
+.seriesItem:focus-within {
+    border-color: rgba(96, 165, 250, 0.55);
+    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.10);
+}
+
+.seriesItemMeta h4 {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.25;
+}
+
+.seriesItemMeta p {
+    margin: 6px 0 0;
+    font-size: 13px;
+    color: var(--muted);
+}
+
+/* Status pill */
+.seriesStatus {
+    font-size: 12px;
+    font-weight: 700;
+    border-radius: 999px;
+    padding: 6px 10px;
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.03);
+    white-space: nowrap;
+}
+
+/* TODO */
+.seriesItem--todo {
+    opacity: 0.92;
+}
+
+/* ACTIVE / IN PROGRESS */
+.seriesItem--active {
+    border-color: rgba(96, 165, 250, 0.55);
+    background: rgba(96, 165, 250, 0.10);
+}
+
+.seriesItem--active .seriesStatus {
+    border-color: rgba(96, 165, 250, 0.55);
+    background: rgba(96, 165, 250, 0.18);
+}
+
+/* DONE / COMPLETED */
+.seriesItem--done {
+    border-color: rgba(34, 197, 94, 0.45);
+    background: rgba(34, 197, 94, 0.08);
+}
+
+.seriesItem--done .seriesStatus {
+    border-color: rgba(34, 197, 94, 0.55);
+    background: rgba(34, 197, 94, 0.18);
+}
+
+/* Optional: tiny action buttons per item (tap-friendly) */
+.seriesItemActions {
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.seriesMiniBtn {
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text);
+    padding: 10px 10px;
+    min-height: 40px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: transform 0.06s ease, background 0.2s ease, border-color 0.2s ease;
+    font-weight: 700;
+    font-size: 12px;
+    touch-action: manipulation;
+}
+
+.seriesMiniBtn:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(96, 165, 250, 0.35);
+}
+
+.seriesMiniBtn:active {
+    transform: translateY(1px);
+}
+
+.seriesMiniBtn.done {
+    border-color: rgba(34, 197, 94, 0.45);
+    background: rgba(34, 197, 94, 0.14);
+}

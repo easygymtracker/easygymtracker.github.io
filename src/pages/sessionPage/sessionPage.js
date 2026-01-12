@@ -3,7 +3,7 @@
 import { t } from "/src/internationalization/i18n.js";
 
 import { escapeHtml } from "/src/ui/dom.js";
-import { pad2, formatMs } from "/src/utils/numberFormat.js";
+import { formatMs } from "/src/utils/numberFormat.js";
 
 
 export function mountSessionPage({ routineStore, exerciseStore }) {
@@ -23,6 +23,11 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
     let startEpochMs = null;
     let elapsedMs = 0;
     let tickHandle = null;
+
+    // --- session progress state (series status) ---
+    let currentRoutineId = null;
+    let currentSeriesIndex = 0; // "in progress"
+    let completedSeries = new Set(); // indices marked completed
 
     function stopTick() {
         if (tickHandle) {
@@ -82,10 +87,38 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
 
     btnReset.addEventListener("click", () => {
         resetTimer();
-        // also keep reset button title/aria consistent with current language
         const resetLabel = t("session.timer.reset");
         btnReset.title = resetLabel;
         btnReset.setAttribute("aria-label", resetLabel);
+    });
+
+    listEl.addEventListener("click", (e) => {
+        const item = e.target.closest(".seriesItem");
+        if (!item) return;
+
+        const idx = Number(item.dataset.seriesIdx);
+        if (!Number.isFinite(idx)) return;
+
+        const completeBtn = e.target.closest('[data-action="complete-series"]');
+        if (completeBtn) {
+            completedSeries.add(idx);
+
+            const routine = currentRoutineId ? routineStore.getById(currentRoutineId) : null;
+            const max = routine?.series?.length ?? 0;
+
+            let next = idx + 1;
+            while (next < max && completedSeries.has(next)) next += 1;
+
+            if (next < max) {
+                currentSeriesIndex = next;
+            }
+
+            renderCurrent();
+            return;
+        }
+
+        currentSeriesIndex = idx;
+        renderCurrent();
     });
 
     function resolveExerciseName(seriesItem) {
@@ -98,6 +131,12 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
             null;
 
         return ex?.name || ex?.description || id;
+    }
+
+    function statusForIndex(idx) {
+        if (completedSeries.has(idx)) return "done";
+        if (idx === currentSeriesIndex) return "active";
+        return "todo";
     }
 
     function renderSeriesList(routine) {
@@ -118,36 +157,61 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
                 ? `<span class="chip" style="margin-left:8px;">${escapeHtml(t("session.rest"))} ${s.restSecondsAfter}s</span>`
                 : "";
 
+            const status = statusForIndex(idx);
+
+            const statusIcon = status === "done" ? "✓" : status === "active" ? "▶" : "•";
+
             return `
-        <div class="routineRow" style="grid-template-columns: 1fr; padding: 12px 10px;">
-          <div class="routineMeta">
-            <h3 style="margin:0; font-size:14px;">
-              ${idx + 1}. ${escapeHtml(name)}${desc}
-            </h3>
-            <p style="margin:6px 0 0;">
-              ${setCount} ${escapeHtml(setCount === 1 ? t("session.set") : t("session.sets"))}
-              ${restAfter}
-            </p>
-          </div>
-        </div>
-      `;
+                <div class="seriesItem seriesItem--${status}" data-series-idx="${idx}">
+                    <div class="seriesItemMeta">
+                        <h4>${idx + 1}. ${escapeHtml(name)}${desc}</h4>
+                        <p>
+                            ${setCount} ${escapeHtml(setCount === 1 ? t("session.set") : t("session.sets"))}
+                            ${restAfter}
+                        </p>
+                    </div>
+
+                    <div class="seriesItemActions">
+                        <span class="seriesStatus" aria-hidden="true">${statusIcon}</span>
+                    ` +
+                     //   <button class="seriesMiniBtn done" type="button" data-action="complete-series" aria-label="✓" title="✓">✓</button>
+                     + `
+                     </div>
+                </div>
+            `;
         }).join("");
+
+        requestAnimationFrame(() => {
+            const active = listEl.querySelector(".seriesItem--active");
+            active?.scrollIntoView?.({ block: "nearest" });
+        });
+    }
+
+    function renderCurrent() {
+        const routine = currentRoutineId ? routineStore.getById(currentRoutineId) : null;
+        if (!routine) return;
+        renderSeriesList(routine);
     }
 
     return {
         render(params) {
-            // reset state when entering / switching routines
             resetTimer();
 
-            // reset reset button label (in case locale changed)
             const resetLabel = t("session.timer.reset");
             btnReset.textContent = resetLabel;
             btnReset.title = resetLabel;
             btnReset.setAttribute("aria-label", resetLabel);
 
+            syncStartPauseLabel();
+
             notFoundEl.style.display = "none";
 
-            const routineId = params?.routineId;
+            const routineId = params?.routineId ?? null;
+            currentRoutineId = routineId;
+
+            currentSeriesIndex = 0;
+            completedSeries = new Set();
+
             const routine = routineId ? routineStore.getById(routineId) : null;
 
             if (!routine) {
@@ -158,8 +222,6 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
                 return;
             }
 
-            // Title is translated by translateDocument(); keep it stable.
-            // Routine description is user content, not translated.
             metaEl.textContent = routine.description ? routine.description : "—";
 
             renderSeriesList(routine);
