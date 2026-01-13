@@ -51,7 +51,6 @@ export function startRouter({ defaultHash = "#/routines", onRoute }) {
     }
 
     window.addEventListener("hashchange", () => {
-        render();
         onNavigate.emit();
     });
 

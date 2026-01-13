@@ -1,3 +1,5 @@
+/* /styles/base.css*/
+
 :root {
     --bg: #07090f;
     /* near-black */
@@ -27,21 +29,21 @@ body {
     font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     font-size: 16px;
     /* smartphone-friendly base */
-    background: radial-gradient(1200px 700px at 20% 0%, rgba(107, 182, 255, 0.10), transparent 60%),
+    background:
+        radial-gradient(1200px 700px at 20% 0%, rgba(107, 182, 255, 0.10), transparent 60%),
         radial-gradient(900px 600px at 80% 20%, rgba(107, 182, 255, 0.06), transparent 60%),
         var(--bg);
     color: var(--text);
     min-height: 100vh;
 }
 
-/* Smartphone-first container */
+/* Layout */
 .app {
     max-width: 720px;
     margin: 0 auto;
     padding: 18px 14px calc(40px + env(safe-area-inset-bottom));
 }
 
-/* Smartphone-first header */
 header {
     display: flex;
     flex-direction: column;
@@ -68,10 +70,10 @@ header {
     gap: 10px;
     align-items: center;
     flex-wrap: wrap;
-    justify-content: end;
+    justify-content: flex-end;
 }
 
-/* Buttons: bigger tap targets */
+/* Buttons */
 .btn {
     border: 1px solid var(--border);
     background: rgba(255, 255, 255, 0.04);
@@ -115,9 +117,15 @@ header {
     background: rgba(248, 113, 113, 0.18);
 }
 
+.btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
 /* Cards */
 .card {
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.015)),
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.015)),
         var(--panel);
     border: 1px solid var(--border);
     border-radius: var(--radius);
@@ -147,19 +155,53 @@ header {
     font-size: 13px;
 }
 
-/* Routine list */
+/* Routine list container */
 .routineList {
     padding: 10px 8px 10px;
 }
 
-/* Smartphone-first routine row: stacked layout */
+/* =========================
+   Routine list row (v2)
+   =========================
+   Row = [ Play square ] [ Body (meta + actions) ]
+*/
+.routineRow {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 12px;
+    align-items: center;
+    padding: 14px 12px;
+    border-radius: 12px;
+    position: relative;
+    /* anchors floating icon */
+}
 
 .routineRow:hover {
     background: rgba(255, 255, 255, 0.03);
 }
 
+.routineRow[draggable="true"] {
+    -webkit-user-drag: element;
+}
+
+/* Reserve space for floating icon (top-right) when present */
+.withFloatingIcon {
+    padding-right: 54px;
+    padding-top: 14px;
+}
+
+/* Body: mobile stacked, desktop meta + actions */
+.routineRowBody {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    min-width: 0;
+    /* prevents overflow in grid */
+}
+
 .routineMeta {
-    width: fill available;
+    min-width: 0;
+    /* replaces invalid width: fill available */
 }
 
 .routineMeta h3 {
@@ -180,9 +222,86 @@ header {
     gap: 10px;
     align-items: center;
     flex-wrap: wrap;
-    justify-content: end;
+    justify-content: flex-end;
 }
 
+/* Main play button (square) */
+.startSessionBtn {
+    width: 54px;
+    height: 54px;
+    border-radius: 14px;
+    border: 1px solid rgba(34, 197, 94, 0.35);
+    background: rgba(34, 197, 94, 0.14);
+    color: var(--text);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.06s ease, background 0.2s ease, border-color 0.2s ease;
+    user-select: none;
+    touch-action: manipulation;
+    flex: 0 0 auto;
+}
+
+.startSessionBtn:hover {
+    background: rgba(34, 197, 94, 0.20);
+    border-color: rgba(34, 197, 94, 0.45);
+}
+
+.startSessionBtn:active {
+    transform: translateY(1px);
+}
+
+.startSessionBtn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+/* Floating routine row icon (download) */
+.routineRowDownloadBtn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 2;
+}
+
+/* Generic icon button (used in headers + rows) */
+.iconBtn {
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text);
+    border-radius: 999px;
+    cursor: pointer;
+    transition: transform 0.06s ease, background 0.2s ease, border-color 0.2s ease;
+    user-select: none;
+    touch-action: manipulation;
+}
+
+.iconBtn:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(96, 165, 250, 0.35);
+}
+
+.iconBtn:active {
+    transform: translateY(1px);
+}
+
+.iconBtn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.iconBtn .icon {
+    font-size: 18px;
+    line-height: 1;
+}
+
+/* Small pill */
 .chip {
     font-size: 12px;
     color: var(--accent2);
@@ -207,6 +326,8 @@ header {
     align-items: center;
     justify-content: space-between;
     gap: 12px;
+    position: relative;
+    /* anchors header icon */
 }
 
 .pageHeader h2 {
@@ -216,6 +337,20 @@ header {
     color: var(--accent2);
 }
 
+/* If you place an icon in the header’s top-right corner */
+.pageHeader .pageHeaderIconBtn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 2;
+}
+
+/* Reserve space so toolbar doesn't overlap the icon */
+.pageHeader .toolbar {
+    padding-right: 54px;
+}
+
+/* Routine detail header body */
 .pageHeader .routineHeader {
     display: grid;
     grid-template-columns: auto 1fr;
@@ -249,7 +384,8 @@ label {
 }
 
 input,
-textarea {
+textarea,
+select {
     width: 100%;
     padding: 12px 14px;
     border-radius: 14px;
@@ -260,7 +396,8 @@ textarea {
 }
 
 input:focus,
-textarea:focus {
+textarea:focus,
+select:focus {
     border-color: rgba(96, 165, 250, 0.55);
     box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.12);
 }
@@ -303,71 +440,7 @@ textarea {
     line-height: 1.45;
 }
 
-/* Desktop enhancements */
-@media (min-width: 720px) {
-    .app {
-        max-width: 980px;
-        padding: 28px 16px calc(60px + env(safe-area-inset-bottom));
-    }
-
-    header {
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-between;
-        gap: 16px;
-        margin-bottom: 18px;
-    }
-
-    .titleBlock h1 {
-        font-size: 24px;
-    }
-
-    .titleBlock p {
-        font-size: 14px;
-    }
-
-    .toolbar {
-        width: auto;
-        justify-content: end;
-    }
-
-    /* Two-column routine rows on larger screens */
-    .routineRow {
-        grid-template-columns: 1fr auto;
-        align-items: center;
-        padding: 12px 10px;
-    }
-
-    .rowActions {
-        justify-content: flex-end;
-    }
-
-    .chip {
-        padding: 6px 10px;
-    }
-
-    .btn {
-        padding: 10px 12px;
-        min-height: 40px;
-        border-radius: 12px;
-    }
-
-    input,
-    textarea {
-        padding: 10px 12px;
-        border-radius: 12px;
-    }
-}
-
-.btn:disabled {
-    opacity: 0.45;
-    cursor: not-allowed;
-}
-
-.routineRow[draggable="true"] {
-    -webkit-user-drag: element;
-}
-
+/* Animations for drag reorder feedback */
 @keyframes movedFlash {
     0% {
         transform: translateY(0);
@@ -411,123 +484,7 @@ textarea {
     animation: otherFlash 260ms ease-out;
 }
 
-select {
-    width: 100%;
-    padding: 12px 14px;
-    border-radius: 14px;
-    border: 1px solid var(--border);
-    background: rgba(255, 255, 255, 0.03);
-    color: var(--text);
-    outline: none;
-}
-
-select:focus {
-    border-color: rgba(96, 165, 250, 0.55);
-    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.12);
-}
-
-/* Routine row: allow absolute-positioned icon button */
-.routineRow {
-    position: relative;
-    /* NEW */
-}
-
-/* Top-right icon button inside a routine row */
-.iconBtn {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-
-    width: 40px;
-    height: 40px;
-
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-
-    border: 1px solid var(--border);
-    background: rgba(255, 255, 255, 0.04);
-    color: var(--text);
-
-    border-radius: 999px;
-    cursor: pointer;
-
-    transition: transform 0.06s ease, background 0.2s ease, border-color 0.2s ease;
-    user-select: none;
-    touch-action: manipulation;
-}
-
-.iconBtn:hover {
-    background: rgba(255, 255, 255, 0.06);
-    border-color: rgba(96, 165, 250, 0.35);
-}
-
-.iconBtn:active {
-    transform: translateY(1px);
-}
-
-.iconBtn:disabled {
-    opacity: 0.45;
-    cursor: not-allowed;
-}
-
-.iconBtn .icon {
-    font-size: 18px;
-    line-height: 1;
-}
-
-@media (min-width: 720px) {
-    .iconBtn {
-        width: 36px;
-        height: 36px;
-        top: 8px;
-        right: 8px;
-    }
-
-    .iconBtn .icon {
-        font-size: 16px;
-    }
-}
-
-@media (min-width: 720px) {
-    .routineRow {
-        padding-right: 54px;
-        padding-top: 14px;
-    }
-
-    .iconBtn {
-        top: 10px;
-        right: 10px;
-        z-index: 2;
-    }
-}
-
-.pageHeader {
-    position: relative;
-}
-
-.pageHeader .pageHeaderIconBtn {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    z-index: 2;
-}
-
-.pageHeader .toolbar {
-    padding-right: 54px;
-}
-
-@media (min-width: 720px) {
-    .pageHeader .pageHeaderIconBtn {
-        top: 8px;
-        right: 8px;
-    }
-
-    .pageHeader .toolbar {
-        padding-right: 52px;
-    }
-}
-
+/* Screen-reader only */
 .srOnly {
     position: absolute;
     width: 1px;
@@ -540,106 +497,74 @@ select:focus {
     border: 0;
 }
 
-/* =========================
-   Routine list row v2 layout
-   ========================= */
-
-/* Row becomes 2 columns:
-   [ Play square ] [ Body (meta + actions) ]
-*/
-.routineRow {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    /* NEW */
-    gap: 12px;
-    /* NEW */
-    align-items: center;
-    /* NEW */
-    padding: 14px 12px;
-    border-radius: 12px;
-    position: relative;
-}
-
-/* Reserve space for floating download icon (top-right) */
-.withFloatingIcon {
-    padding-right: 54px;
-    padding-top: 14px;
-}
-
-/* Body holds the "original grid":
-   - mobile: meta then actions stacked
-   - desktop: meta left, actions right
-*/
-.routineRowBody {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 10px;
-    min-width: 0;
-    /* important for ellipsis / no overflow */
-}
-
+/* Desktop enhancements */
 @media (min-width: 720px) {
+    .app {
+        max-width: 980px;
+        padding: 28px 16px calc(60px + env(safe-area-inset-bottom));
+    }
+
+    header {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 18px;
+    }
+
+    .titleBlock h1 {
+        font-size: 24px;
+    }
+
+    .toolbar {
+        width: auto;
+        justify-content: flex-end;
+    }
+
+    /* Routine row body becomes 2 columns on desktop */
     .routineRowBody {
         grid-template-columns: 1fr auto;
         align-items: center;
     }
-}
 
-/* Big main play button (square, rounded) */
-.startSessionBtn {
-    width: 54px;
-    height: 54px;
-    border-radius: 14px;
-    /* squared-ish with rounded corners */
-    border: 1px solid rgba(34, 197, 94, 0.35);
-    background: rgba(34, 197, 94, 0.14);
-    color: var(--text);
+    .chip {
+        padding: 6px 10px;
+    }
 
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+    .btn {
+        padding: 10px 12px;
+        min-height: 40px;
+        border-radius: 12px;
+    }
 
-    cursor: pointer;
-    transition: transform 0.06s ease, background 0.2s ease, border-color 0.2s ease;
-    user-select: none;
-    touch-action: manipulation;
-    flex: 0 0 auto;
-}
+    input,
+    textarea,
+    select {
+        padding: 10px 12px;
+        border-radius: 12px;
+    }
 
-.startSessionBtn:hover {
-    background: rgba(34, 197, 94, 0.20);
-    border-color: rgba(34, 197, 94, 0.45);
-}
-
-.startSessionBtn:active {
-    transform: translateY(1px);
-}
-
-.startSessionBtn:disabled {
-    opacity: 0.45;
-    cursor: not-allowed;
-}
-
-/* Slightly smaller on desktop to match your button sizing rhythm */
-@media (min-width: 720px) {
     .startSessionBtn {
         width: 48px;
         height: 48px;
         border-radius: 12px;
     }
-}
 
-/* Floating download icon stays absolute, but needs its own right anchor */
-.routineRowDownloadBtn {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    z-index: 2;
-}
+    .iconBtn {
+        width: 36px;
+        height: 36px;
+    }
 
-@media (min-width: 720px) {
-    .routineRowDownloadBtn {
-        top: 10px;
-        right: 10px;
+    .iconBtn .icon {
+        font-size: 16px;
+    }
+
+    .pageHeader .pageHeaderIconBtn {
+        top: 8px;
+        right: 8px;
+    }
+
+    .pageHeader .toolbar {
+        padding-right: 52px;
     }
 }

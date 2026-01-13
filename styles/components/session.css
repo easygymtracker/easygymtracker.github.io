@@ -1,13 +1,10 @@
-/* =========================
-   Session Series Item States
-   ========================= */
+/* /styles/components/session.css */
 
 .seriesItem {
     border: 1px solid var(--border);
     background: rgba(255, 255, 255, 0.02);
     border-radius: 14px;
     padding: 12px 12px;
-    margin-bottom: 10px;
     display: grid;
     grid-template-columns: 1fr auto;
     gap: 10px;
@@ -42,12 +39,11 @@
     white-space: nowrap;
 }
 
-/* TODO */
+/* Item states */
 .seriesItem--todo {
     opacity: 0.92;
 }
 
-/* ACTIVE / IN PROGRESS */
 .seriesItem--active {
     border-color: rgba(96, 165, 250, 0.55);
     background: rgba(96, 165, 250, 0.10);
@@ -58,7 +54,6 @@
     background: rgba(96, 165, 250, 0.18);
 }
 
-/* DONE / COMPLETED */
 .seriesItem--done {
     border-color: rgba(34, 197, 94, 0.45);
     background: rgba(34, 197, 94, 0.08);
@@ -99,6 +94,12 @@
     transform: translateY(1px);
 }
 
+.seriesMiniBtn:focus-visible {
+    border-color: rgba(96, 165, 250, 0.55);
+    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.12);
+    outline: none;
+}
+
 .seriesMiniBtn.done {
     border-color: rgba(34, 197, 94, 0.45);
     background: rgba(34, 197, 94, 0.14);
@@ -126,7 +127,7 @@
     }
 }
 
-/* Optional: keep right panel visible while scrolling (desktop) */
+/* Desktop: keep right panel visible while scrolling */
 @media (min-width: 901px) {
     .sessionRight {
         position: sticky;
@@ -203,7 +204,7 @@
     align-items: center;
 }
 
-/* Rep states */
+/* Rep group states */
 .repGroupItem--todo {
     opacity: 0.92;
 }
@@ -235,20 +236,18 @@
     color: var(--muted);
 }
 
+/* =========================
+   Exercise block wrapper + sublist
+   ========================= */
+
 /* Wrapper for one exercise + its sets */
 .seriesBlock {
     margin-bottom: 12px;
-    /* replaces seriesItem margin if you want */
 }
 
-/* Optional: remove margin-bottom on seriesItem since wrapper handles spacing */
-.seriesItem {
-    margin-bottom: 0;
-}
-
-/* The sublist sits visually "outside" the card */
+/* Sublist sits visually "outside" the card */
 .seriesSublist {
-    margin-top: 8px;
+    margin-top: 6px;
     padding-left: 12px;
     /* indents sets under exercise */
     border-left: 2px solid rgba(255, 255, 255, 0.08);
@@ -257,8 +256,4 @@
 /* Collapse behavior (only show sublist for active series) */
 .seriesSublist.is-collapsed {
     display: none;
-}
-
-.seriesSublist {
-    margin-top: 6px;
 }
