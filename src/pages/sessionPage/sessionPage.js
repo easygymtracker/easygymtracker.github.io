@@ -17,6 +17,24 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
     const emptyEl = document.getElementById("sessionEmpty");
     const notFoundEl = document.getElementById("sessionNotFound");
 
+    // --- insert "current exercise" section just below the timer ROW (not inside it) ---
+    const sessionFormEl = timerEl?.closest(".form");
+    const timerRowEl = sessionFormEl ? sessionFormEl.querySelector(":scope > div") : null;
+
+    const currentSectionEl = document.createElement("div");
+    currentSectionEl.id = "sessionCurrentExercise";
+    currentSectionEl.style.marginTop = "10px";
+    currentSectionEl.style.paddingTop = "10px";
+    currentSectionEl.style.borderTop = "1px solid var(--border)";
+    currentSectionEl.style.display = "none";
+
+    if (timerRowEl) {
+        timerRowEl.insertAdjacentElement("afterend", currentSectionEl);
+    } else if (sessionFormEl) {
+        // fallback: still place it at the top of the form, after the timer UI area
+        sessionFormEl.insertAdjacentElement("afterbegin", currentSectionEl);
+    }
+
     // --- timer state ---
     let running = false;
     let startEpochMs = null;
@@ -204,6 +222,122 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         return null;
     }
 
+    function renderCurrentExercise(routine) {
+        if (!currentSectionEl) return;
+
+        const series = Array.isArray(routine?.series) ? routine.series : [];
+        const s = series[currentSeriesIndex] || null;
+
+        if (!s) {
+            currentSectionEl.style.display = "none";
+            currentSectionEl.innerHTML = "";
+            return;
+        }
+
+        const name = resolveExerciseName(s);
+        const seriesDesc = s?.description ? String(s.description) : "";
+        const descSuffix = seriesDesc ? ` — <span class="muted">${escapeHtml(seriesDesc)}</span>` : "";
+
+        const groups = Array.isArray(s?.repGroups) ? s.repGroups : [];
+
+        const weightLabel = t("session.weight") || "Weight";
+        const repsLabel = t("session.reps") || "Reps";
+
+        // Render squares with arrows + rest time between them (for this exercise)
+        const flow = groups.map((rg, repIdx) => {
+            const st = statusForRep(currentSeriesIndex, repIdx);
+
+            const weight = resolveRepValue(rg, "targetWeight");
+            const reps = resolveRepValue(rg, "targetReps");
+            const weightTxt = formatSideValue(weight);
+            const repsTxt = formatSideValue(reps);
+
+            const border =
+                st === "active" ? "rgba(96, 165, 250, 0.55)"
+                    : st === "done" ? "rgba(34, 197, 94, 0.55)"
+                        : "var(--border)";
+
+            const bg =
+                st === "active" ? "rgba(96, 165, 250, 0.10)"
+                    : st === "done" ? "rgba(34, 197, 94, 0.08)"
+                        : "rgba(255, 255, 255, 0.02)";
+
+            const square = `
+              <button
+                type="button"
+                data-action="focus-current-rep"
+                data-rep-idx="${repIdx}"
+                aria-label="${escapeHtml((t("session.set") || "Set"))} ${repIdx + 1}"
+                style="
+                  min-width: 64px;
+                  height: 64px;
+                  border-radius: 12px;
+                  border: 1px solid ${border};
+                  background: ${bg};
+                  color: var(--text);
+                  display: grid;
+                  grid-template-rows: auto 1fr;
+                  align-content: start;
+                  gap: 4px;
+                  padding: 6px;
+                  cursor: pointer;
+                "
+              >
+                <div style="font-size:12px; font-weight:800; line-height:1;">${repIdx + 1}</div>
+                <div style="font-size:11px; line-height:1.15; text-align:left;">
+                  <div><span class="muted">${escapeHtml(weightLabel)}:</span> ${escapeHtml(weightTxt)}</div>
+                  <div><span class="muted">${escapeHtml(repsLabel)}:</span> ${escapeHtml(repsTxt)}</div>
+                </div>
+              </button>
+            `;
+
+            // Between sets: arrow + rest time (from THIS rep group's restSecondsAfter)
+            const restSeconds = typeof rg?.restSecondsAfter === "number" ? rg.restSecondsAfter : 0;
+            const between = (repIdx < groups.length - 1)
+                ? `
+                  <div aria-hidden="true" style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; min-width:44px;">
+                    <div style="font-size:18px; line-height:1; color: var(--muted);">→</div>
+                    ${restSeconds > 0
+                        ? `<div style="font-size:12px; color: var(--muted); font-weight:700; line-height:1;">${restSeconds}s</div>`
+                        : `<div style="font-size:12px; color: var(--muted); opacity:0.65; font-weight:700; line-height:1;">—</div>`
+                    }
+                  </div>
+                `
+                : "";
+
+            return square + between;
+        }).join("");
+
+        currentSectionEl.style.display = "";
+        currentSectionEl.innerHTML = `
+          <div style="display:flex; align-items:baseline; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+            <div style="min-width:0;">
+              <div style="font-size:12px; color: var(--muted); margin-bottom:6px;">${escapeHtml(t("session.currentExercise") || "Current exercise")}</div>
+              <div style="font-size:15px; font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                ${escapeHtml(name)}${descSuffix}
+              </div>
+            </div>
+            <div style="font-size:12px; color: var(--muted);">
+              ${escapeHtml((t("session.exercise.unknown") || "Exercise"))} ${currentSeriesIndex + 1}/${series.length}
+            </div>
+          </div>
+
+          <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+            ${flow || `<span class="muted">${escapeHtml(t("session.noSets") || "No sets")}</span>`}
+          </div>
+        `;
+    }
+
+    currentSectionEl?.addEventListener("click", (e) => {
+        const btn = e.target.closest('[data-action="focus-current-rep"]');
+        if (!btn) return;
+        const repIdx = Number(btn.dataset.repIdx);
+        if (!Number.isFinite(repIdx)) return;
+
+        currentRepGroupIndex = repIdx;
+        renderCurrent();
+    });
+
     function renderRepGroupList(seriesIdx, s) {
         const groups = Array.isArray(s?.repGroups) ? s.repGroups : [];
         if (!groups.length) return "";
@@ -324,11 +458,18 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
 
         recomputeCompletedSeries(routine);
 
+        renderCurrentExercise(routine);
+
         listEl.innerHTML = series
             .map((s, idx) => {
                 const name = resolveExerciseName(s);
                 const desc = s.description
                     ? ` — <span class="muted">${escapeHtml(s.description)}</span>`
+                    : "";
+
+                const repCount = Array.isArray(s?.repGroups) ? s.repGroups.length : 0;
+                const countChip = repCount > 0
+                    ? `<span class="chip">${repCount} ${escapeHtml(t("session.sets") || "sets")}</span>`
                     : "";
 
                 const seriesRestAfter =
@@ -349,7 +490,7 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
           <div class="seriesItem seriesItem--${status}" data-series-idx="${idx}">
             <div class="seriesItemMeta">
               <h4>${idx + 1}. ${escapeHtml(name)}${desc}</h4>
-              <p style="margin-top:8px;">${seriesRestAfter}</p>
+              <p style="margin-top:8px;">${countChip}${seriesRestAfter}</p>
             </div>
 
             <div class="seriesItemActions">
@@ -408,6 +549,8 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
                 listEl.innerHTML = "";
                 emptyEl.style.display = "none";
                 notFoundEl.style.display = "";
+                currentSectionEl.style.display = "none";
+                currentSectionEl.innerHTML = "";
                 return;
             }
 

@@ -109,7 +109,11 @@ export const DICTS = {
         "session.rest": "Rest",
         "session.restAfterExercise": "Rest after exercise",
         "session.exercise.set": "set",
-        "session.exercise.sets": "sets"
+        "session.exercise.sets": "sets",
+        "session.currentExercise": "Current exercise",
+        "session.noSets": "No sets",
+        "session.weight": "Weight",
+        "session.reps": "Reps",
     },
 
     es: {
@@ -218,7 +222,11 @@ export const DICTS = {
         "session.rest": "Descanso",
         "session.restAfterExercise": "Descanso tras el ejercicio",
         "session.exercise.set": "serie",
-        "session.exercise.sets": "series"
+        "session.exercise.sets": "series",
+        "session.currentExercise": "Ejercicio actual",
+        "session.noSets": "Sin series",
+        "session.weight": "Peso",
+        "session.reps": "Repeticiones",
     },
 
     pt: {
@@ -327,7 +335,11 @@ export const DICTS = {
         "session.rest": "Descanso",
         "session.restAfterExercise": "Descanso após o exercício",
         "session.exercise.set": "série",
-        "session.exercise.sets": "séries"
+        "session.exercise.sets": "séries",
+        "session.currentExercise": "Exercício atual",
+        "session.noSets": "Sem séries",
+        "session.weight": "Peso",
+        "session.reps": "Repetições",
     },
 
     ja: {
@@ -436,7 +448,11 @@ export const DICTS = {
         "session.rest": "休憩",
         "session.restAfterExercise": "エクササイズ後の休憩",
         "session.exercise.set": "セット",
-        "session.exercise.sets": "セット"
+        "session.exercise.sets": "セット",
+        "session.currentExercise": "現在の種目",
+        "session.noSets": "セットなし",
+        "session.weight": "重量",
+        "session.reps": "回数",
     },
 
     zh: {
@@ -545,7 +561,11 @@ export const DICTS = {
         "session.rest": "休息",
         "session.restAfterExercise": "动作后休息",
         "session.exercise.set": "组",
-        "session.exercise.sets": "组"
+        "session.exercise.sets": "组",
+        "session.currentExercise": "当前动作",
+        "session.noSets": "暂无组数",
+        "session.weight": "重量",
+        "session.reps": "次数",
     },
 
     ar: {
@@ -654,7 +674,11 @@ export const DICTS = {
         "session.rest": "راحة",
         "session.restAfterExercise": "راحة بعد التمرين",
         "session.exercise.set": "مجموعة",
-        "session.exercise.sets": "مجموعات"
+        "session.exercise.sets": "مجموعات",
+        "session.currentExercise": "التمرين الحالي",
+        "session.noSets": "لا توجد مجموعات",
+        "session.weight": "الوزن",
+        "session.reps": "التكرارات",
     },
 
     hi: {
@@ -763,7 +787,11 @@ export const DICTS = {
         "session.rest": "आराम",
         "session.restAfterExercise": "एक्सरसाइज़ के बाद आराम",
         "session.exercise.set": "सेट",
-        "session.exercise.sets": "सेट"
+        "session.exercise.sets": "सेट",
+        "session.currentExercise": "वर्तमान व्यायाम",
+        "session.noSets": "कोई सेट नहीं",
+        "session.weight": "वजन",
+        "session.reps": "दोहराव",
     },
 
     de: {
@@ -872,7 +900,11 @@ export const DICTS = {
         "session.rest": "Pause",
         "session.restAfterExercise": "Pause nach der Übung",
         "session.exercise.set": "Satz",
-        "session.exercise.sets": "Sätze"
+        "session.exercise.sets": "Sätze",
+        "session.currentExercise": "Aktuelle Übung",
+        "session.noSets": "Keine Sätze",
+        "session.weight": "Gewicht",
+        "session.reps": "Wiederholungen",
     },
 
     fr: {
@@ -981,7 +1013,11 @@ export const DICTS = {
         "session.rest": "Repos",
         "session.restAfterExercise": "Repos après l’exercice",
         "session.exercise.set": "série",
-        "session.exercise.sets": "séries"
+        "session.exercise.sets": "séries",
+        "session.currentExercise": "Exercice en cours",
+        "session.noSets": "Aucune série",
+        "session.weight": "Poids",
+        "session.reps": "Répétitions",
     },
 
     ru: {
@@ -1090,7 +1126,11 @@ export const DICTS = {
         "session.rest": "Отдых",
         "session.restAfterExercise": "Отдых после упражнения",
         "session.exercise.set": "подход",
-        "session.exercise.sets": "подходы"
+        "session.exercise.sets": "подходы",
+        "session.currentExercise": "Текущее упражнение",
+        "session.noSets": "Нет подходов",
+        "session.weight": "Вес",
+        "session.reps": "Повторы",
     },
 
     it: {
@@ -1199,7 +1239,11 @@ export const DICTS = {
         "session.rest": "Recupero",
         "session.restAfterExercise": "Recupero dopo l’esercizio",
         "session.exercise.set": "serie",
-        "session.exercise.sets": "serie"
+        "session.exercise.sets": "serie",
+        "session.currentExercise": "Esercizio corrente",
+        "session.noSets": "Nessuna serie",
+        "session.weight": "Peso",
+        "session.reps": "Ripetizioni",
     },
 
     nl: {
@@ -1308,7 +1352,11 @@ export const DICTS = {
         "session.rest": "Rust",
         "session.restAfterExercise": "Rust na oefening",
         "session.exercise.set": "set",
-        "session.exercise.sets": "sets"
+        "session.exercise.sets": "sets",
+        "session.currentExercise": "Huidige oefening",
+        "session.noSets": "Geen sets",
+        "session.weight": "Gewicht",
+        "session.reps": "Herhalingen",
     },
 
     pl: {
@@ -1417,7 +1465,11 @@ export const DICTS = {
         "session.rest": "Przerwa",
         "session.restAfterExercise": "Przerwa po ćwiczeniu",
         "session.exercise.set": "seria",
-        "session.exercise.sets": "serie"
+        "session.exercise.sets": "serie",
+        "session.currentExercise": "Bieżące ćwiczenie",
+        "session.noSets": "Brak serii",
+        "session.weight": "Ciężar",
+        "session.reps": "Powtórzenia",
     },
 
     tr: {
@@ -1526,6 +1578,10 @@ export const DICTS = {
         "session.rest": "Dinlenme",
         "session.restAfterExercise": "Egzersiz sonrası dinlenme",
         "session.exercise.set": "set",
-        "session.exercise.sets": "set"
+        "session.exercise.sets": "set",
+        "session.currentExercise": "Mevcut egzersiz",
+        "session.noSets": "Set yok",
+        "session.weight": "Ağırlık",
+        "session.reps": "Tekrar",
     }
 };
