@@ -281,7 +281,6 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
                   align-content: start;
                   gap: 4px;
                   padding: 6px;
-                  cursor: pointer;
                 "
               >
                 <div style="font-size:12px; font-weight:800; line-height:1;">${repIdx + 1}</div>
@@ -292,7 +291,6 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
               </button>
             `;
 
-            // Between sets: arrow + rest time (from THIS rep group's restSecondsAfter)
             const restSeconds = typeof rg?.restSecondsAfter === "number" ? rg.restSecondsAfter : 0;
             const between = (repIdx < groups.length - 1)
                 ? `
@@ -332,11 +330,6 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
     currentSectionEl?.addEventListener("click", (e) => {
         const btn = e.target.closest('[data-action="focus-current-rep"]');
         if (!btn) return;
-        const repIdx = Number(btn.dataset.repIdx);
-        if (!Number.isFinite(repIdx)) return;
-
-        currentRepGroupIndex = repIdx;
-        renderCurrent();
     });
 
     function renderRepGroupList(seriesIdx, s) {
@@ -399,7 +392,6 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         const repItem = e.target.closest(".repGroupItem");
         const seriesItem = e.target.closest(".seriesItem");
 
-        // Complete a rep group
         const completeRepBtn = e.target.closest('[data-action="complete-rep"]');
         if (completeRepBtn && repItem) {
             const sIdx = Number(repItem.dataset.seriesIdx);
@@ -421,32 +413,13 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
             return;
         }
 
-        // Click a rep group to focus it
         if (repItem) {
-            const sIdx = Number(repItem.dataset.seriesIdx);
-            const rIdx = Number(repItem.dataset.repIdx);
-            if (!Number.isFinite(sIdx) || !Number.isFinite(rIdx)) return;
-
-            currentSeriesIndex = sIdx;
-            currentRepGroupIndex = rIdx;
-            renderCurrent();
             return;
         }
 
-        // Click a series to focus its first incomplete rep (or first rep)
+        // Disable "focus by click" for series items
         if (seriesItem) {
-            const sIdx = Number(seriesItem.dataset.seriesIdx);
-            if (!Number.isFinite(sIdx)) return;
-
-            const routine = currentRoutineId ? routineStore.getById(currentRoutineId) : null;
-            const groups = routine?.series?.[sIdx]?.repGroups ?? [];
-
-            let first = 0;
-            while (first < groups.length && isRepDone(sIdx, first)) first += 1;
-
-            currentSeriesIndex = sIdx;
-            currentRepGroupIndex = groups.length ? Math.min(first, groups.length - 1) : 0;
-            renderCurrent();
+            return;
         }
     });
 
