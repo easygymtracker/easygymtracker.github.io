@@ -33,6 +33,79 @@ function rowFromPoint(rowSelector, x, y) {
   return el ? el.closest(rowSelector) : null;
 }
 
+function closestFromEventTarget(target, selector) {
+  if (!target) return null;
+  if (target.nodeType === 1) return target.closest(selector);
+  if (target.nodeType === 3) return target.parentElement?.closest(selector) ?? null;
+  return null;
+}
+
+function getRowByIndex(containerEl, rowSelector, idx) {
+  return containerEl.querySelector(`${rowSelector}[data-index="${idx}"]`);
+}
+
+/**
+ * Creates a floating "ghost" element that follows pointer/cursor.
+ */
+function createDragGhostFromRow(rowEl) {
+  if (!rowEl) return null;
+
+  const rect = rowEl.getBoundingClientRect();
+  const ghost = rowEl.cloneNode(true);
+
+  // Keep it visually consistent but "floating"
+  ghost.style.position = "fixed";
+  ghost.style.left = "0px";
+  ghost.style.top = "0px";
+  ghost.style.width = `${rect.width}px`;
+  ghost.style.height = `${rect.height}px`;
+  ghost.style.margin = "0";
+  ghost.style.pointerEvents = "none";
+  ghost.style.zIndex = "9999";
+  ghost.style.boxSizing = "border-box";
+  ghost.style.transform = `translate(${rect.left}px, ${rect.top}px)`;
+  ghost.style.opacity = "0.95";
+  ghost.style.filter = "drop-shadow(0 10px 18px rgba(0,0,0,0.25))";
+  ghost.style.transition = "transform 0.02s linear";
+
+  document.body.appendChild(ghost);
+  return ghost;
+}
+
+function applyTakenStyle(rowEl) {
+  if (!rowEl) return;
+  rowEl.__reorderPrevStyle = {
+    opacity: rowEl.style.opacity,
+    transform: rowEl.style.transform,
+    filter: rowEl.style.filter,
+  };
+  rowEl.style.opacity = "0.55";
+  rowEl.style.transform = "scale(0.995)";
+  rowEl.style.filter = "saturate(0.8)";
+}
+
+function clearTakenStyle(rowEl) {
+  if (!rowEl) return;
+  const prev = rowEl.__reorderPrevStyle;
+  if (prev) {
+    rowEl.style.opacity = prev.opacity ?? "";
+    rowEl.style.transform = prev.transform ?? "";
+    rowEl.style.filter = prev.filter ?? "";
+    delete rowEl.__reorderPrevStyle;
+  } else {
+    rowEl.style.opacity = "";
+    rowEl.style.transform = "";
+    rowEl.style.filter = "";
+  }
+}
+
+function moveGhost(ghostEl, x, y, offsetX, offsetY) {
+  if (!ghostEl) return;
+  const gx = x - (offsetX || 0);
+  const gy = y - (offsetY || 0);
+  ghostEl.style.transform = `translate(${gx}px, ${gy}px)`;
+}
+
 /**
  * Attach drag-and-drop reorder behavior to a container that renders rows with:
  *   - `rowSelector` (default: ".routineRow[data-index]")
@@ -44,6 +117,10 @@ function rowFromPoint(rowSelector, x, y) {
  *   - Long-press to enter "reorder mode"
  *   - Drag finger over rows to choose destination
  *   - Calls onReorder ONCE on release
+ *
+ * Visual support:
+ *   - The dragged item is "taken" from the list (dimmed)
+ *   - A ghost clone follows cursor/finger
  */
 export function attachDragReorder(containerEl, {
   rowSelector = '.routineRow[data-index]',
@@ -53,40 +130,89 @@ export function attachDragReorder(containerEl, {
   if (!containerEl) return () => { };
   if (typeof onReorder !== 'function') return () => { };
 
-  let dragFromIndex = null;
+  // -----------------------
+  // Shared ghost state
+  // -----------------------
+  let ghostEl = null;
+  let sourceRowEl = null;
+  let offsetX = 0;
+  let offsetY = 0;
 
-  function closestFromEventTarget(target, selector) {
-    if (!target) return null;
-    if (target.nodeType === 1) return target.closest(selector);
-    if (target.nodeType === 3) return target.parentElement?.closest(selector) ?? null;
-    return null;
+  function cleanupGhost() {
+    if (ghostEl) {
+      ghostEl.remove();
+      ghostEl = null;
+    }
+    if (sourceRowEl) {
+      clearTakenStyle(sourceRowEl);
+      sourceRowEl = null;
+    }
+    offsetX = 0;
+    offsetY = 0;
   }
+
+  // -----------------------
+  // Desktop HTML5 DnD
+  // -----------------------
+  let dragFromIndex = null;
 
   function onDragStart(e) {
     const row = closestFromEventTarget(e.target, rowSelector);
     if (!row) return;
 
     dragFromIndex = Number(row.getAttribute('data-index'));
+
+    // make the row look "taken"
+    sourceRowEl = row;
+    applyTakenStyle(sourceRowEl);
+
+    // compute cursor offset inside row
+    const rect = row.getBoundingClientRect();
+    offsetX = (typeof e.clientX === "number") ? (e.clientX - rect.left) : 12;
+    offsetY = (typeof e.clientY === "number") ? (e.clientY - rect.top) : 12;
+
+    // create ghost + place initially
+    ghostEl = createDragGhostFromRow(row);
+    moveGhost(ghostEl, e.clientX, e.clientY, offsetX, offsetY);
+
+    // keep default DnD behavior, but try to hide the browser drag image
+    try {
+      const img = new Image();
+      img.src =
+        "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==";
+      e.dataTransfer.setDragImage(img, 0, 0);
+    } catch { }
+
     e.dataTransfer.effectAllowed = 'move';
     e.dataTransfer.setData('text/plain', String(dragFromIndex));
-    row.style.opacity = '0.7';
   }
 
-  function onDragEnd(e) {
-    const row = closestFromEventTarget(e.target, rowSelector);
-    if (row) row.style.opacity = '';
+  function onDragEnd() {
     dragFromIndex = null;
+    cleanupGhost();
   }
 
   function onDragOver(e) {
-    const row = e.target.closest(rowSelector);
+    const row = closestFromEventTarget(e.target, rowSelector);
     if (!row) return;
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
+
+    // update ghost position on dragover (works in most browsers)
+    if (ghostEl && typeof e.clientX === "number" && typeof e.clientY === "number") {
+      moveGhost(ghostEl, e.clientX, e.clientY, offsetX, offsetY);
+    }
+  }
+
+  // extra: update ghost even when over gaps / container background
+  function onDocDragOver(e) {
+    if (!ghostEl) return;
+    if (typeof e.clientX !== "number" || typeof e.clientY !== "number") return;
+    moveGhost(ghostEl, e.clientX, e.clientY, offsetX, offsetY);
   }
 
   function onDrop(e) {
-    const targetRow = e.target.closest(rowSelector);
+    const targetRow = closestFromEventTarget(e.target, rowSelector);
     if (!targetRow) return;
     e.preventDefault();
 
@@ -98,13 +224,16 @@ export function attachDragReorder(containerEl, {
     }
 
     if (!Number.isInteger(fromIdx) || !Number.isInteger(toIdx)) return;
+
     onReorder(fromIdx, toIdx);
+    cleanupGhost();
   }
 
   containerEl.addEventListener('dragstart', onDragStart);
   containerEl.addEventListener('dragend', onDragEnd);
   containerEl.addEventListener('dragover', onDragOver);
   containerEl.addEventListener('drop', onDrop);
+  document.addEventListener('dragover', onDocDragOver);
 
   // -----------------------
   // Mobile long-press reorder (single call)
@@ -118,7 +247,6 @@ export function attachDragReorder(containerEl, {
   let startX = 0;
   let startY = 0;
 
-  // allow a little finger drift while long-pressing
   const CANCEL_DRIFT_PX = 18;
 
   function clearPressTimer() {
@@ -143,18 +271,22 @@ export function attachDragReorder(containerEl, {
     containerEl.style.userSelect = "";
     containerEl.style.touchAction = "";
     containerEl.removeEventListener("contextmenu", preventContextMenu);
+
+    cleanupGhost();
   }
 
-  function armReorder() {
+  function armReorder(startRow) {
     armed = true;
     containerEl.classList.add("isReordering");
 
-    // lock down selection + touch gestures while armed
     containerEl.style.userSelect = "none";
     containerEl.style.touchAction = "none";
-
-    // stop iOS long-press menu
     containerEl.addEventListener("contextmenu", preventContextMenu, { passive: false });
+
+    // Create ghost + mark source as taken
+    sourceRowEl = startRow;
+    applyTakenStyle(sourceRowEl);
+    ghostEl = createDragGhostFromRow(startRow);
   }
 
   function commitIfNeeded() {
@@ -164,14 +296,14 @@ export function attachDragReorder(containerEl, {
     onReorder(fromIdx, pendingToIdx);
   }
 
-  // ---- Pointer Events path (preferred when available) ----
+  // ---- Pointer Events path ----
   let pointerId = null;
 
   function onPointerDown(e) {
     if (!isTouchLike()) return;
     if (e.button != null && e.button !== 0) return;
 
-    const row = e.target.closest(rowSelector);
+    const row = closestFromEventTarget(e.target, rowSelector);
     if (!row) return;
 
     pointerId = e.pointerId;
@@ -182,12 +314,18 @@ export function attachDragReorder(containerEl, {
     startX = e.clientX;
     startY = e.clientY;
 
+    // offset inside row for ghost positioning
+    const rect = row.getBoundingClientRect();
+    offsetX = e.clientX - rect.left;
+    offsetY = e.clientY - rect.top;
+
     armed = false;
     containerEl.style.userSelect = "none";
 
     clearPressTimer();
     pressTimer = setTimeout(() => {
-      armReorder();
+      armReorder(row);
+      moveGhost(ghostEl, startX, startY, offsetX, offsetY);
       try { row.setPointerCapture(pointerId); } catch { }
     }, longPressMs);
   }
@@ -200,15 +338,18 @@ export function attachDragReorder(containerEl, {
       const dx = Math.abs(e.clientX - startX);
       const dy = Math.abs(e.clientY - startY);
       if (dx > CANCEL_DRIFT_PX || dy > CANCEL_DRIFT_PX) {
-        cleanupMobile(); // user is scrolling
+        cleanupMobile();
         pointerId = null;
       }
       return;
     }
 
-    // armed: prevent scroll and track destination
     e.preventDefault();
 
+    // move ghost
+    moveGhost(ghostEl, e.clientX, e.clientY, offsetX, offsetY);
+
+    // track destination
     const targetRow = rowFromPoint(rowSelector, e.clientX, e.clientY);
     if (!targetRow) return;
 
@@ -236,18 +377,17 @@ export function attachDragReorder(containerEl, {
     pointerId = null;
   }
 
-  // Use passive:false on down so browsers don't lock us out of gesture control
   containerEl.addEventListener("pointerdown", onPointerDown, { passive: false });
   containerEl.addEventListener("pointermove", onPointerMove, { passive: false });
   containerEl.addEventListener("pointerup", onPointerUp, { passive: true });
   containerEl.addEventListener("pointercancel", onPointerCancel, { passive: true });
 
-  // ---- Touch Events fallback (for mobile Safari quirks / older browsers) ----
+  // ---- Touch Events fallback ----
   function onTouchStart(e) {
     if (!isTouchLike()) return;
     if (!e.touches || e.touches.length !== 1) return;
 
-    const row = e.target.closest(rowSelector);
+    const row = closestFromEventTarget(e.target, rowSelector);
     if (!row) return;
 
     const t0 = e.touches[0];
@@ -257,12 +397,18 @@ export function attachDragReorder(containerEl, {
     fromIdx = Number(row.getAttribute("data-index"));
     pendingToIdx = fromIdx;
 
+    // offset inside row
+    const rect = row.getBoundingClientRect();
+    offsetX = t0.clientX - rect.left;
+    offsetY = t0.clientY - rect.top;
+
     armed = false;
     containerEl.style.userSelect = "none";
 
     clearPressTimer();
     pressTimer = setTimeout(() => {
-      armReorder();
+      armReorder(row);
+      moveGhost(ghostEl, startX, startY, offsetX, offsetY);
     }, longPressMs);
   }
 
@@ -279,9 +425,12 @@ export function attachDragReorder(containerEl, {
       return;
     }
 
-    // armed: prevent scroll and track destination
     e.preventDefault();
 
+    // move ghost
+    moveGhost(ghostEl, t0.clientX, t0.clientY, offsetX, offsetY);
+
+    // track destination
     const targetRow = rowFromPoint(rowSelector, t0.clientX, t0.clientY);
     if (!targetRow) return;
 
@@ -311,6 +460,7 @@ export function attachDragReorder(containerEl, {
     containerEl.removeEventListener('dragend', onDragEnd);
     containerEl.removeEventListener('dragover', onDragOver);
     containerEl.removeEventListener('drop', onDrop);
+    document.removeEventListener('dragover', onDocDragOver);
 
     containerEl.removeEventListener("pointerdown", onPointerDown);
     containerEl.removeEventListener("pointermove", onPointerMove);
@@ -323,5 +473,6 @@ export function attachDragReorder(containerEl, {
     containerEl.removeEventListener("touchcancel", onTouchCancel);
 
     cleanupMobile();
+    cleanupGhost();
   };
 }
