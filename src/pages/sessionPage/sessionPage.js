@@ -4,6 +4,7 @@ import { t } from "/src/internationalization/i18n.js";
 
 import { escapeHtml } from "/src/ui/dom.js";
 import { formatMs } from "/src/utils/numberFormat.js";
+import { attachDragReorder, moveItem } from "/src/ui/common/reorderUtils.js";
 
 export function mountSessionPage({ routineStore, exerciseStore }) {
     const titleEl = document.getElementById("sessionTitle");
@@ -298,9 +299,9 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
                   <div aria-hidden="true" style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; min-width:44px;">
                     <div style="font-size:18px; line-height:1; color: var(--muted);">→</div>
                     ${restSeconds > 0
-                        ? `<div style="font-size:12px; color: var(--muted); font-weight:700; line-height:1;">${restSeconds}s</div>`
-                        : `<div style="font-size:12px; color: var(--muted); opacity:0.65; font-weight:700; line-height:1;">—</div>`
-                    }
+                    ? `<div style="font-size:12px; color: var(--muted); font-weight:700; line-height:1;">${restSeconds}s</div>`
+                    : `<div style="font-size:12px; color: var(--muted); opacity:0.65; font-weight:700; line-height:1;">—</div>`
+                }
                   </div>
                 `
                 : "";
@@ -449,6 +450,33 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         }
     });
 
+    function reorderSeriesAndSave(fromIdx, toIdx) {
+        const routine = currentRoutineId ? routineStore.getById(currentRoutineId) : null;
+        if (!routine) return;
+
+        const n = Array.isArray(routine.series) ? routine.series.length : 0;
+        if (
+            !Number.isInteger(fromIdx) || !Number.isInteger(toIdx) ||
+            fromIdx < 0 || toIdx < 0 || fromIdx >= n || toIdx >= n
+        ) return;
+
+        moveItem(routine.series, fromIdx, toIdx);
+        routineStore.update(routine);
+
+        // keep selection stable: if the user reordered around the active series, adjust index
+        if (currentSeriesIndex === fromIdx) currentSeriesIndex = toIdx;
+        else if (fromIdx < currentSeriesIndex && toIdx >= currentSeriesIndex) currentSeriesIndex -= 1;
+        else if (fromIdx > currentSeriesIndex && toIdx <= currentSeriesIndex) currentSeriesIndex += 1;
+
+        renderSeriesList(routine);
+    }
+
+    // Attach once (no need to reattach on each render)
+    attachDragReorder(listEl, {
+        rowSelector: '.seriesBlock[data-index]',
+        onReorder: (fromIdx, toIdx) => reorderSeriesAndSave(fromIdx, toIdx),
+    });
+
     function renderSeriesList(routine) {
         const series = Array.isArray(routine?.series) ? routine.series : [];
 
@@ -482,11 +510,10 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
                 const status = statusForSeries(idx, routine);
                 const statusIcon = status === "done" ? "✓" : status === "active" ? "▶" : "•";
 
-                // Only show sublist for the selected/current series (recommended UX)
                 const showSublist = idx === currentSeriesIndex;
 
                 return `
-        <div class="seriesBlock" data-series-idx="${idx}">
+        <div class="seriesBlock" data-index="${idx}" draggable="true" style="cursor:grab;">
           <div class="seriesItem seriesItem--${status}" data-series-idx="${idx}">
             <div class="seriesItemMeta">
               <h4>${idx + 1}. ${escapeHtml(name)}${desc}</h4>

@@ -568,3 +568,6 @@ textarea {
         padding-right: 52px;
     }
 }
+
+/* only during active long-press drag */
+.isReordering { touch-action: none; }
