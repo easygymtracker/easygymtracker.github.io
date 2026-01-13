@@ -45,11 +45,14 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
     // --- session progress state (series + repGroups status) ---
     let currentRoutineId = null;
 
-    let currentSeriesIndex = 0; // active exercise
+    let currentSeriesIndex = 0; // active exercise (index in ORIGINAL routine.series)
     let currentRepGroupIndex = 0; // active set within exercise
 
     let completedSeries = new Set(); // indices marked completed (derived/optional)
     let completedRepGroups = new Map(); // seriesIdx -> Set(repIdx)
+
+    // Local display order
+    let sessionSeriesOrder = null;
 
     function stopTick() {
         if (tickHandle) {
@@ -211,8 +214,6 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         return String(v);
     }
 
-    // Uses last history entry if present; otherwise uses target fields.
-    // Supports number (bilateral) or {left,right} (unilateral).
     function resolveRepValue(repGroup, field /* "targetWeight" | "targetReps" */) {
         const hist = Array.isArray(repGroup?.history) ? repGroup.history : [];
         const last = hist.length ? hist[hist.length - 1] : null;
@@ -244,7 +245,6 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         const weightLabel = t("session.weight") || "Weight";
         const repsLabel = t("session.reps") || "Reps";
 
-        // Render squares with arrows + rest time between them (for this exercise)
         const flow = groups.map((rg, repIdx) => {
             const st = statusForRep(currentSeriesIndex, repIdx);
 
@@ -417,7 +417,6 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
             return;
         }
 
-        // Disable "focus by click" for series items
         if (seriesItem) {
             return;
         }
@@ -427,19 +426,16 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         const routine = currentRoutineId ? routineStore.getById(currentRoutineId) : null;
         if (!routine) return;
 
-        const n = Array.isArray(routine.series) ? routine.series.length : 0;
+        const series = Array.isArray(routine.series) ? routine.series : [];
+        if (!sessionSeriesOrder) sessionSeriesOrder = series.map((_, i) => i);
+
+        const n = sessionSeriesOrder.length;
         if (
             !Number.isInteger(fromIdx) || !Number.isInteger(toIdx) ||
             fromIdx < 0 || toIdx < 0 || fromIdx >= n || toIdx >= n
         ) return;
 
-        moveItem(routine.series, fromIdx, toIdx);
-        routineStore.update(routine);
-
-        // keep selection stable: if the user reordered around the active series, adjust index
-        if (currentSeriesIndex === fromIdx) currentSeriesIndex = toIdx;
-        else if (fromIdx < currentSeriesIndex && toIdx >= currentSeriesIndex) currentSeriesIndex -= 1;
-        else if (fromIdx > currentSeriesIndex && toIdx <= currentSeriesIndex) currentSeriesIndex += 1;
+        moveItem(sessionSeriesOrder, fromIdx, toIdx);
 
         renderSeriesList(routine);
     }
@@ -453,6 +449,10 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
     function renderSeriesList(routine) {
         const series = Array.isArray(routine?.series) ? routine.series : [];
 
+        if (!sessionSeriesOrder || sessionSeriesOrder.length !== series.length) {
+            sessionSeriesOrder = series.map((_, i) => i);
+        }
+
         emptyEl.style.display = series.length ? "none" : "";
         listEl.innerHTML = "";
         if (!series.length) return;
@@ -461,8 +461,11 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
 
         renderCurrentExercise(routine);
 
-        listEl.innerHTML = series
-            .map((s, idx) => {
+        listEl.innerHTML = sessionSeriesOrder
+            .map((origIdx, displayIdx) => {
+                const s = series[origIdx];
+                const idx = origIdx;
+
                 const name = resolveExerciseName(s);
                 const desc = s.description
                     ? ` — <span class="muted">${escapeHtml(s.description)}</span>`
@@ -486,7 +489,7 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
                 const showSublist = idx === currentSeriesIndex;
 
                 return `
-        <div class="seriesBlock" data-index="${idx}" draggable="true" style="cursor:grab;">
+        <div class="seriesBlock" data-index="${displayIdx}" draggable="true" style="cursor:grab;">
           <div class="seriesItem seriesItem--${status}" data-series-idx="${idx}">
             <div class="seriesItemMeta">
               <h4>${idx + 1}. ${escapeHtml(name)}${desc}</h4>
@@ -541,6 +544,8 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
 
             completedSeries = new Set();
             completedRepGroups = new Map();
+
+            sessionSeriesOrder = null;
 
             const routine = routineId ? routineStore.getById(routineId) : null;
 
