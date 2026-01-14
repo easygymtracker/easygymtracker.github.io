@@ -570,4 +570,4 @@ textarea {
 }
 
 /* only during active long-press drag */
-.isReordering { touch-action: none; }
+body .isReordering { touch-action: none; }
