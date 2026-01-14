@@ -32,7 +32,6 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
     if (timerRowEl) {
         timerRowEl.insertAdjacentElement("afterend", currentSectionEl);
     } else if (sessionFormEl) {
-        // fallback: still place it at the top of the form, after the timer UI area
         sessionFormEl.insertAdjacentElement("afterbegin", currentSectionEl);
     }
 
@@ -241,15 +240,64 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         const descSuffix = seriesDesc ? ` — <span class="muted">${escapeHtml(seriesDesc)}</span>` : "";
 
         const groups = Array.isArray(s?.repGroups) ? s.repGroups : [];
+        const rg = groups[currentRepGroupIndex] || null;
 
         const weightLabel = t("session.weight") || "Weight";
         const repsLabel = t("session.reps") || "Reps";
 
-        const flow = groups.map((rg, repIdx) => {
-            const st = statusForRep(currentSeriesIndex, repIdx);
-
+        // ----- Current set subsection (only if a set exists) -----
+        let currentSetHtml = "";
+        if (rg) {
             const weight = resolveRepValue(rg, "targetWeight");
             const reps = resolveRepValue(rg, "targetReps");
+            const weightTxt = formatSideValue(weight);
+            const repsTxt = formatSideValue(reps);
+
+            const timerLabel = t("session.currentSet.timer") || "Set timer";
+            const doneLabel = t("session.currentSet.done") || "Completed";
+
+            currentSetHtml = `
+          <div class="currentExerciseSubdivider"></div>
+
+          <div class="currentSetRow">
+            <div class="currentSetTimer" aria-label="${escapeHtml(timerLabel)}">
+              <div class="currentSetTimerLabel">${escapeHtml(timerLabel)}</div>
+              <div class="currentSetTimerValue" id="currentSetTimerValue">00:00</div>
+            </div>
+
+            <div class="currentSetMetrics">
+              <div class="currentSetMetricsTop">
+                <span class="currentSetBadge">${escapeHtml(t("session.set") || "Set")} ${currentRepGroupIndex + 1}</span>
+                <span class="muted">${escapeHtml(name)}</span>
+              </div>
+
+              <div style="margin-top:8px; display:flex; gap:14px; flex-wrap:wrap;">
+                <div class="currentSetMetricLine">
+                  <span class="muted">${escapeHtml(weightLabel)}:</span> ${escapeHtml(weightTxt)}
+                </div>
+                <div class="currentSetMetricLine">
+                  <span class="muted">${escapeHtml(repsLabel)}:</span> ${escapeHtml(repsTxt)}
+                </div>
+              </div>
+            </div>
+
+            <div class="currentSetActions">
+              <button class="btn primary currentSetDoneBtn"
+                      type="button"
+                      data-action="complete-current-set">
+                ${escapeHtml(doneLabel)}
+              </button>
+            </div>
+          </div>
+        `;
+        }
+
+        // ----- All sets subsection (your existing squares flow) -----
+        const flow = groups.map((rg2, repIdx) => {
+            const st = statusForRep(currentSeriesIndex, repIdx);
+
+            const weight = resolveRepValue(rg2, "targetWeight");
+            const reps = resolveRepValue(rg2, "targetReps");
             const weightTxt = formatSideValue(weight);
             const repsTxt = formatSideValue(reps);
 
@@ -264,67 +312,75 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
                         : "rgba(255, 255, 255, 0.02)";
 
             const square = `
-              <button
-                type="button"
-                data-action="focus-current-rep"
-                data-rep-idx="${repIdx}"
-                aria-label="${escapeHtml((t("session.set") || "Set"))} ${repIdx + 1}"
-                style="
-                  min-width: 64px;
-                  height: 64px;
-                  border-radius: 12px;
-                  border: 1px solid ${border};
-                  background: ${bg};
-                  color: var(--text);
-                  display: grid;
-                  grid-template-rows: auto 1fr;
-                  align-content: start;
-                  gap: 4px;
-                  padding: 6px;
-                "
-              >
-                <div style="font-size:12px; font-weight:800; line-height:1;">${repIdx + 1}</div>
-                <div style="font-size:11px; line-height:1.15; text-align:left;">
-                  <div><span class="muted">${escapeHtml(weightLabel)}:</span> ${escapeHtml(weightTxt)}</div>
-                  <div><span class="muted">${escapeHtml(repsLabel)}:</span> ${escapeHtml(repsTxt)}</div>
-                </div>
-              </button>
-            `;
+          <button
+            type="button"
+            data-action="focus-current-rep"
+            data-rep-idx="${repIdx}"
+            aria-label="${escapeHtml((t("session.set") || "Set"))} ${repIdx + 1}"
+            style="
+              min-width: 64px;
+              height: 64px;
+              border-radius: 12px;
+              border: 1px solid ${border};
+              background: ${bg};
+              color: var(--text);
+              display: grid;
+              grid-template-rows: auto 1fr;
+              align-content: start;
+              gap: 4px;
+              padding: 6px;
+            "
+          >
+            <div style="font-size:12px; font-weight:800; line-height:1;">${repIdx + 1}</div>
+            <div style="font-size:11px; line-height:1.15; text-align:left;">
+              <div><span class="muted">${escapeHtml(weightLabel)}:</span> ${escapeHtml(weightTxt)}</div>
+              <div><span class="muted">${escapeHtml(repsLabel)}:</span> ${escapeHtml(repsTxt)}</div>
+            </div>
+          </button>
+        `;
 
-            const restSeconds = typeof rg?.restSecondsAfter === "number" ? rg.restSecondsAfter : 0;
+            const restSeconds = typeof rg2?.restSecondsAfter === "number" ? rg2.restSecondsAfter : 0;
             const between = (repIdx < groups.length - 1)
                 ? `
-                  <div aria-hidden="true" style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; min-width:44px;">
-                    <div style="font-size:18px; line-height:1; color: var(--muted);">→</div>
-                    ${restSeconds > 0
+              <div aria-hidden="true" style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; min-width:44px;">
+                <div style="font-size:18px; line-height:1; color: var(--muted);">→</div>
+                ${restSeconds > 0
                     ? `<div style="font-size:12px; color: var(--muted); font-weight:700; line-height:1;">${restSeconds}s</div>`
                     : `<div style="font-size:12px; color: var(--muted); opacity:0.65; font-weight:700; line-height:1;">—</div>`
                 }
-                  </div>
-                `
+              </div>
+            `
                 : "";
 
             return square + between;
         }).join("");
 
+        const allSetsLabel = escapeHtml(t("session.allSets") || "All sets");
+
         currentSectionEl.style.display = "";
         currentSectionEl.innerHTML = `
-          <div style="display:flex; align-items:baseline; justify-content:space-between; gap:10px; flex-wrap:wrap;">
-            <div style="min-width:0;">
-              <div style="font-size:12px; color: var(--muted); margin-bottom:6px;">${escapeHtml(t("session.currentExercise") || "Current exercise")}</div>
-              <div style="font-size:15px; font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
-                ${escapeHtml(name)}${descSuffix}
-              </div>
-            </div>
-            <div style="font-size:12px; color: var(--muted);">
-              ${escapeHtml((t("session.exercise.unknown") || "Exercise"))} ${currentSeriesIndex + 1}/${series.length}
-            </div>
+      <div class="currentExerciseHeader">
+        <div class="currentExerciseTitleWrap">
+          <div class="currentExerciseLabel">${escapeHtml(t("session.currentExercise") || "Current exercise")}</div>
+          <div class="currentExerciseName">
+            ${escapeHtml(name)}${descSuffix}
           </div>
+        </div>
 
-          <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
-            ${flow || `<span class="muted">${escapeHtml(t("session.noSets") || "No sets")}</span>`}
-          </div>
-        `;
+        <div class="currentExerciseIdx">
+          ${escapeHtml((t("session.exercise") || "Exercise"))} ${currentSeriesIndex + 1}/${series.length}
+        </div>
+      </div>
+
+      ${currentSetHtml}
+
+      <div class="currentExerciseSubdivider"></div>
+
+      <div class="allSetsLabel">${allSetsLabel}</div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+        ${flow || `<span class="muted">${escapeHtml(t("session.noSets") || "No sets")}</span>`}
+      </div>
+    `;
     }
 
     currentSectionEl?.addEventListener("click", (e) => {
