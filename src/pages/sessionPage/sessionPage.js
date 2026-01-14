@@ -146,6 +146,7 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
             restRunning = false;
             stopRestTick();
             updateRestTimerUI();
+            renderCurrent();
         }
     }
 
@@ -321,7 +322,10 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
             const repsTxt = formatSideValue(reps);
 
             const timerLabel = t("session.currentSet.timer") || "Set timer";
-            const completeLabel = t("session.currentSet.complete") || "Complete set";
+            const isDisabled = restRunning === true;
+            const btnLabel = isDisabled
+                ? (t("session.currentSet.restTimer") || "Rest timer")
+                : (t("session.currentSet.complete") || "Complete set");
 
             currentSetHtml = `
                 <div class="currentExerciseSubdivider"></div>
@@ -348,15 +352,16 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
                     </div>
 
                     <div class="currentSetActions">
-                    <button
-                        type="button"
-                        class="currentSetDoneIconBtn"
-                        data-action="complete-current-set"
-                        title="${escapeHtml(completeLabel)}"
-                        aria-label="${escapeHtml(completeLabel)}"
-                    >
-                        <span class="currentSetDoneIcon" aria-hidden="true">✓</span>
-                    </button>
+                        <button
+                            type="button"
+                            class="currentSetDoneIconBtn"
+                            data-action="complete-current-set"
+                            ${isDisabled ? "disabled" : ""}
+                            title="${escapeHtml(btnLabel)}"
+                            aria-label="${escapeHtml(btnLabel)}"
+                        >
+                            <span class="currentSetDoneIcon" aria-hidden="true">✓</span>
+                        </button>
                     </div>
                 </div>
             `;
@@ -456,6 +461,7 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
     currentSectionEl?.addEventListener("click", (e) => {
         const completeBtn = e.target.closest('[data-action="complete-current-set"]');
         if (completeBtn) {
+            if (restRunning) return;
             const routine = currentRoutineId ? routineStore.getById(currentRoutineId) : null;
             if (!routine) return;
 
@@ -483,8 +489,8 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
             recomputeCompletedSeries(routine);
             advanceToNext(routine);
 
-            renderCurrent();
             startRest(restToRun);
+            renderCurrent();
 
             return;
         }
