@@ -35,6 +35,7 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
     }
 
     // --- timer state ---
+    let hasInitiated = false;
     let running = false;
     let startEpochMs = null;
     let elapsedMs = 0;
@@ -132,6 +133,10 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
 
     function startTimer() {
         if (running) return;
+        if (!hasInitiated) {
+            hasInitiated = true;
+        }
+
         running = true;
 
         if (restRunning && restPaused) resumeRestTimer();
@@ -147,9 +152,9 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         }, 250);
 
         updateTimerUI();
+        renderCurrent();
         syncCurrentSetControls();
     }
-
     function pauseTimer() {
         if (!running) return;
         running = false;
@@ -404,6 +409,12 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
     function renderCurrentExercise(routine) {
         if (!currentSectionEl) return;
 
+        if (!hasInitiated) {
+            currentSectionEl.style.display = "none";
+            currentSectionEl.innerHTML = "";
+            return;
+        }
+
         const series = Array.isArray(routine?.series) ? routine.series : [];
         const s = series[currentSeriesIndex] || null;
 
@@ -580,6 +591,7 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
     }
 
     function syncCurrentSetControls() {
+        if (!hasInitiated) return;
         const btn = currentSectionEl?.querySelector('[data-action="complete-current-set"]');
         if (!btn) return;
 
@@ -837,7 +849,7 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
             resetTimer();
             resetRestTimer();
             resetSetTimer();
-
+            hasInitiated = false;
             syncStartPauseLabel();
 
             notFoundEl.style.display = "none";
@@ -867,6 +879,8 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
                 return;
             }
 
+            currentSectionEl.style.display = "none";
+            currentSectionEl.innerHTML = "";
             metaEl.textContent = routine.description ? routine.description : "—";
 
             renderSeriesList(routine);
