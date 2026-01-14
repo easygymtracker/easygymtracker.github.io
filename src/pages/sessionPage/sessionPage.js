@@ -45,6 +45,8 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
     let restStartEpochMs = null;
     let restDurationMs = 0;
     let restTickHandle = null;
+    let restPaused = false;
+    let restRemainingMs = 0;
 
     // --- session progress state (series + repGroups status) ---
     let currentRoutineId = null;
@@ -82,6 +84,7 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
     function startTimer() {
         if (running) return;
         running = true;
+        if (restRunning && restPaused) resumeRestTimer();
         startEpochMs = Date.now() - elapsedMs;
 
         stopTick();
@@ -99,6 +102,7 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         running = false;
         stopTick();
         updateTimerUI();
+        if (restRunning && !restPaused) pauseRestTimer();
     }
 
     function resetTimer() {
@@ -111,8 +115,10 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
 
     function resetRestTimer() {
         restRunning = false;
+        restPaused = false;
         restStartEpochMs = null;
         restDurationMs = 0;
+        restRemainingMs = 0;
         stopRestTick();
         updateRestTimerUI();
     }
@@ -135,15 +141,23 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
             return;
         }
 
+        labelEl.textContent = t("session.currentSet.restTimer") || "Rest timer";
+
+        if (restPaused) {
+            valueEl.textContent = formatMs(Math.max(0, restRemainingMs));
+            return;
+        }
+
         const now = Date.now();
         const elapsed = now - restStartEpochMs;
-        const remaining = Math.max(0, restDurationMs - elapsed);
+        const remaining = Math.max(0, restRemainingMs - elapsed);
 
-        labelEl.textContent = t("session.rest") || "Rest";
         valueEl.textContent = formatMs(remaining);
 
         if (remaining <= 0) {
             restRunning = false;
+            restPaused = false;
+            restRemainingMs = 0;
             stopRestTick();
             updateRestTimerUI();
             renderCurrent();
@@ -154,18 +168,58 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         const s = Number(seconds);
         if (!Number.isFinite(s) || s <= 0) {
             restRunning = false;
+            restPaused = false;
+            restRemainingMs = 0;
             stopRestTick();
             updateRestTimerUI();
             return;
         }
 
         restRunning = true;
+        restPaused = false;
         restDurationMs = Math.round(s * 1000);
+        restRemainingMs = restDurationMs;
         restStartEpochMs = Date.now();
 
         stopRestTick();
         restTickHandle = window.setInterval(() => {
-            if (!restRunning) return;
+            if (!restRunning || restPaused) return;
+            updateRestTimerUI();
+        }, 250);
+
+        updateRestTimerUI();
+    }
+
+    function pauseRestTimer() {
+        if (!restRunning || restPaused) return;
+
+        // compute remaining and freeze it
+        const now = Date.now();
+        const elapsed = now - restStartEpochMs;
+        restRemainingMs = Math.max(0, restRemainingMs - elapsed);
+
+        restPaused = true;
+        stopRestTick();
+        updateRestTimerUI();
+    }
+
+    function resumeRestTimer() {
+        if (!restRunning || !restPaused) return;
+        if (restRemainingMs <= 0) {
+            restRunning = false;
+            restPaused = false;
+            stopRestTick();
+            updateRestTimerUI();
+            renderCurrent();
+            return;
+        }
+
+        restPaused = false;
+        restStartEpochMs = Date.now();
+
+        stopRestTick();
+        restTickHandle = window.setInterval(() => {
+            if (!restRunning || restPaused) return;
             updateRestTimerUI();
         }, 250);
 
@@ -322,10 +376,20 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
             const repsTxt = formatSideValue(reps);
 
             const timerLabel = t("session.currentSet.timer") || "Set timer";
-            const isDisabled = restRunning === true;
-            const btnLabel = isDisabled
-                ? (t("session.currentSet.restTimer") || "Rest timer")
-                : (t("session.currentSet.complete") || "Complete set");
+            const hasStarted = startEpochMs != null;
+            const canComplete = hasStarted && running && !restRunning;
+
+            const isDisabled = !canComplete;
+
+            const btnLabel = !hasStarted
+                ? (t("session.currentSet.startToEnable") || "Start workout to complete sets")
+                : (!running
+                    ? (t("session.currentSet.resumeToEnable") || "Resume workout to complete sets")
+                    : (restRunning
+                        ? (t("session.currentSet.restTimer") || "Rest timer")
+                        : (t("session.currentSet.complete") || "Complete set")
+                    )
+                );
 
             currentSetHtml = `
                 <div class="currentExerciseSubdivider"></div>
@@ -461,7 +525,7 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
     currentSectionEl?.addEventListener("click", (e) => {
         const completeBtn = e.target.closest('[data-action="complete-current-set"]');
         if (completeBtn) {
-            if (restRunning) return;
+            if (!running || startEpochMs == null || restRunning) return;
             const routine = currentRoutineId ? routineStore.getById(currentRoutineId) : null;
             if (!routine) return;
 

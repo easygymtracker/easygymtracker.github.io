@@ -118,6 +118,9 @@ export const DICTS = {
         "session.currentSet.timer": "Set timer",
         "session.currentSet.done": "Complete set",
         "session.allSets": "All sets",
+        "session.currentSet.restTimer": "Rest timer",
+        "session.currentSet.startToEnable": "Start workout to complete sets",
+        "session.currentSet.resumeToEnable": "Resume workout to complete sets",
     },
 
     es: {
@@ -235,6 +238,9 @@ export const DICTS = {
         "session.currentSet.timer": "Temporizador de la serie",
         "session.currentSet.done": "Completar serie",
         "session.allSets": "Todas las series",
+        "session.currentSet.restTimer": "Temporizador de descanso",
+        "session.currentSet.startToEnable": "Inicia el entrenamiento para completar series",
+        "session.currentSet.resumeToEnable": "Reanuda el entrenamiento para completar series",
     },
 
     pt: {
@@ -352,6 +358,9 @@ export const DICTS = {
         "session.currentSet.timer": "Temporizador da série",
         "session.currentSet.done": "Completar série",
         "session.allSets": "Todas as séries",
+        "session.currentSet.restTimer": "Temporizador de descanso",
+        "session.currentSet.startToEnable": "Inicie o treino para concluir as séries",
+        "session.currentSet.resumeToEnable": "Retome o treino para concluir as séries",
     },
 
     ja: {
@@ -469,6 +478,9 @@ export const DICTS = {
         "session.currentSet.timer": "セットタイマー",
         "session.currentSet.done": "セット完了",
         "session.allSets": "すべてのセット",
+        "session.currentSet.restTimer": "休憩タイマー",
+        "session.currentSet.startToEnable": "トレーニングを開始してセットを完了してください",
+        "session.currentSet.resumeToEnable": "トレーニングを再開してセットを完了してください",
     },
 
     zh: {
@@ -586,6 +598,9 @@ export const DICTS = {
         "session.currentSet.timer": "组计时器",
         "session.currentSet.done": "完成组",
         "session.allSets": "所有组",
+        "session.currentSet.restTimer": "休息计时器",
+        "session.currentSet.startToEnable": "开始训练以完成组",
+        "session.currentSet.resumeToEnable": "继续训练以完成组",
     },
 
     ar: {
@@ -703,6 +718,9 @@ export const DICTS = {
         "session.currentSet.timer": "مؤقت المجموعة",
         "session.currentSet.done": "إكمال المجموعة",
         "session.allSets": "جميع المجموعات",
+        "session.currentSet.restTimer": "مؤقت الراحة",
+        "session.currentSet.startToEnable": "ابدأ التمرين لإكمال المجموعات",
+        "session.currentSet.resumeToEnable": "استأنف التمرين لإكمال المجموعات",
     },
 
     hi: {
@@ -820,6 +838,9 @@ export const DICTS = {
         "session.currentSet.timer": "सेट टाइमर",
         "session.currentSet.done": "सेट पूरा करें",
         "session.allSets": "सभी सेट",
+        "session.currentSet.restTimer": "आराम टाइमर",
+        "session.currentSet.startToEnable": "सेट पूरा करने के लिए वर्कआउट शुरू करें",
+        "session.currentSet.resumeToEnable": "सेट पूरा करने के लिए वर्कआउट फिर से शुरू करें",
     },
 
     de: {
@@ -937,6 +958,9 @@ export const DICTS = {
         "session.currentSet.timer": "Satz-Timer",
         "session.currentSet.done": "Satz abgeschlossen",
         "session.allSets": "Alle Sätze",
+        "session.currentSet.restTimer": "Pausen-Timer",
+        "session.currentSet.startToEnable": "Training starten, um Sätze abzuschließen",
+        "session.currentSet.resumeToEnable": "Training fortsetzen, um Sätze abzuschließen",
     },
 
     fr: {
@@ -1054,6 +1078,9 @@ export const DICTS = {
         "session.currentSet.timer": "Minuteur de la série",
         "session.currentSet.done": "Série terminée",
         "session.allSets": "Toutes les séries",
+        "session.currentSet.restTimer": "Minuteur de repos",
+        "session.currentSet.startToEnable": "Démarrez l’entraînement pour terminer les séries",
+        "session.currentSet.resumeToEnable": "Reprenez l’entraînement pour terminer les séries",
     },
 
     ru: {
@@ -1171,6 +1198,9 @@ export const DICTS = {
         "session.currentSet.timer": "Таймер подхода",
         "session.currentSet.done": "Завершить подход",
         "session.allSets": "Все подходы",
+        "session.currentSet.restTimer": "Таймер отдыха",
+        "session.currentSet.startToEnable": "Начните тренировку, чтобы завершать подходы",
+        "session.currentSet.resumeToEnable": "Возобновите тренировку, чтобы завершать подходы",
     },
 
     it: {
@@ -1288,6 +1318,9 @@ export const DICTS = {
         "session.currentSet.timer": "Timer serie",
         "session.currentSet.done": "Completa serie",
         "session.allSets": "Tutte le serie",
+        "session.currentSet.restTimer": "Timer di recupero",
+        "session.currentSet.startToEnable": "Avvia l’allenamento per completare le serie",
+        "session.currentSet.resumeToEnable": "Riprendi l’allenamento per completare le serie",
     },
 
     nl: {
@@ -1405,6 +1438,9 @@ export const DICTS = {
         "session.currentSet.timer": "Set-timer",
         "session.currentSet.done": "Set voltooien",
         "session.allSets": "Alle sets",
+        "session.currentSet.restTimer": "Rusttimer",
+        "session.currentSet.startToEnable": "Start de training om sets te voltooien",
+        "session.currentSet.resumeToEnable": "Hervat de training om sets te voltooien",
     },
 
     pl: {
@@ -1522,6 +1558,9 @@ export const DICTS = {
         "session.currentSet.timer": "Minutnik serii",
         "session.currentSet.done": "Zakończ serię",
         "session.allSets": "Wszystkie serie",
+        "session.currentSet.restTimer": "Timer przerwy",
+        "session.currentSet.startToEnable": "Rozpocznij trening, aby ukończyć serie",
+        "session.currentSet.resumeToEnable": "Wznów trening, aby ukończyć serie",
     },
 
     tr: {
@@ -1639,5 +1678,8 @@ export const DICTS = {
         "session.currentSet.timer": "Set zamanlayıcı",
         "session.currentSet.done": "Seti tamamla",
         "session.allSets": "Tüm setler",
+        "session.currentSet.restTimer": "Dinlenme zamanlayıcısı",
+        "session.currentSet.startToEnable": "Setleri tamamlamak için antrenmanı başlat",
+        "session.currentSet.resumeToEnable": "Setleri tamamlamak için antrenmana devam et",
     }
 };
