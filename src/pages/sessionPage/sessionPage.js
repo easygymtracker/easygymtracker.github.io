@@ -12,7 +12,6 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
 
     const timerEl = document.getElementById("sessionTimer");
     const btnStartPause = document.getElementById("btnSessionStartPause");
-    const btnReset = document.getElementById("btnSessionReset");
 
     const listEl = document.getElementById("sessionSeriesList");
     const emptyEl = document.getElementById("sessionEmpty");
@@ -292,13 +291,6 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
     btnStartPause.addEventListener("click", () => {
         if (running) pauseTimer();
         else startTimer();
-    });
-
-    btnReset.addEventListener("click", () => {
-        resetTimer();
-        const resetLabel = t("session.timer.reset");
-        btnReset.title = resetLabel;
-        btnReset.setAttribute("aria-label", resetLabel);
     });
 
     function isRepDone(seriesIdx, repIdx) {
@@ -844,11 +836,6 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
             resetTimer();
             resetRestTimer();
             resetSetTimer();
-
-            const resetLabel = t("session.timer.reset");
-            btnReset.textContent = resetLabel;
-            btnReset.title = resetLabel;
-            btnReset.setAttribute("aria-label", resetLabel);
 
             syncStartPauseLabel();
 
