@@ -40,6 +40,11 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
     let startEpochMs = null;
     let elapsedMs = 0;
     let tickHandle = null;
+    // --- rest timer state ---
+    let restRunning = false;
+    let restStartEpochMs = null;
+    let restDurationMs = 0;
+    let restTickHandle = null;
 
     // --- session progress state (series + repGroups status) ---
     let currentRoutineId = null;
@@ -102,6 +107,68 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         startEpochMs = null;
         elapsedMs = 0;
         updateTimerUI();
+    }
+
+    function resetRestTimer() {
+        restRunning = false;
+        restStartEpochMs = null;
+        restDurationMs = 0;
+        stopRestTick();
+        updateRestTimerUI();
+    }
+
+    function stopRestTick() {
+        if (restTickHandle) {
+            clearInterval(restTickHandle);
+            restTickHandle = null;
+        }
+    }
+
+    function updateRestTimerUI() {
+        const valueEl = currentSectionEl?.querySelector("#currentSetTimerValue");
+        const labelEl = currentSectionEl?.querySelector(".currentSetTimerLabel");
+        if (!valueEl || !labelEl) return;
+
+        if (!restRunning) {
+            labelEl.textContent = t("session.currentSet.timer") || "Set timer";
+            valueEl.textContent = "00:00";
+            return;
+        }
+
+        const now = Date.now();
+        const elapsed = now - restStartEpochMs;
+        const remaining = Math.max(0, restDurationMs - elapsed);
+
+        labelEl.textContent = t("session.rest") || "Rest";
+        valueEl.textContent = formatMs(remaining);
+
+        if (remaining <= 0) {
+            restRunning = false;
+            stopRestTick();
+            updateRestTimerUI();
+        }
+    }
+
+    function startRest(seconds) {
+        const s = Number(seconds);
+        if (!Number.isFinite(s) || s <= 0) {
+            restRunning = false;
+            stopRestTick();
+            updateRestTimerUI();
+            return;
+        }
+
+        restRunning = true;
+        restDurationMs = Math.round(s * 1000);
+        restStartEpochMs = Date.now();
+
+        stopRestTick();
+        restTickHandle = window.setInterval(() => {
+            if (!restRunning) return;
+            updateRestTimerUI();
+        }, 250);
+
+        updateRestTimerUI();
     }
 
     btnStartPause.addEventListener("click", () => {
@@ -387,8 +454,54 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
     }
 
     currentSectionEl?.addEventListener("click", (e) => {
-        const btn = e.target.closest('[data-action="focus-current-rep"]');
-        if (!btn) return;
+        const completeBtn = e.target.closest('[data-action="complete-current-set"]');
+        if (completeBtn) {
+            const routine = currentRoutineId ? routineStore.getById(currentRoutineId) : null;
+            if (!routine) return;
+
+            const series = Array.isArray(routine.series) ? routine.series : [];
+            const s = series[currentSeriesIndex] || null;
+            const groups = Array.isArray(s?.repGroups) ? s.repGroups : [];
+            const rg = groups[currentRepGroupIndex] || null;
+
+            if (!s || !rg) return;
+
+            if (isRepDone(currentSeriesIndex, currentRepGroupIndex)) return;
+
+            const isLastSetInExercise = currentRepGroupIndex >= groups.length - 1;
+
+            const restSecondsAfterSet =
+                typeof rg.restSecondsAfter === "number" ? rg.restSecondsAfter : 0;
+
+            const restSecondsAfterExercise =
+                typeof s.restSecondsAfter === "number" ? s.restSecondsAfter : 0;
+
+            const restToRun = isLastSetInExercise ? restSecondsAfterExercise : restSecondsAfterSet;
+
+            markRepDone(currentSeriesIndex, currentRepGroupIndex);
+
+            recomputeCompletedSeries(routine);
+            advanceToNext(routine);
+
+            renderCurrent();
+            startRest(restToRun);
+
+            return;
+        }
+
+        const focusBtn = e.target.closest('[data-action="focus-current-rep"]');
+        if (focusBtn) {
+            const repIdx = Number(focusBtn.dataset.repIdx);
+            if (!Number.isFinite(repIdx)) return;
+
+            currentRepGroupIndex = repIdx;
+
+            restRunning = false;
+            stopRestTick();
+
+            renderCurrent();
+            return;
+        }
     });
 
     function renderRepGroupList(seriesIdx, s) {
@@ -585,6 +698,7 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
     return {
         render(params) {
             resetTimer();
+            resetRestTimer();
 
             const resetLabel = t("session.timer.reset");
             btnReset.textContent = resetLabel;
@@ -615,6 +729,8 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
                 notFoundEl.style.display = "";
                 currentSectionEl.style.display = "none";
                 currentSectionEl.innerHTML = "";
+                restRunning = false;
+                stopRestTick();
                 return;
             }
 
