@@ -254,42 +254,45 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
             const repsTxt = formatSideValue(reps);
 
             const timerLabel = t("session.currentSet.timer") || "Set timer";
-            const doneLabel = t("session.currentSet.done") || "Completed";
+            const completeLabel = t("session.currentSet.complete") || "Complete set";
 
             currentSetHtml = `
-          <div class="currentExerciseSubdivider"></div>
+                <div class="currentExerciseSubdivider"></div>
 
-          <div class="currentSetRow">
-            <div class="currentSetTimer" aria-label="${escapeHtml(timerLabel)}">
-              <div class="currentSetTimerLabel">${escapeHtml(timerLabel)}</div>
-              <div class="currentSetTimerValue" id="currentSetTimerValue">00:00</div>
-            </div>
+                <div class="currentSetRow">
+                    <div class="currentSetTimer" aria-label="${escapeHtml(timerLabel)}">
+                    <div class="currentSetTimerLabel">${escapeHtml(timerLabel)}</div>
+                    <div class="currentSetTimerValue" id="currentSetTimerValue">00:00</div>
+                    </div>
 
-            <div class="currentSetMetrics">
-              <div class="currentSetMetricsTop">
-                <span class="currentSetBadge">${escapeHtml(t("session.set") || "Set")} ${currentRepGroupIndex + 1}</span>
-                <span class="muted">${escapeHtml(name)}</span>
-              </div>
+                    <div class="currentSetMetrics">
+                    <div class="currentSetMetricsTop">
+                        <span class="currentSetBadge">${escapeHtml(t("session.set") || "Set")} ${currentRepGroupIndex + 1}</span>
+                    </div>
 
-              <div style="margin-top:8px; display:flex; gap:14px; flex-wrap:wrap;">
-                <div class="currentSetMetricLine">
-                  <span class="muted">${escapeHtml(weightLabel)}:</span> ${escapeHtml(weightTxt)}
+                    <div style="margin-top:8px; display:flex; gap:14px; flex-wrap:wrap;">
+                        <div class="currentSetMetricLine">
+                        <span class="muted">${escapeHtml(weightLabel)}:</span> ${escapeHtml(weightTxt)}
+                        </div>
+                        <div class="currentSetMetricLine">
+                        <span class="muted">${escapeHtml(repsLabel)}:</span> ${escapeHtml(repsTxt)}
+                        </div>
+                    </div>
+                    </div>
+
+                    <div class="currentSetActions">
+                    <button
+                        type="button"
+                        class="currentSetDoneIconBtn"
+                        data-action="complete-current-set"
+                        title="${escapeHtml(completeLabel)}"
+                        aria-label="${escapeHtml(completeLabel)}"
+                    >
+                        <span class="currentSetDoneIcon" aria-hidden="true">✓</span>
+                    </button>
+                    </div>
                 </div>
-                <div class="currentSetMetricLine">
-                  <span class="muted">${escapeHtml(repsLabel)}:</span> ${escapeHtml(repsTxt)}
-                </div>
-              </div>
-            </div>
-
-            <div class="currentSetActions">
-              <button class="btn primary currentSetDoneBtn"
-                      type="button"
-                      data-action="complete-current-set">
-                ${escapeHtml(doneLabel)}
-              </button>
-            </div>
-          </div>
-        `;
+            `;
         }
 
         // ----- All sets subsection (your existing squares flow) -----

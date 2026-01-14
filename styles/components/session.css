@@ -256,25 +256,60 @@
     font-weight: 800;
     padding: 4px 8px;
     border-radius: 999px;
-    border: 1px solid var(--border);
-    background: rgba(255, 255, 255, 0.03);
 }
 
 .currentSetMetricLine {
-    font-size: 13px;
+    font-size: 15px;
+    font-weight: 700;
 }
 
 .currentSetActions {
     flex: 0 0 auto;
     display: flex;
-    align-items: stretch;
+    align-items: center;
 }
 
-.currentSetDoneBtn {
-    min-height: 44px;
-    padding: 12px 14px;
+.currentSetDoneIconBtn {
+    width: 54px;
+    height: 54px;
     border-radius: 14px;
-    font-weight: 800;
+    border: 1px solid rgba(34, 197, 94, 0.35);
+    background: rgba(34, 197, 94, 0.14);
+    color: var(--text);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.06s ease, background 0.2s ease, border-color 0.2s ease;
+    user-select: none;
+    touch-action: manipulation;
+    flex: 0 0 auto;
+}
+
+.currentSetDoneIconBtn:hover {
+    background: rgba(34, 197, 94, 0.20);
+    border-color: rgba(34, 197, 94, 0.45);
+}
+
+.currentSetDoneIconBtn:active {
+    transform: translateY(1px);
+}
+
+.currentSetDoneIconBtn:focus-visible {
+    border-color: rgba(96, 165, 250, 0.55);
+    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.12);
+    outline: none;
+}
+
+.currentSetDoneIconBtn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.currentSetDoneIcon {
+    font-size: 18px;
+    font-weight: 900;
+    line-height: 1;
 }
 
 /* All sets label */
@@ -290,9 +325,13 @@
         font-size: 20px;
     }
 
-    .currentSetDoneBtn {
-        min-height: 40px;
-        padding: 10px 12px;
+    .currentSetDoneIconBtn {
+        width: 48px;
+        height: 48px;
         border-radius: 12px;
+    }
+
+    .currentSetDoneIcon {
+        font-size: 16px;
     }
 }

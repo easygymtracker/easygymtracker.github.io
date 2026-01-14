@@ -104,7 +104,7 @@ export const DICTS = {
         "session.series.empty": "This routine has no exercises yet.",
         "session.routineNotFound": "Routine not found.",
         "session.exercise.unknown": "Exercise",
-        "session.set": "set",
+        "session.set": "Set",
         "session.sets": "sets",
         "session.rest": "Rest",
         "session.restAfterExercise": "Rest after exercise",
@@ -114,6 +114,10 @@ export const DICTS = {
         "session.noSets": "No sets",
         "session.weight": "Weight",
         "session.reps": "Reps",
+        "session.exercise": "Exercise",
+        "session.currentSet.timer": "Set timer",
+        "session.currentSet.done": "Complete set",
+        "session.allSets": "All sets",
     },
 
     es: {
@@ -217,7 +221,7 @@ export const DICTS = {
         "session.series.empty": "Esta rutina no tiene ejercicios todavía.",
         "session.routineNotFound": "Rutina no encontrada.",
         "session.exercise.unknown": "Ejercicio",
-        "session.set": "serie",
+        "session.set": "Serie",
         "session.sets": "series",
         "session.rest": "Descanso",
         "session.restAfterExercise": "Descanso tras el ejercicio",
@@ -227,6 +231,10 @@ export const DICTS = {
         "session.noSets": "Sin series",
         "session.weight": "Peso",
         "session.reps": "Repeticiones",
+        "session.exercise": "Ejercicio",
+        "session.currentSet.timer": "Temporizador de la serie",
+        "session.currentSet.done": "Completar serie",
+        "session.allSets": "Todas las series",
     },
 
     pt: {
@@ -330,7 +338,7 @@ export const DICTS = {
         "session.series.empty": "Esta rotina ainda não tem exercícios.",
         "session.routineNotFound": "Rotina não encontrada.",
         "session.exercise.unknown": "Exercício",
-        "session.set": "série",
+        "session.set": "Série",
         "session.sets": "séries",
         "session.rest": "Descanso",
         "session.restAfterExercise": "Descanso após o exercício",
@@ -340,6 +348,10 @@ export const DICTS = {
         "session.noSets": "Sem séries",
         "session.weight": "Peso",
         "session.reps": "Repetições",
+        "session.exercise": "Exercício",
+        "session.currentSet.timer": "Temporizador da série",
+        "session.currentSet.done": "Completar série",
+        "session.allSets": "Todas as séries",
     },
 
     ja: {
@@ -453,6 +465,10 @@ export const DICTS = {
         "session.noSets": "セットなし",
         "session.weight": "重量",
         "session.reps": "回数",
+        "session.exercise": "エクササイズ",
+        "session.currentSet.timer": "セットタイマー",
+        "session.currentSet.done": "セット完了",
+        "session.allSets": "すべてのセット",
     },
 
     zh: {
@@ -566,6 +582,10 @@ export const DICTS = {
         "session.noSets": "暂无组数",
         "session.weight": "重量",
         "session.reps": "次数",
+        "session.exercise": "动作",
+        "session.currentSet.timer": "组计时器",
+        "session.currentSet.done": "完成组",
+        "session.allSets": "所有组",
     },
 
     ar: {
@@ -679,6 +699,10 @@ export const DICTS = {
         "session.noSets": "لا توجد مجموعات",
         "session.weight": "الوزن",
         "session.reps": "التكرارات",
+        "session.exercise": "تمرين",
+        "session.currentSet.timer": "مؤقت المجموعة",
+        "session.currentSet.done": "إكمال المجموعة",
+        "session.allSets": "جميع المجموعات",
     },
 
     hi: {
@@ -792,6 +816,10 @@ export const DICTS = {
         "session.noSets": "कोई सेट नहीं",
         "session.weight": "वजन",
         "session.reps": "दोहराव",
+        "session.exercise": "एक्सरसाइज़",
+        "session.currentSet.timer": "सेट टाइमर",
+        "session.currentSet.done": "सेट पूरा करें",
+        "session.allSets": "सभी सेट",
     },
 
     de: {
@@ -905,6 +933,10 @@ export const DICTS = {
         "session.noSets": "Keine Sätze",
         "session.weight": "Gewicht",
         "session.reps": "Wiederholungen",
+        "session.exercise": "Übung",
+        "session.currentSet.timer": "Satz-Timer",
+        "session.currentSet.done": "Satz abgeschlossen",
+        "session.allSets": "Alle Sätze",
     },
 
     fr: {
@@ -1008,7 +1040,7 @@ export const DICTS = {
         "session.series.empty": "Cette routine ne contient pas encore d'exercices.",
         "session.routineNotFound": "Routine introuvable.",
         "session.exercise.unknown": "Exercice",
-        "session.set": "série",
+        "session.set": "Série",
         "session.sets": "séries",
         "session.rest": "Repos",
         "session.restAfterExercise": "Repos après l’exercice",
@@ -1018,6 +1050,10 @@ export const DICTS = {
         "session.noSets": "Aucune série",
         "session.weight": "Poids",
         "session.reps": "Répétitions",
+        "session.exercise": "Exercice",
+        "session.currentSet.timer": "Minuteur de la série",
+        "session.currentSet.done": "Série terminée",
+        "session.allSets": "Toutes les séries",
     },
 
     ru: {
@@ -1131,6 +1167,10 @@ export const DICTS = {
         "session.noSets": "Нет подходов",
         "session.weight": "Вес",
         "session.reps": "Повторы",
+        "session.exercise": "Упражнение",
+        "session.currentSet.timer": "Таймер подхода",
+        "session.currentSet.done": "Завершить подход",
+        "session.allSets": "Все подходы",
     },
 
     it: {
@@ -1234,7 +1274,7 @@ export const DICTS = {
         "session.series.empty": "Questa routine non ha ancora esercizi.",
         "session.routineNotFound": "Routine non trovata.",
         "session.exercise.unknown": "Esercizio",
-        "session.set": "serie",
+        "session.set": "Serie",
         "session.sets": "serie",
         "session.rest": "Recupero",
         "session.restAfterExercise": "Recupero dopo l’esercizio",
@@ -1244,6 +1284,10 @@ export const DICTS = {
         "session.noSets": "Nessuna serie",
         "session.weight": "Peso",
         "session.reps": "Ripetizioni",
+        "session.exercise": "Esercizio",
+        "session.currentSet.timer": "Timer serie",
+        "session.currentSet.done": "Completa serie",
+        "session.allSets": "Tutte le serie",
     },
 
     nl: {
@@ -1347,7 +1391,7 @@ export const DICTS = {
         "session.series.empty": "Deze routine heeft nog geen oefeningen.",
         "session.routineNotFound": "Routine niet gevonden.",
         "session.exercise.unknown": "Oefening",
-        "session.set": "set",
+        "session.set": "Set",
         "session.sets": "sets",
         "session.rest": "Rust",
         "session.restAfterExercise": "Rust na oefening",
@@ -1357,6 +1401,10 @@ export const DICTS = {
         "session.noSets": "Geen sets",
         "session.weight": "Gewicht",
         "session.reps": "Herhalingen",
+        "session.exercise": "Oefening",
+        "session.currentSet.timer": "Set-timer",
+        "session.currentSet.done": "Set voltooien",
+        "session.allSets": "Alle sets",
     },
 
     pl: {
@@ -1460,7 +1508,7 @@ export const DICTS = {
         "session.series.empty": "Ta rutyna nie zawiera jeszcze ćwiczeń.",
         "session.routineNotFound": "Nie znaleziono rutyny.",
         "session.exercise.unknown": "Ćwiczenie",
-        "session.set": "seria",
+        "session.set": "Seria",
         "session.sets": "serie",
         "session.rest": "Przerwa",
         "session.restAfterExercise": "Przerwa po ćwiczeniu",
@@ -1470,6 +1518,10 @@ export const DICTS = {
         "session.noSets": "Brak serii",
         "session.weight": "Ciężar",
         "session.reps": "Powtórzenia",
+        "session.exercise": "Ćwiczenie",
+        "session.currentSet.timer": "Minutnik serii",
+        "session.currentSet.done": "Zakończ serię",
+        "session.allSets": "Wszystkie serie",
     },
 
     tr: {
@@ -1573,7 +1625,7 @@ export const DICTS = {
         "session.series.empty": "Bu rutin henüz egzersiz içermiyor.",
         "session.routineNotFound": "Rutin bulunamadı.",
         "session.exercise.unknown": "Egzersiz",
-        "session.set": "set",
+        "session.set": "Set",
         "session.sets": "set",
         "session.rest": "Dinlenme",
         "session.restAfterExercise": "Egzersiz sonrası dinlenme",
@@ -1583,5 +1635,9 @@ export const DICTS = {
         "session.noSets": "Set yok",
         "session.weight": "Ağırlık",
         "session.reps": "Tekrar",
+        "session.exercise": "Egzersiz",
+        "session.currentSet.timer": "Set zamanlayıcı",
+        "session.currentSet.done": "Seti tamamla",
+        "session.allSets": "Tüm setler",
     }
 };
