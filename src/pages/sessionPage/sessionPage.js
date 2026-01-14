@@ -47,6 +47,55 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
     let restTickHandle = null;
     let restPaused = false;
     let restRemainingMs = 0;
+    // --- set timer state (increasing) ---
+    let setRunning = false;
+    let setStartEpochMs = null;
+    let setElapsedMs = 0;
+    let setTickHandle = null;
+
+    function stopSetTick() {
+        if (setTickHandle) {
+            clearInterval(setTickHandle);
+            setTickHandle = null;
+        }
+    }
+
+    function startSetTimer({ reset = false } = {}) {
+        if (reset) {
+            setElapsedMs = 0;
+        }
+        if (setRunning) return;
+
+        setRunning = true;
+        setStartEpochMs = Date.now() - setElapsedMs;
+
+        stopSetTick();
+        setTickHandle = window.setInterval(() => {
+            if (!setRunning) return;
+            setElapsedMs = Date.now() - setStartEpochMs;
+            updateCurrentSetTimerUI();
+        }, 250);
+
+        updateCurrentSetTimerUI();
+        syncCurrentSetControls();
+    }
+
+    function pauseSetTimer() {
+        if (!setRunning) return;
+        setRunning = false;
+        stopSetTick();
+        updateCurrentSetTimerUI();
+        syncCurrentSetControls();
+    }
+
+    function resetSetTimer() {
+        setRunning = false;
+        stopSetTick();
+        setStartEpochMs = null;
+        setElapsedMs = 0;
+        updateCurrentSetTimerUI();
+        syncCurrentSetControls();
+    }
 
     // --- session progress state (series + repGroups status) ---
     let currentRoutineId = null;
@@ -84,7 +133,10 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
     function startTimer() {
         if (running) return;
         running = true;
+
         if (restRunning && restPaused) resumeRestTimer();
+        if (!restRunning) startSetTimer({ reset: setStartEpochMs == null && setElapsedMs === 0 });
+
         startEpochMs = Date.now() - elapsedMs;
 
         stopTick();
@@ -95,6 +147,7 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         }, 250);
 
         updateTimerUI();
+        syncCurrentSetControls();
     }
 
     function pauseTimer() {
@@ -102,7 +155,10 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         running = false;
         stopTick();
         updateTimerUI();
+
+        if (!restRunning) pauseSetTimer();
         if (restRunning && !restPaused) pauseRestTimer();
+        syncCurrentSetControls();
     }
 
     function resetTimer() {
@@ -120,7 +176,7 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         restDurationMs = 0;
         restRemainingMs = 0;
         stopRestTick();
-        updateRestTimerUI();
+        updateCurrentSetTimerUI();
     }
 
     function stopRestTick() {
@@ -130,48 +186,54 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         }
     }
 
-    function updateRestTimerUI() {
+    function updateCurrentSetTimerUI() {
         const valueEl = currentSectionEl?.querySelector("#currentSetTimerValue");
         const labelEl = currentSectionEl?.querySelector(".currentSetTimerLabel");
         if (!valueEl || !labelEl) return;
 
-        if (!restRunning) {
-            labelEl.textContent = t("session.currentSet.timer") || "Set timer";
-            valueEl.textContent = "00:00";
+        if (restRunning) {
+            labelEl.textContent = t("session.currentSet.restTimer") || "Rest timer";
+
+            if (restPaused) {
+                valueEl.textContent = formatMs(Math.max(0, restRemainingMs));
+                return;
+            }
+
+            const now = Date.now();
+            const elapsed = now - restStartEpochMs;
+            const remaining = Math.max(0, restRemainingMs - elapsed);
+
+            valueEl.textContent = formatMs(remaining);
+
+            if (remaining <= 0) {
+                restRunning = false;
+                restPaused = false;
+                restRemainingMs = 0;
+                stopRestTick();
+
+                if (running) startSetTimer({ reset: true });
+
+                updateCurrentSetTimerUI();
+                renderCurrent();
+                syncCurrentSetControls();
+            }
             return;
         }
 
-        labelEl.textContent = t("session.currentSet.restTimer") || "Rest timer";
-
-        if (restPaused) {
-            valueEl.textContent = formatMs(Math.max(0, restRemainingMs));
-            return;
-        }
-
-        const now = Date.now();
-        const elapsed = now - restStartEpochMs;
-        const remaining = Math.max(0, restRemainingMs - elapsed);
-
-        valueEl.textContent = formatMs(remaining);
-
-        if (remaining <= 0) {
-            restRunning = false;
-            restPaused = false;
-            restRemainingMs = 0;
-            stopRestTick();
-            updateRestTimerUI();
-            renderCurrent();
-        }
+        labelEl.textContent = t("session.currentSet.timer") || "Set timer";
+        valueEl.textContent = formatMs(setElapsedMs);
     }
 
     function startRest(seconds) {
+        resetSetTimer();
         const s = Number(seconds);
         if (!Number.isFinite(s) || s <= 0) {
             restRunning = false;
             restPaused = false;
             restRemainingMs = 0;
             stopRestTick();
-            updateRestTimerUI();
+            updateCurrentSetTimerUI();
+            syncCurrentSetControls();
             return;
         }
 
@@ -184,10 +246,11 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         stopRestTick();
         restTickHandle = window.setInterval(() => {
             if (!restRunning || restPaused) return;
-            updateRestTimerUI();
+            updateCurrentSetTimerUI();
         }, 250);
 
-        updateRestTimerUI();
+        updateCurrentSetTimerUI();
+        syncCurrentSetControls();
     }
 
     function pauseRestTimer() {
@@ -200,7 +263,7 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
 
         restPaused = true;
         stopRestTick();
-        updateRestTimerUI();
+        updateCurrentSetTimerUI();
     }
 
     function resumeRestTimer() {
@@ -209,7 +272,7 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
             restRunning = false;
             restPaused = false;
             stopRestTick();
-            updateRestTimerUI();
+            updateCurrentSetTimerUI();
             renderCurrent();
             return;
         }
@@ -220,10 +283,10 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         stopRestTick();
         restTickHandle = window.setInterval(() => {
             if (!restRunning || restPaused) return;
-            updateRestTimerUI();
+            updateCurrentSetTimerUI();
         }, 250);
 
-        updateRestTimerUI();
+        updateCurrentSetTimerUI();
     }
 
     btnStartPause.addEventListener("click", () => {
@@ -377,8 +440,7 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
 
             const timerLabel = t("session.currentSet.timer") || "Set timer";
             const hasStarted = startEpochMs != null;
-            const canComplete = hasStarted && running && !restRunning;
-
+            const canComplete = setRunning === true && running === true && restRunning === false;
             const isDisabled = !canComplete;
 
             const btnLabel = !hasStarted
@@ -451,81 +513,106 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
                         : "rgba(255, 255, 255, 0.02)";
 
             const square = `
-          <button
-            type="button"
-            data-action="focus-current-rep"
-            data-rep-idx="${repIdx}"
-            aria-label="${escapeHtml((t("session.set") || "Set"))} ${repIdx + 1}"
-            style="
-              min-width: 64px;
-              height: 64px;
-              border-radius: 12px;
-              border: 1px solid ${border};
-              background: ${bg};
-              color: var(--text);
-              display: grid;
-              grid-template-rows: auto 1fr;
-              align-content: start;
-              gap: 4px;
-              padding: 6px;
-            "
-          >
-            <div style="font-size:12px; font-weight:800; line-height:1;">${repIdx + 1}</div>
-            <div style="font-size:11px; line-height:1.15; text-align:left;">
-              <div><span class="muted">${escapeHtml(weightLabel)}:</span> ${escapeHtml(weightTxt)}</div>
-              <div><span class="muted">${escapeHtml(repsLabel)}:</span> ${escapeHtml(repsTxt)}</div>
+                <button
+                    type="button"
+                    data-action="focus-current-rep"
+                    data-rep-idx="${repIdx}"
+                    aria-label="${escapeHtml((t("session.set") || "Set"))} ${repIdx + 1}"
+                    style="
+                    min-width: 64px;
+                    height: 64px;
+                    border-radius: 12px;
+                    border: 1px solid ${border};
+                    background: ${bg};
+                    color: var(--text);
+                    display: grid;
+                    grid-template-rows: auto 1fr;
+                    align-content: start;
+                    gap: 4px;
+                    padding: 6px;
+                    "
+                >
+                    <div style="font-size:12px; font-weight:800; line-height:1;">${repIdx + 1}</div>
+                    <div style="font-size:11px; line-height:1.15; text-align:left;">
+                    <div><span class="muted">${escapeHtml(weightLabel)}:</span> ${escapeHtml(weightTxt)}</div>
+                    <div><span class="muted">${escapeHtml(repsLabel)}:</span> ${escapeHtml(repsTxt)}</div>
+                    </div>
+                </button>
+                `;
+
+                    const restSeconds = typeof rg2?.restSecondsAfter === "number" ? rg2.restSecondsAfter : 0;
+                    const between = (repIdx < groups.length - 1)
+                        ? `
+                    <div aria-hidden="true" style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; min-width:44px;">
+                        <div style="font-size:18px; line-height:1; color: var(--muted);">→</div>
+                        ${restSeconds > 0
+                            ? `<div style="font-size:12px; color: var(--muted); font-weight:700; line-height:1;">${restSeconds}s</div>`
+                            : `<div style="font-size:12px; color: var(--muted); opacity:0.65; font-weight:700; line-height:1;">—</div>`
+                        }
+                    </div>
+                    `
+                        : "";
+
+                    return square + between;
+                }).join("");
+
+                const allSetsLabel = escapeHtml(t("session.allSets") || "All sets");
+
+                currentSectionEl.style.display = "";
+                currentSectionEl.innerHTML = `
+            <div class="currentExerciseHeader">
+                <div class="currentExerciseTitleWrap">
+                <div class="currentExerciseLabel">${escapeHtml(t("session.currentExercise") || "Current exercise")}</div>
+                <div class="currentExerciseName">
+                    ${escapeHtml(name)}${descSuffix}
+                </div>
+                </div>
+
+                <div class="currentExerciseIdx">
+                ${escapeHtml((t("session.exercise") || "Exercise"))} ${currentSeriesIndex + 1}/${series.length}
+                </div>
             </div>
-          </button>
+
+            ${currentSetHtml}
+
+            <div class="currentExerciseSubdivider"></div>
+
+            <div class="allSetsLabel">${allSetsLabel}</div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+                ${flow || `<span class="muted">${escapeHtml(t("session.noSets") || "No sets")}</span>`}
+            </div>
         `;
 
-            const restSeconds = typeof rg2?.restSecondsAfter === "number" ? rg2.restSecondsAfter : 0;
-            const between = (repIdx < groups.length - 1)
-                ? `
-              <div aria-hidden="true" style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; min-width:44px;">
-                <div style="font-size:18px; line-height:1; color: var(--muted);">→</div>
-                ${restSeconds > 0
-                    ? `<div style="font-size:12px; color: var(--muted); font-weight:700; line-height:1;">${restSeconds}s</div>`
-                    : `<div style="font-size:12px; color: var(--muted); opacity:0.65; font-weight:700; line-height:1;">—</div>`
-                }
-              </div>
-            `
-                : "";
+        syncCurrentSetControls();
+    }
 
-            return square + between;
-        }).join("");
+    function syncCurrentSetControls() {
+        const btn = currentSectionEl?.querySelector('[data-action="complete-current-set"]');
+        if (!btn) return;
 
-        const allSetsLabel = escapeHtml(t("session.allSets") || "All sets");
+        const hasStarted = startEpochMs != null;
+        const canComplete = hasStarted && running && setRunning && !restRunning;
 
-        currentSectionEl.style.display = "";
-        currentSectionEl.innerHTML = `
-      <div class="currentExerciseHeader">
-        <div class="currentExerciseTitleWrap">
-          <div class="currentExerciseLabel">${escapeHtml(t("session.currentExercise") || "Current exercise")}</div>
-          <div class="currentExerciseName">
-            ${escapeHtml(name)}${descSuffix}
-          </div>
-        </div>
+        btn.disabled = !canComplete;
 
-        <div class="currentExerciseIdx">
-          ${escapeHtml((t("session.exercise") || "Exercise"))} ${currentSeriesIndex + 1}/${series.length}
-        </div>
-      </div>
+        const label = !hasStarted
+            ? (t("session.currentSet.startToEnable") || "Start workout to complete sets")
+            : (!running
+                ? (t("session.currentSet.resumeToEnable") || "Resume workout to complete sets")
+                : (restRunning
+                    ? (t("session.currentSet.restTimer") || "Rest timer")
+                    : (t("session.currentSet.complete") || "Complete set")
+                )
+            );
 
-      ${currentSetHtml}
-
-      <div class="currentExerciseSubdivider"></div>
-
-      <div class="allSetsLabel">${allSetsLabel}</div>
-      <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
-        ${flow || `<span class="muted">${escapeHtml(t("session.noSets") || "No sets")}</span>`}
-      </div>
-    `;
+        btn.title = label;
+        btn.setAttribute("aria-label", label);
     }
 
     currentSectionEl?.addEventListener("click", (e) => {
         const completeBtn = e.target.closest('[data-action="complete-current-set"]');
         if (completeBtn) {
-            if (!running || startEpochMs == null || restRunning) return;
+            if (!running || startEpochMs == null || restRunning || !setRunning) return;
             const routine = currentRoutineId ? routineStore.getById(currentRoutineId) : null;
             if (!routine) return;
 
@@ -553,23 +640,10 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
             recomputeCompletedSeries(routine);
             advanceToNext(routine);
 
+            resetSetTimer();
             startRest(restToRun);
             renderCurrent();
 
-            return;
-        }
-
-        const focusBtn = e.target.closest('[data-action="focus-current-rep"]');
-        if (focusBtn) {
-            const repIdx = Number(focusBtn.dataset.repIdx);
-            if (!Number.isFinite(repIdx)) return;
-
-            currentRepGroupIndex = repIdx;
-
-            restRunning = false;
-            stopRestTick();
-
-            renderCurrent();
             return;
         }
     });
@@ -769,6 +843,7 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         render(params) {
             resetTimer();
             resetRestTimer();
+            resetSetTimer();
 
             const resetLabel = t("session.timer.reset");
             btnReset.textContent = resetLabel;
