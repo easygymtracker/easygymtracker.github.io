@@ -116,10 +116,11 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
     }
 
     function syncStartPauseLabel() {
+        const isPaused = !running;
         const key = running ? "session.timer.pause" : "session.timer.start";
         const label = t(key);
-
-        btnStartPause.textContent = label;
+        const icon = isPaused ? "▶" : "⏸";
+        btnStartPause.innerHTML = `<span aria-hidden="true" style="margin-right:8px;">${icon}</span>${escapeHtml(label)}`;
         btnStartPause.title = label;
         btnStartPause.setAttribute("aria-label", label);
     }
@@ -532,26 +533,26 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
                 </button>
                 `;
 
-                    const restSeconds = typeof rg2?.restSecondsAfter === "number" ? rg2.restSecondsAfter : 0;
-                    const between = (repIdx < groups.length - 1)
-                        ? `
+            const restSeconds = typeof rg2?.restSecondsAfter === "number" ? rg2.restSecondsAfter : 0;
+            const between = (repIdx < groups.length - 1)
+                ? `
                     <div aria-hidden="true" style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; min-width:44px;">
                         <div style="font-size:18px; line-height:1; color: var(--muted);">→</div>
                         ${restSeconds > 0
-                            ? `<div style="font-size:12px; color: var(--muted); font-weight:700; line-height:1;">${restSeconds}s</div>`
-                            : `<div style="font-size:12px; color: var(--muted); opacity:0.65; font-weight:700; line-height:1;">—</div>`
-                        }
+                    ? `<div style="font-size:12px; color: var(--muted); font-weight:700; line-height:1;">${restSeconds}s</div>`
+                    : `<div style="font-size:12px; color: var(--muted); opacity:0.65; font-weight:700; line-height:1;">—</div>`
+                }
                     </div>
                     `
-                        : "";
+                : "";
 
-                    return square + between;
-                }).join("");
+            return square + between;
+        }).join("");
 
-                const allSetsLabel = escapeHtml(t("session.allSets") || "All sets");
+        const allSetsLabel = escapeHtml(t("session.allSets") || "All sets");
 
-                currentSectionEl.style.display = "";
-                currentSectionEl.innerHTML = `
+        currentSectionEl.style.display = "";
+        currentSectionEl.innerHTML = `
             <div class="currentExerciseHeader">
                 <div class="currentExerciseTitleWrap">
                 <div class="currentExerciseLabel">${escapeHtml(t("session.currentExercise") || "Current exercise")}</div>
