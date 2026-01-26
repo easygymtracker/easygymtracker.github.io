@@ -758,6 +758,11 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
 
         moveItem(sessionSeriesOrder, fromIdx, toIdx);
 
+        if (!hasInitiated && sessionSeriesOrder.length > 0) {
+            currentSeriesIndex = sessionSeriesOrder[0];
+            currentRepGroupIndex = 0;
+        }
+
         renderSeriesList(routine);
     }
 
