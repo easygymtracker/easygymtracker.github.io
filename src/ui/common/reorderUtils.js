@@ -276,6 +276,9 @@ export function attachDragReorder(containerEl, {
   }
 
   function armReorder(startRow) {
+    if (armed) return;
+    cleanupGhost();
+
     armed = true;
     containerEl.classList.add("isReordering");
 
@@ -283,7 +286,6 @@ export function attachDragReorder(containerEl, {
     containerEl.style.touchAction = "none";
     containerEl.addEventListener("contextmenu", preventContextMenu, { passive: false });
 
-    // Create ghost + mark source as taken
     sourceRowEl = startRow;
     applyTakenStyle(sourceRowEl);
     ghostEl = createDragGhostFromRow(startRow);
@@ -314,7 +316,6 @@ export function attachDragReorder(containerEl, {
     startX = e.clientX;
     startY = e.clientY;
 
-    // offset inside row for ghost positioning
     const rect = row.getBoundingClientRect();
     offsetX = e.clientX - rect.left;
     offsetY = e.clientY - rect.top;
@@ -324,6 +325,7 @@ export function attachDragReorder(containerEl, {
 
     clearPressTimer();
     pressTimer = setTimeout(() => {
+      clearPressTimer();
       armReorder(row);
       moveGhost(ghostEl, startX, startY, offsetX, offsetY);
       try { row.setPointerCapture(pointerId); } catch { }
@@ -397,7 +399,6 @@ export function attachDragReorder(containerEl, {
     fromIdx = Number(row.getAttribute("data-index"));
     pendingToIdx = fromIdx;
 
-    // offset inside row
     const rect = row.getBoundingClientRect();
     offsetX = t0.clientX - rect.left;
     offsetY = t0.clientY - rect.top;
@@ -407,6 +408,7 @@ export function attachDragReorder(containerEl, {
 
     clearPressTimer();
     pressTimer = setTimeout(() => {
+      clearPressTimer();
       armReorder(row);
       moveGhost(ghostEl, startX, startY, offsetX, offsetY);
     }, longPressMs);
