@@ -121,6 +121,10 @@ export const DICTS = {
         "session.currentSet.restTimer": "Rest timer",
         "session.currentSet.startToEnable": "Start workout to complete sets",
         "session.currentSet.resumeToEnable": "Resume workout to complete sets",
+        "session.enterReps": "Reps performed",
+        "session.enterWeight": "Weight used",
+        "session.enterWeightLeft": "Left weight",
+        "session.enterWeightRight": "Right weight",
     },
 
     es: {
@@ -241,6 +245,10 @@ export const DICTS = {
         "session.currentSet.restTimer": "Temporizador de descanso",
         "session.currentSet.startToEnable": "Inicia el entrenamiento para completar series",
         "session.currentSet.resumeToEnable": "Reanuda el entrenamiento para completar series",
+        "session.enterReps": "Repeticiones realizadas",
+        "session.enterWeight": "Peso usado",
+        "session.enterWeightLeft": "Peso izquierdo",
+        "session.enterWeightRight": "Peso derecho",
     },
 
     pt: {
@@ -361,6 +369,10 @@ export const DICTS = {
         "session.currentSet.restTimer": "Temporizador de descanso",
         "session.currentSet.startToEnable": "Inicie o treino para concluir as séries",
         "session.currentSet.resumeToEnable": "Retome o treino para concluir as séries",
+        "session.enterReps": "Repetições realizadas",
+        "session.enterWeight": "Peso usado",
+        "session.enterWeightLeft": "Peso esquerdo",
+        "session.enterWeightRight": "Peso direito",
     },
 
     ja: {
@@ -481,6 +493,10 @@ export const DICTS = {
         "session.currentSet.restTimer": "休憩タイマー",
         "session.currentSet.startToEnable": "トレーニングを開始してセットを完了してください",
         "session.currentSet.resumeToEnable": "トレーニングを再開してセットを完了してください",
+        "session.enterReps": "実施した回数",
+        "session.enterWeight": "使用重量",
+        "session.enterWeightLeft": "左の重量",
+        "session.enterWeightRight": "右の重量",
     },
 
     zh: {
@@ -601,6 +617,10 @@ export const DICTS = {
         "session.currentSet.restTimer": "休息计时器",
         "session.currentSet.startToEnable": "开始训练以完成组",
         "session.currentSet.resumeToEnable": "继续训练以完成组",
+        "session.enterReps": "完成次数",
+        "session.enterWeight": "使用重量",
+        "session.enterWeightLeft": "左侧重量",
+        "session.enterWeightRight": "右侧重量",
     },
 
     ar: {
@@ -721,6 +741,10 @@ export const DICTS = {
         "session.currentSet.restTimer": "مؤقت الراحة",
         "session.currentSet.startToEnable": "ابدأ التمرين لإكمال المجموعات",
         "session.currentSet.resumeToEnable": "استأنف التمرين لإكمال المجموعات",
+        "session.enterReps": "عدد التكرارات المنفذة",
+        "session.enterWeight": "الوزن المستخدم",
+        "session.enterWeightLeft": "وزن الجهة اليسرى",
+        "session.enterWeightRight": "وزن الجهة اليمنى",
     },
 
     hi: {
@@ -841,6 +865,10 @@ export const DICTS = {
         "session.currentSet.restTimer": "आराम टाइमर",
         "session.currentSet.startToEnable": "सेट पूरा करने के लिए वर्कआउट शुरू करें",
         "session.currentSet.resumeToEnable": "सेट पूरा करने के लिए वर्कआउट फिर से शुरू करें",
+        "session.enterReps": "किए गए रेप्स",
+        "session.enterWeight": "उपयोग किया गया वजन",
+        "session.enterWeightLeft": "बायाँ वजन",
+        "session.enterWeightRight": "दायाँ वजन",
     },
 
     de: {
@@ -961,6 +989,10 @@ export const DICTS = {
         "session.currentSet.restTimer": "Pausen-Timer",
         "session.currentSet.startToEnable": "Training starten, um Sätze abzuschließen",
         "session.currentSet.resumeToEnable": "Training fortsetzen, um Sätze abzuschließen",
+        "session.enterReps": "Ausgeführte Wiederholungen",
+        "session.enterWeight": "Verwendetes Gewicht",
+        "session.enterWeightLeft": "Linkes Gewicht",
+        "session.enterWeightRight": "Rechtes Gewicht",
     },
 
     fr: {
@@ -1081,6 +1113,10 @@ export const DICTS = {
         "session.currentSet.restTimer": "Minuteur de repos",
         "session.currentSet.startToEnable": "Démarrez l’entraînement pour terminer les séries",
         "session.currentSet.resumeToEnable": "Reprenez l’entraînement pour terminer les séries",
+        "session.enterReps": "Répétitions effectuées",
+        "session.enterWeight": "Poids utilisé",
+        "session.enterWeightLeft": "Poids gauche",
+        "session.enterWeightRight": "Poids droit",
     },
 
     ru: {
@@ -1201,6 +1237,10 @@ export const DICTS = {
         "session.currentSet.restTimer": "Таймер отдыха",
         "session.currentSet.startToEnable": "Начните тренировку, чтобы завершать подходы",
         "session.currentSet.resumeToEnable": "Возобновите тренировку, чтобы завершать подходы",
+        "session.enterReps": "Выполненные повторения",
+        "session.enterWeight": "Использованный вес",
+        "session.enterWeightLeft": "Вес слева",
+        "session.enterWeightRight": "Вес справа",
     },
 
     it: {
@@ -1321,6 +1361,10 @@ export const DICTS = {
         "session.currentSet.restTimer": "Timer di recupero",
         "session.currentSet.startToEnable": "Avvia l’allenamento per completare le serie",
         "session.currentSet.resumeToEnable": "Riprendi l’allenamento per completare le serie",
+        "session.enterReps": "Ripetizioni eseguite",
+        "session.enterWeight": "Peso utilizzato",
+        "session.enterWeightLeft": "Peso sinistro",
+        "session.enterWeightRight": "Peso destro",
     },
 
     nl: {
@@ -1441,6 +1485,10 @@ export const DICTS = {
         "session.currentSet.restTimer": "Rusttimer",
         "session.currentSet.startToEnable": "Start de training om sets te voltooien",
         "session.currentSet.resumeToEnable": "Hervat de training om sets te voltooien",
+        "session.enterReps": "Uitgevoerde herhalingen",
+        "session.enterWeight": "Gebruikt gewicht",
+        "session.enterWeightLeft": "Linker gewicht",
+        "session.enterWeightRight": "Rechter gewicht",
     },
 
     pl: {
@@ -1561,6 +1609,10 @@ export const DICTS = {
         "session.currentSet.restTimer": "Timer przerwy",
         "session.currentSet.startToEnable": "Rozpocznij trening, aby ukończyć serie",
         "session.currentSet.resumeToEnable": "Wznów trening, aby ukończyć serie",
+        "session.enterReps": "Wykonane powtórzenia",
+        "session.enterWeight": "Użyty ciężar",
+        "session.enterWeightLeft": "Lewy ciężar",
+        "session.enterWeightRight": "Prawy ciężar",
     },
 
     tr: {
@@ -1681,5 +1733,9 @@ export const DICTS = {
         "session.currentSet.restTimer": "Dinlenme zamanlayıcısı",
         "session.currentSet.startToEnable": "Setleri tamamlamak için antrenmanı başlat",
         "session.currentSet.resumeToEnable": "Setleri tamamlamak için antrenmana devam et",
+        "session.enterReps": "Yapılan tekrar sayısı",
+        "session.enterWeight": "Kullanılan ağırlık",
+        "session.enterWeightLeft": "Sol ağırlık",
+        "session.enterWeightRight": "Sağ ağırlık",
     }
 };

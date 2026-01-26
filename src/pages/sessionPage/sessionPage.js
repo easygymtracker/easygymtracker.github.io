@@ -61,9 +61,7 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
     }
 
     function startSetTimer({ reset = false } = {}) {
-        if (reset) {
-            setElapsedMs = 0;
-        }
+        if (reset) setElapsedMs = 0;
         if (setRunning) return;
 
         setRunning = true;
@@ -97,16 +95,12 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         syncCurrentSetControls();
     }
 
-    // --- session progress state (series + repGroups status) ---
+    // --- session progress state ---
     let currentRoutineId = null;
-
-    let currentSeriesIndex = 0; // active exercise (index in ORIGINAL routine.series)
-    let currentRepGroupIndex = 0; // active set within exercise
-
-    let completedSeries = new Set(); // indices marked completed (derived/optional)
-    let completedRepGroups = new Map(); // seriesIdx -> Set(repIdx)
-
-    // Local display order
+    let currentSeriesIndex = 0;
+    let currentRepGroupIndex = 0;
+    let completedSeries = new Set();
+    let completedRepGroups = new Map();
     let sessionSeriesOrder = null;
 
     function stopTick() {
@@ -133,9 +127,7 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
 
     function startTimer() {
         if (running) return;
-        if (!hasInitiated) {
-            hasInitiated = true;
-        }
+        if (!hasInitiated) hasInitiated = true;
 
         running = true;
 
@@ -155,6 +147,7 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         renderCurrent();
         syncCurrentSetControls();
     }
+
     function pauseTimer() {
         if (!running) return;
         running = false;
@@ -189,6 +182,72 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
             clearInterval(restTickHandle);
             restTickHandle = null;
         }
+    }
+
+    function normalizeWeight(w) {
+        if (w === null) return null;
+        if (typeof w === "number") return w;
+        return { left: w.left ?? null, right: w.right ?? null };
+    }
+
+    function isSameWeight(a, b) {
+        const wa = normalizeWeight(a);
+        const wb = normalizeWeight(b);
+
+        if (wa === null && wb === null) return true;
+        if (typeof wa === "number" && typeof wb === "number") return wa === wb;
+        if (typeof wa === "object" && typeof wb === "object") {
+            return wa.left === wb.left && wa.right === wb.right;
+        }
+        return false;
+    }
+
+    function collectPerformedValues(repGroup) {
+        const latest = repGroup.getLatestHistory?.();
+        const baseReps = latest?.reps ?? repGroup.targetReps;
+        const baseWeight = latest?.weight ?? repGroup.targetWeight;
+
+        const repsInput = prompt(t("session.enterReps") || "Reps performed:", baseReps ?? "");
+        if (repsInput === null) return null;
+
+        const reps = repsInput === "" ? baseReps : Number(repsInput);
+        if (!Number.isFinite(reps) || reps <= 0) return null;
+
+        let weight = baseWeight;
+
+        if (repGroup.laterality === "unilateral") {
+            const bw = normalizeWeight(baseWeight) ?? { left: null, right: null };
+
+            const l = prompt(t("session.enterWeightLeft") || "Left weight:", bw.left ?? "");
+            if (l === null) return null;
+
+            const r = prompt(t("session.enterWeightRight") || "Right weight:", bw.right ?? "");
+            if (r === null) return null;
+
+            const left = l === "" ? bw.left : Number(l);
+            const right = r === "" ? bw.right : Number(r);
+
+            if (
+                (left !== null && !Number.isFinite(left)) ||
+                (right !== null && !Number.isFinite(right))
+            ) return null;
+
+            weight = { left, right };
+        } else {
+            const w = prompt(t("session.enterWeight") || "Weight:", baseWeight ?? "");
+            if (w === null) return null;
+
+            const v = w === "" ? baseWeight : Number(w);
+            if (v !== null && !Number.isFinite(v)) return null;
+
+            weight = v;
+        }
+
+        return {
+            reps,
+            weight,
+            changed: reps !== baseReps || !isSameWeight(weight, baseWeight),
+        };
     }
 
     function updateCurrentSetTimerUI() {
@@ -616,41 +675,56 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
 
     currentSectionEl?.addEventListener("click", (e) => {
         const completeBtn = e.target.closest('[data-action="complete-current-set"]');
-        if (completeBtn) {
-            if (!running || startEpochMs == null || restRunning || !setRunning) return;
-            const routine = currentRoutineId ? routineStore.getById(currentRoutineId) : null;
-            if (!routine) return;
+        if (!completeBtn) return;
+        if (!running || startEpochMs == null || restRunning || !setRunning) return;
 
-            const series = Array.isArray(routine.series) ? routine.series : [];
-            const s = series[currentSeriesIndex] || null;
-            const groups = Array.isArray(s?.repGroups) ? s.repGroups : [];
-            const rg = groups[currentRepGroupIndex] || null;
+        const routine = currentRoutineId ? routineStore.getById(currentRoutineId) : null;
+        if (!routine) return;
 
-            if (!s || !rg) return;
+        const s = routine.series?.[currentSeriesIndex];
+        const rg = s?.repGroups?.[currentRepGroupIndex];
+        if (!s || !rg) return;
+        if (isRepDone(currentSeriesIndex, currentRepGroupIndex)) return;
 
-            if (isRepDone(currentSeriesIndex, currentRepGroupIndex)) return;
+        const performed = collectPerformedValues(rg);
+        if (!performed) return;
 
-            const isLastSetInExercise = currentRepGroupIndex >= groups.length - 1;
+        if (performed.changed) {
+            const prev = rg.getLatestHistory?.();
 
-            const restSecondsAfterSet =
-                typeof rg.restSecondsAfter === "number" ? rg.restSecondsAfter : 0;
-
-            const restSecondsAfterExercise =
-                typeof s.restSecondsAfter === "number" ? s.restSecondsAfter : 0;
-
-            const restToRun = isLastSetInExercise ? restSecondsAfterExercise : restSecondsAfterSet;
-
-            markRepDone(currentSeriesIndex, currentRepGroupIndex);
-
-            recomputeCompletedSeries(routine);
-            advanceToNext(routine);
-
-            resetSetTimer();
-            startRest(restToRun);
-            renderCurrent();
-
-            return;
+            console.group("[Session] RepGroup history updated");
+            console.log("Exercise:", resolveExerciseName(s));
+            console.log("Series index:", currentSeriesIndex);
+            console.log("Set index:", currentRepGroupIndex);
+            console.log("Previous:", {
+                reps: prev?.reps ?? rg.targetReps,
+                weight: prev?.weight ?? rg.targetWeight,
+            });
+            console.log("New:", {
+                reps: performed.reps,
+                weight: performed.weight,
+            });
+            console.log("Timestamp:", new Date().toISOString());
+            console.groupEnd();
+            rg.upsertHistory(new Date().toISOString(), {
+                reps: performed.reps,
+                weight: performed.weight,
+            });
+            routineStore.update(routine);
         }
+
+        const isLast = currentRepGroupIndex >= s.repGroups.length - 1;
+        const restToRun = isLast
+            ? (typeof s.restSecondsAfter === "number" ? s.restSecondsAfter : 0)
+            : (typeof rg.restSecondsAfter === "number" ? rg.restSecondsAfter : 0);
+
+        markRepDone(currentSeriesIndex, currentRepGroupIndex);
+        recomputeCompletedSeries(routine);
+        advanceToNext(routine);
+
+        resetSetTimer();
+        startRest(restToRun);
+        renderCurrent();
     });
 
     function renderRepGroupList(seriesIdx, s) {
@@ -857,37 +931,18 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
             hasInitiated = false;
             syncStartPauseLabel();
 
-            notFoundEl.style.display = "none";
-
             const routineId = params?.routineId ?? null;
             currentRoutineId = routineId;
-
             currentSeriesIndex = 0;
             currentRepGroupIndex = 0;
-
             completedSeries = new Set();
             completedRepGroups = new Map();
-
             sessionSeriesOrder = null;
 
             const routine = routineId ? routineStore.getById(routineId) : null;
+            if (!routine) return;
 
-            if (!routine) {
-                metaEl.textContent = "—";
-                listEl.innerHTML = "";
-                emptyEl.style.display = "none";
-                notFoundEl.style.display = "";
-                currentSectionEl.style.display = "none";
-                currentSectionEl.innerHTML = "";
-                restRunning = false;
-                stopRestTick();
-                return;
-            }
-
-            currentSectionEl.style.display = "none";
-            currentSectionEl.innerHTML = "";
-            metaEl.textContent = routine.description ? routine.description : "—";
-
+            metaEl.textContent = routine.description || "—";
             renderSeriesList(routine);
         },
     };
