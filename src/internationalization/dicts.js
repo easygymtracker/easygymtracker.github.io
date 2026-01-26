@@ -125,6 +125,9 @@ export const DICTS = {
         "session.enterWeight": "Weight used",
         "session.enterWeightLeft": "Left weight",
         "session.enterWeightRight": "Right weight",
+        "session.currentSet.subtitle": "Enter what you actually performed to track your progress.",
+        "session.error.invalidReps": "Reps must be a positive whole number.",
+        "session.error.invalidWeight": "Weight must be zero or a positive number.",
     },
 
     es: {
@@ -249,6 +252,9 @@ export const DICTS = {
         "session.enterWeight": "Peso usado",
         "session.enterWeightLeft": "Peso izquierdo",
         "session.enterWeightRight": "Peso derecho",
+        "session.currentSet.subtitle": "Introduce lo que realmente realizaste para seguir tu progreso.",
+        "session.error.invalidReps": "Las repeticiones deben ser un número entero positivo.",
+        "session.error.invalidWeight": "El peso debe ser cero o un número positivo.",
     },
 
     pt: {
@@ -373,6 +379,9 @@ export const DICTS = {
         "session.enterWeight": "Peso usado",
         "session.enterWeightLeft": "Peso esquerdo",
         "session.enterWeightRight": "Peso direito",
+        "session.currentSet.subtitle": "Informe o que você realmente executou para acompanhar seu progresso.",
+        "session.error.invalidReps": "As repetições devem ser um número inteiro positivo.",
+        "session.error.invalidWeight": "O peso deve ser zero ou um número positivo.",
     },
 
     ja: {
@@ -497,6 +506,9 @@ export const DICTS = {
         "session.enterWeight": "使用重量",
         "session.enterWeightLeft": "左の重量",
         "session.enterWeightRight": "右の重量",
+        "session.currentSet.subtitle": "実際に行った内容を入力して、進捗を記録しましょう。",
+        "session.error.invalidReps": "回数は正の整数で入力してください。",
+        "session.error.invalidWeight": "重量は0以上の数値で入力してください。",
     },
 
     zh: {
@@ -621,6 +633,9 @@ export const DICTS = {
         "session.enterWeight": "使用重量",
         "session.enterWeightLeft": "左侧重量",
         "session.enterWeightRight": "右侧重量",
+        "session.currentSet.subtitle": "请输入你实际完成的内容，以跟踪你的训练进度。",
+        "session.error.invalidReps": "次数必须是正整数。",
+        "session.error.invalidWeight": "重量必须是零或正数。",
     },
 
     ar: {
@@ -745,6 +760,9 @@ export const DICTS = {
         "session.enterWeight": "الوزن المستخدم",
         "session.enterWeightLeft": "وزن الجهة اليسرى",
         "session.enterWeightRight": "وزن الجهة اليمنى",
+        "session.currentSet.subtitle": "أدخل ما قمت به فعليًا لتتبع تقدمك.",
+        "session.error.invalidReps": "يجب أن يكون عدد التكرارات رقمًا صحيحًا موجبًا.",
+        "session.error.invalidWeight": "يجب أن يكون الوزن صفرًا أو رقمًا موجبًا.",
     },
 
     hi: {
@@ -869,6 +887,9 @@ export const DICTS = {
         "session.enterWeight": "उपयोग किया गया वजन",
         "session.enterWeightLeft": "बायाँ वजन",
         "session.enterWeightRight": "दायाँ वजन",
+        "session.currentSet.subtitle": "अपनी प्रगति को ट्रैक करने के लिए आपने वास्तव में जो किया उसे दर्ज करें।",
+        "session.error.invalidReps": "रेप्स एक धनात्मक पूर्ण संख्या होनी चाहिए।",
+        "session.error.invalidWeight": "वजन शून्य या धनात्मक संख्या होना चाहिए।",
     },
 
     de: {
@@ -993,6 +1014,9 @@ export const DICTS = {
         "session.enterWeight": "Verwendetes Gewicht",
         "session.enterWeightLeft": "Linkes Gewicht",
         "session.enterWeightRight": "Rechtes Gewicht",
+        "session.currentSet.subtitle": "Gib ein, was du tatsächlich ausgeführt hast, um deinen Fortschritt zu verfolgen.",
+        "session.error.invalidReps": "Wiederholungen müssen eine positive ganze Zahl sein.",
+        "session.error.invalidWeight": "Das Gewicht muss null oder eine positive Zahl sein.",
     },
 
     fr: {
@@ -1117,6 +1141,9 @@ export const DICTS = {
         "session.enterWeight": "Poids utilisé",
         "session.enterWeightLeft": "Poids gauche",
         "session.enterWeightRight": "Poids droit",
+        "session.currentSet.subtitle": "Indique ce que vous avez réellement effectué pour suivre vos performances.",
+        "session.error.invalidReps": "Les répétitions doivent être un nombre entier positif.",
+        "session.error.invalidWeight": "Le poids doit être zéro ou un nombre positif.",
     },
 
     ru: {
@@ -1241,6 +1268,9 @@ export const DICTS = {
         "session.enterWeight": "Использованный вес",
         "session.enterWeightLeft": "Вес слева",
         "session.enterWeightRight": "Вес справа",
+        "session.currentSet.subtitle": "Введите то, что вы действительно выполнили, чтобы отслеживать прогресс.",
+        "session.error.invalidReps": "Повторы должны быть положительным целым числом.",
+        "session.error.invalidWeight": "Вес должен быть равен нулю или положительным числом.",
     },
 
     it: {
@@ -1365,6 +1395,9 @@ export const DICTS = {
         "session.enterWeight": "Peso utilizzato",
         "session.enterWeightLeft": "Peso sinistro",
         "session.enterWeightRight": "Peso destro",
+        "session.currentSet.subtitle": "Inserisci ciò che hai effettivamente eseguito per tenere traccia dei progressi.",
+        "session.error.invalidReps": "Le ripetizioni devono essere un numero intero positivo.",
+        "session.error.invalidWeight": "Il peso deve essere zero o un numero positivo.",
     },
 
     nl: {
@@ -1489,6 +1522,9 @@ export const DICTS = {
         "session.enterWeight": "Gebruikt gewicht",
         "session.enterWeightLeft": "Linker gewicht",
         "session.enterWeightRight": "Rechter gewicht",
+        "session.currentSet.subtitle": "Voer in wat je daadwerkelijk hebt uitgevoerd om je voortgang bij te houden.",
+        "session.error.invalidReps": "Herhalingen moeten een positief geheel getal zijn.",
+        "session.error.invalidWeight": "Het gewicht moet nul of een positief getal zijn.",
     },
 
     pl: {
@@ -1613,6 +1649,9 @@ export const DICTS = {
         "session.enterWeight": "Użyty ciężar",
         "session.enterWeightLeft": "Lewy ciężar",
         "session.enterWeightRight": "Prawy ciężar",
+        "session.currentSet.subtitle": "Wprowadź to, co faktycznie wykonałeś, aby śledzić postępy.",
+        "session.error.invalidReps": "Powtórzenia muszą być dodatnią liczbą całkowitą.",
+        "session.error.invalidWeight": "Ciężar musi być zerem lub liczbą dodatnią.",
     },
 
     tr: {
@@ -1737,5 +1776,8 @@ export const DICTS = {
         "session.enterWeight": "Kullanılan ağırlık",
         "session.enterWeightLeft": "Sol ağırlık",
         "session.enterWeightRight": "Sağ ağırlık",
+        "session.currentSet.subtitle": "Performansını takip etmek için gerçekten yaptığını gir.",
+        "session.error.invalidReps": "Tekrar sayısı pozitif bir tam sayı olmalıdır.",
+        "session.error.invalidWeight": "Ağırlık sıfır veya pozitif bir sayı olmalıdır.",
     }
 };

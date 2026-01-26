@@ -5,6 +5,7 @@ import { t } from "/src/internationalization/i18n.js";
 import { escapeHtml } from "/src/ui/dom.js";
 import { formatMs } from "/src/utils/numberFormat.js";
 import { attachDragReorder, moveItem } from "/src/ui/common/reorderUtils.js";
+import { openSessionSetModal } from "/src/ui/components/sessionSetModal.js";
 
 export function mountSessionPage({ routineStore, exerciseStore }) {
     const titleEl = document.getElementById("sessionTitle");
@@ -200,54 +201,6 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
             return wa.left === wb.left && wa.right === wb.right;
         }
         return false;
-    }
-
-    function collectPerformedValues(repGroup) {
-        const latest = repGroup.getLatestHistory?.();
-        const baseReps = latest?.reps ?? repGroup.targetReps;
-        const baseWeight = latest?.weight ?? repGroup.targetWeight;
-
-        const repsInput = prompt(t("session.enterReps") || "Reps performed:", baseReps ?? "");
-        if (repsInput === null) return null;
-
-        const reps = repsInput === "" ? baseReps : Number(repsInput);
-        if (!Number.isFinite(reps) || reps <= 0) return null;
-
-        let weight = baseWeight;
-
-        if (repGroup.laterality === "unilateral") {
-            const bw = normalizeWeight(baseWeight) ?? { left: null, right: null };
-
-            const l = prompt(t("session.enterWeightLeft") || "Left weight:", bw.left ?? "");
-            if (l === null) return null;
-
-            const r = prompt(t("session.enterWeightRight") || "Right weight:", bw.right ?? "");
-            if (r === null) return null;
-
-            const left = l === "" ? bw.left : Number(l);
-            const right = r === "" ? bw.right : Number(r);
-
-            if (
-                (left !== null && !Number.isFinite(left)) ||
-                (right !== null && !Number.isFinite(right))
-            ) return null;
-
-            weight = { left, right };
-        } else {
-            const w = prompt(t("session.enterWeight") || "Weight:", baseWeight ?? "");
-            if (w === null) return null;
-
-            const v = w === "" ? baseWeight : Number(w);
-            if (v !== null && !Number.isFinite(v)) return null;
-
-            weight = v;
-        }
-
-        return {
-            reps,
-            weight,
-            changed: reps !== baseReps || !isSameWeight(weight, baseWeight),
-        };
     }
 
     function updateCurrentSetTimerUI() {
@@ -673,7 +626,7 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         btn.setAttribute("aria-label", label);
     }
 
-    currentSectionEl?.addEventListener("click", (e) => {
+    currentSectionEl?.addEventListener("click", async (e) => {
         const completeBtn = e.target.closest('[data-action="complete-current-set"]');
         if (!completeBtn) return;
         if (!running || startEpochMs == null || restRunning || !setRunning) return;
@@ -686,19 +639,28 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         if (!s || !rg) return;
         if (isRepDone(currentSeriesIndex, currentRepGroupIndex)) return;
 
-        const performed = collectPerformedValues(rg);
+        const latest = rg.getLatestHistory?.();
+        const baseReps = latest?.reps ?? rg.targetReps;
+        const baseWeight = latest?.weight ?? rg.targetWeight;
+
+        const performed = await openSessionSetModal({
+            exerciseName: resolveExerciseName(s),
+            setIndex: currentRepGroupIndex + 1,
+            laterality: rg.laterality,
+            initialReps: baseReps,
+            initialWeight: baseWeight,
+        });
+
         if (!performed) return;
 
         if (performed.changed) {
-            const prev = rg.getLatestHistory?.();
-
             console.group("[Session] RepGroup history updated");
             console.log("Exercise:", resolveExerciseName(s));
             console.log("Series index:", currentSeriesIndex);
             console.log("Set index:", currentRepGroupIndex);
             console.log("Previous:", {
-                reps: prev?.reps ?? rg.targetReps,
-                weight: prev?.weight ?? rg.targetWeight,
+                reps: baseReps,
+                weight: baseWeight,
             });
             console.log("New:", {
                 reps: performed.reps,
