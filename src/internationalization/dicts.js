@@ -130,6 +130,9 @@ export const DICTS = {
         "session.error.invalidWeight": "Weight must be zero or a positive number.",
         "session.addSet": "Add set",
         "session.addSet.confirm": "Add set",
+        "session.restSeconds": "Rest (seconds)",
+"session.seconds": "seconds",
+"session.error.invalidRest": "Rest must be zero or a positive whole number."
     },
 
     es: {
@@ -259,6 +262,9 @@ export const DICTS = {
         "session.error.invalidWeight": "El peso debe ser cero o un número positivo.",
         "session.addSet": "Añadir serie",
         "session.addSet.confirm": "Añadir serie",
+        "session.restSeconds": "Descanso (segundos)",
+        "session.seconds": "segundos",
+        "session.error.invalidRest": "El descanso debe ser un número entero positivo o cero."
     },
 
     pt: {
@@ -388,6 +394,9 @@ export const DICTS = {
         "session.error.invalidWeight": "O peso deve ser zero ou um número positivo.",
         "session.addSet": "Adicionar série",
         "session.addSet.confirm": "Adicionar série",
+        "session.restSeconds": "Descanso (segundos)",
+        "session.seconds": "segundos",
+        "session.error.invalidRest": "O descanso deve ser um número inteiro positivo ou zero."
     },
 
     ja: {
@@ -517,6 +526,9 @@ export const DICTS = {
         "session.error.invalidWeight": "重量は0以上の数値で入力してください。",
         "session.addSet": "セットを追加",
         "session.addSet.confirm": "セットを追加",
+        "session.restSeconds": "休憩（秒）",
+        "session.seconds": "秒",
+        "session.error.invalidRest": "休憩は0以上の正の整数で入力してください。"
     },
 
     zh: {
@@ -646,6 +658,9 @@ export const DICTS = {
         "session.error.invalidWeight": "重量必须是零或正数。",
         "session.addSet": "添加组",
         "session.addSet.confirm": "添加组",
+        "session.restSeconds": "休息（秒）",
+        "session.seconds": "秒",
+        "session.error.invalidRest": "休息时间必须是零或正整数。"
     },
 
     ar: {
@@ -775,6 +790,9 @@ export const DICTS = {
         "session.error.invalidWeight": "يجب أن يكون الوزن صفرًا أو رقمًا موجبًا.",
         "session.addSet": "إضافة مجموعة",
         "session.addSet.confirm": "إضافة مجموعة",
+        "session.restSeconds": "راحة (ثوانٍ)",
+        "session.seconds": "ثوانٍ",
+        "session.error.invalidRest": "يجب أن تكون الراحة رقمًا صحيحًا موجبًا أو صفرًا."
     },
 
     hi: {
@@ -904,6 +922,9 @@ export const DICTS = {
         "session.error.invalidWeight": "वजन शून्य या धनात्मक संख्या होना चाहिए।",
         "session.addSet": "सेट जोड़ें",
         "session.addSet.confirm": "सेट जोड़ें",
+        "session.restSeconds": "आराम (सेकंड)",
+        "session.seconds": "सेकंड",
+        "session.error.invalidRest": "आराम शून्य या धनात्मक पूर्ण संख्या होनी चाहिए।"
     },
 
     de: {
@@ -1033,6 +1054,9 @@ export const DICTS = {
         "session.error.invalidWeight": "Das Gewicht muss null oder eine positive Zahl sein.",
         "session.addSet": "Satz hinzufügen",
         "session.addSet.confirm": "Satz hinzufügen",
+        "session.restSeconds": "Pause (Sekunden)",
+        "session.seconds": "Sekunden",
+        "session.error.invalidRest": "Die Pause muss null oder eine positive ganze Zahl sein."
     },
 
     fr: {
@@ -1162,6 +1186,9 @@ export const DICTS = {
         "session.error.invalidWeight": "Le poids doit être zéro ou un nombre positif.",
         "session.addSet": "Ajouter une série",
         "session.addSet.confirm": "Ajouter une série",
+        "session.restSeconds": "Repos (secondes)",
+        "session.seconds": "secondes",
+        "session.error.invalidRest": "Le repos doit être un nombre entier positif ou zéro."
     },
 
     ru: {
@@ -1291,6 +1318,9 @@ export const DICTS = {
         "session.error.invalidWeight": "Вес должен быть равен нулю или положительным числом.",
         "session.addSet": "Добавить подход",
         "session.addSet.confirm": "Добавить подход",
+        "session.restSeconds": "Отдых (сек.)",
+        "session.seconds": "секунды",
+        "session.error.invalidRest": "Отдых должен быть нулём или положительным целым числом."
     },
 
     it: {
@@ -1420,6 +1450,9 @@ export const DICTS = {
         "session.error.invalidWeight": "Il peso deve essere zero o un numero positivo.",
         "session.addSet": "Aggiungi serie",
         "session.addSet.confirm": "Aggiungi serie",
+        "session.restSeconds": "Recupero (secondi)",
+        "session.seconds": "secondi",
+        "session.error.invalidRest": "Il recupero deve essere zero o un numero intero positivo."
     },
 
     nl: {
@@ -1549,6 +1582,9 @@ export const DICTS = {
         "session.error.invalidWeight": "Het gewicht moet nul of een positief getal zijn.",
         "session.addSet": "Set toevoegen",
         "session.addSet.confirm": "Set toevoegen",
+        "session.restSeconds": "Rust (seconden)",
+        "session.seconds": "seconden",
+        "session.error.invalidRest": "Rust moet nul of een positief geheel getal zijn."
     },
 
     pl: {
@@ -1678,6 +1714,9 @@ export const DICTS = {
         "session.error.invalidWeight": "Ciężar musi być zerem lub liczbą dodatnią.",
         "session.addSet": "Dodaj serię",
         "session.addSet.confirm": "Dodaj serię",
+        "session.restSeconds": "Przerwa (sekundy)",
+        "session.seconds": "sekundy",
+        "session.error.invalidRest": "Przerwa musi być zerem lub dodatnią liczbą całkowitą."
     },
 
     tr: {
@@ -1807,5 +1846,8 @@ export const DICTS = {
         "session.error.invalidWeight": "Ağırlık sıfır veya pozitif bir sayı olmalıdır.",
         "session.addSet": "Set ekle",
         "session.addSet.confirm": "Set ekle",
+        "session.restSeconds": "Dinlenme (saniye)",
+        "session.seconds": "saniye",
+        "session.error.invalidRest": "Dinlenme sıfır veya pozitif bir tam sayı olmalıdır."
     }
 };

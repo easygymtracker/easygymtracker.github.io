@@ -9,6 +9,7 @@ export function openSessionSetModal({
   laterality,
   initialReps,
   initialWeight,
+  initialRestSeconds,
   mode = "edit",
 }) {
   return new Promise((resolve) => {
@@ -89,6 +90,17 @@ export function openSessionSetModal({
       `
       }
 
+      <label>
+        ${escapeHtml(t("session.rest"))} (${escapeHtml(t("session.seconds") || "seconds")})
+        <input
+          type="number"
+          min="0"
+          step="1"
+          value="${initialRestSeconds ?? ""}"
+          data-field="rest"
+        />
+      </label>
+
       <div class="modalError muted" style="display:none; margin-top:8px;"></div>
 
       <div class="modalActions">
@@ -101,17 +113,17 @@ export function openSessionSetModal({
           class="currentSetDoneIconBtn"
           data-action="confirm"
           aria-label="${escapeHtml(
-                mode === "create"
-                  ? (t("session.addSet.confirm") || "Add set")
-                  : t("session.currentSet.done")
-              )}"
+        mode === "create"
+          ? (t("session.addSet.confirm") || "Add set")
+          : t("session.currentSet.done")
+      )}"
         >
           <span class="currentSetDoneIcon" aria-hidden="true">✓</span>
           ${escapeHtml(
-                mode === "create"
-                  ? (t("session.addSet.confirm") || "Add set")
-                  : t("session.currentSet.done")
-              )}
+        mode === "create"
+          ? (t("session.addSet.confirm") || "Add set")
+          : t("session.currentSet.done")
+      )}
         </button>
       </div>
     `;
@@ -130,7 +142,9 @@ export function openSessionSetModal({
 
     const errorEl = modal.querySelector(".modalError");
     const repsInput = modal.querySelector('[data-field="reps"]');
+    const restInput = modal.querySelector('[data-field="rest"]');
     const weightInput = modal.querySelector('[data-field="weight"]');
+    const confirmBtn = modal.querySelector('[data-action="confirm"]');
     const weightLeftInput = modal.querySelector('[data-field="weight-left"]');
     const weightRightInput = modal.querySelector('[data-field="weight-right"]');
 
@@ -180,6 +194,27 @@ export function openSessionSetModal({
       return !invalid;
     }
 
+    function validateRest(live = false) {
+      if (!restInput) return true;
+      if (restInput.value === "") {
+        markInvalid(restInput, false);
+        return true;
+      }
+
+      const v = Number(restInput.value);
+      const invalid = !Number.isInteger(v) || v < 0;
+      markInvalid(restInput, invalid);
+
+      if (invalid && live) {
+        showError(
+          t("session.error.invalidRest") ||
+          "Rest must be zero or a positive whole number."
+        );
+      }
+
+      return !invalid;
+    }
+
     function validateAll(live = false) {
       clearError();
 
@@ -194,14 +229,40 @@ export function openSessionSetModal({
         ok = validateWeightInput(weightInput, live) && ok;
       }
 
+      ok = validateRest(live) && ok;
+
       if (ok) clearError();
       return ok;
     }
 
-    repsInput.addEventListener("input", () => validateAll(true));
-    weightInput?.addEventListener("input", () => validateAll(true));
-    weightLeftInput?.addEventListener("input", () => validateAll(true));
-    weightRightInput?.addEventListener("input", () => validateAll(true));
+    function syncConfirmState() {
+      confirmBtn.disabled = !validateAll(false);
+    }
+
+    repsInput.addEventListener("input", () => {
+      validateAll(true);
+      syncConfirmState();
+    });
+
+    weightInput?.addEventListener("input", () => {
+      validateAll(true);
+      syncConfirmState();
+    });
+
+    weightLeftInput?.addEventListener("input", () => {
+      validateAll(true);
+      syncConfirmState();
+    });
+
+    weightRightInput?.addEventListener("input", () => {
+      validateAll(true);
+      syncConfirmState();
+    });
+
+    restInput?.addEventListener("input", () => {
+      validateAll(true);
+      syncConfirmState();
+    });
 
     function close(result) {
       document.removeEventListener("keydown", onKeyDown);
@@ -226,11 +287,15 @@ export function openSessionSetModal({
         weight = weightInput.value === "" ? null : Number(weightInput.value);
       }
 
+      const restSecondsAfter =
+        restInput.value === "" ? 0 : Number(restInput.value);
+
       const changed =
         reps !== initialReps ||
-        JSON.stringify(weight) !== JSON.stringify(initialWeight);
+        JSON.stringify(weight) !== JSON.stringify(initialWeight) ||
+        restSecondsAfter !== initialRestSeconds;
 
-      close({ reps, weight, changed });
+      close({ reps, weight, restSecondsAfter, changed });
     };
   });
 }

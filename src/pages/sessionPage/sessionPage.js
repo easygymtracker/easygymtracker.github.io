@@ -738,17 +738,18 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
                 laterality: ref?.laterality ?? Laterality.BILATERAL,
                 initialReps: baseReps,
                 initialWeight: baseWeight,
+                initialRestSeconds: ref?.restSecondsAfter ?? 0,
                 mode: "create",
             });
 
             if (!performed) return;
 
             const newRepGroup = new RepGroup({
-                exerciseId: s.exerciseId,          // ✅ REQUIRED
+                exerciseId: s.exerciseId,
                 laterality: ref?.laterality ?? Laterality.BILATERAL,
                 targetReps: performed.reps,
                 targetWeight: performed.weight,
-                restSecondsAfter: 0,
+                restSecondsAfter: performed.restSecondsAfter ?? 0,
                 history: [],
             });
 
@@ -778,6 +779,7 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
             laterality: rg.laterality,
             initialReps: baseReps,
             initialWeight: baseWeight,
+            initialRestSeconds: rg.restSecondsAfter ?? 0,
         });
 
         if (!performed) return;
@@ -801,6 +803,7 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
                 reps: performed.reps,
                 weight: performed.weight,
             });
+            rg.restSecondsAfter = performed.restSecondsAfter ?? rg.restSecondsAfter;
             routineStore.update(routine);
         }
 
