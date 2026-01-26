@@ -475,8 +475,19 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
 
                 <div class="currentSetRow">
                     <div class="currentSetTimer" aria-label="${escapeHtml(timerLabel)}">
-                    <div class="currentSetTimerLabel">${escapeHtml(timerLabel)}</div>
-                    <div class="currentSetTimerValue" id="currentSetTimerValue">00:00</div>
+                        <div class="currentSetTimerLabel">${escapeHtml(timerLabel)}</div>
+                        <div class="currentSetTimerValue" id="currentSetTimerValue">00:00</div>
+
+                        ${restRunning ? `
+                            <button
+                            type="button"
+                            class="skipRestBtn"
+                            data-action="skip-rest"
+                            aria-label="${escapeHtml(t("session.rest.skip") || "Skip rest")}"
+                            >
+                            ${escapeHtml(t("session.rest.skip") || "Skip rest")}
+                            </button>
+                        ` : ""}
                     </div>
 
                     <div class="currentSetMetrics">
@@ -708,6 +719,24 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
 
         const s = routine.series?.[currentSeriesIndex];
         if (!s) return;
+
+        const skipRestBtn = e.target.closest('[data-action="skip-rest"]');
+        if (skipRestBtn && restRunning) {
+            restRunning = false;
+            restPaused = false;
+            restRemainingMs = 0;
+            restStartEpochMs = null;
+            stopRestTick();
+
+            if (running) {
+                startSetTimer({ reset: true });
+            }
+
+            updateCurrentSetTimerUI();
+            renderCurrent();
+            syncCurrentSetControls();
+            return;
+        }
 
         const addBtn = e.target.closest('[data-action="add-set"]');
         if (addBtn) {

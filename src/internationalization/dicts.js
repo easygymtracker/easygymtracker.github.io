@@ -131,8 +131,9 @@ export const DICTS = {
         "session.addSet": "Add set",
         "session.addSet.confirm": "Add set",
         "session.restSeconds": "Rest (seconds)",
-"session.seconds": "seconds",
-"session.error.invalidRest": "Rest must be zero or a positive whole number."
+        "session.seconds": "seconds",
+        "session.error.invalidRest": "Rest must be zero or a positive whole number.",
+        "session.rest.skip": "Skip rest"
     },
 
     es: {
@@ -264,7 +265,8 @@ export const DICTS = {
         "session.addSet.confirm": "Añadir serie",
         "session.restSeconds": "Descanso (segundos)",
         "session.seconds": "segundos",
-        "session.error.invalidRest": "El descanso debe ser un número entero positivo o cero."
+        "session.error.invalidRest": "El descanso debe ser un número entero positivo o cero.",
+        "session.rest.skip": "Saltar descanso"
     },
 
     pt: {
@@ -396,7 +398,8 @@ export const DICTS = {
         "session.addSet.confirm": "Adicionar série",
         "session.restSeconds": "Descanso (segundos)",
         "session.seconds": "segundos",
-        "session.error.invalidRest": "O descanso deve ser um número inteiro positivo ou zero."
+        "session.error.invalidRest": "O descanso deve ser um número inteiro positivo ou zero.",
+        "session.rest.skip": "Pular descanso"
     },
 
     ja: {
@@ -528,7 +531,8 @@ export const DICTS = {
         "session.addSet.confirm": "セットを追加",
         "session.restSeconds": "休憩（秒）",
         "session.seconds": "秒",
-        "session.error.invalidRest": "休憩は0以上の正の整数で入力してください。"
+        "session.error.invalidRest": "休憩は0以上の正の整数で入力してください。",
+        "session.rest.skip": "休憩をスキップ"
     },
 
     zh: {
@@ -660,7 +664,8 @@ export const DICTS = {
         "session.addSet.confirm": "添加组",
         "session.restSeconds": "休息（秒）",
         "session.seconds": "秒",
-        "session.error.invalidRest": "休息时间必须是零或正整数。"
+        "session.error.invalidRest": "休息时间必须是零或正整数。",
+        "session.rest.skip": "跳过休息"
     },
 
     ar: {
@@ -792,7 +797,8 @@ export const DICTS = {
         "session.addSet.confirm": "إضافة مجموعة",
         "session.restSeconds": "راحة (ثوانٍ)",
         "session.seconds": "ثوانٍ",
-        "session.error.invalidRest": "يجب أن تكون الراحة رقمًا صحيحًا موجبًا أو صفرًا."
+        "session.error.invalidRest": "يجب أن تكون الراحة رقمًا صحيحًا موجبًا أو صفرًا.",
+        "session.rest.skip": "تخطي الراحة"
     },
 
     hi: {
@@ -924,7 +930,8 @@ export const DICTS = {
         "session.addSet.confirm": "सेट जोड़ें",
         "session.restSeconds": "आराम (सेकंड)",
         "session.seconds": "सेकंड",
-        "session.error.invalidRest": "आराम शून्य या धनात्मक पूर्ण संख्या होनी चाहिए।"
+        "session.error.invalidRest": "आराम शून्य या धनात्मक पूर्ण संख्या होनी चाहिए।",
+        "session.rest.skip": "आराम छोड़ें"
     },
 
     de: {
@@ -1056,7 +1063,8 @@ export const DICTS = {
         "session.addSet.confirm": "Satz hinzufügen",
         "session.restSeconds": "Pause (Sekunden)",
         "session.seconds": "Sekunden",
-        "session.error.invalidRest": "Die Pause muss null oder eine positive ganze Zahl sein."
+        "session.error.invalidRest": "Die Pause muss null oder eine positive ganze Zahl sein.",
+        "session.rest.skip": "Pause überspringen"
     },
 
     fr: {
@@ -1188,7 +1196,8 @@ export const DICTS = {
         "session.addSet.confirm": "Ajouter une série",
         "session.restSeconds": "Repos (secondes)",
         "session.seconds": "secondes",
-        "session.error.invalidRest": "Le repos doit être un nombre entier positif ou zéro."
+        "session.error.invalidRest": "Le repos doit être un nombre entier positif ou zéro.",
+        "session.rest.skip": "Passer le repos"
     },
 
     ru: {
@@ -1320,7 +1329,8 @@ export const DICTS = {
         "session.addSet.confirm": "Добавить подход",
         "session.restSeconds": "Отдых (сек.)",
         "session.seconds": "секунды",
-        "session.error.invalidRest": "Отдых должен быть нулём или положительным целым числом."
+        "session.error.invalidRest": "Отдых должен быть нулём или положительным целым числом.",
+        "session.rest.skip": "Пропустить отдых"
     },
 
     it: {
@@ -1452,7 +1462,8 @@ export const DICTS = {
         "session.addSet.confirm": "Aggiungi serie",
         "session.restSeconds": "Recupero (secondi)",
         "session.seconds": "secondi",
-        "session.error.invalidRest": "Il recupero deve essere zero o un numero intero positivo."
+        "session.error.invalidRest": "Il recupero deve essere zero o un numero intero positivo.",
+        "session.rest.skip": "Salta recupero"
     },
 
     nl: {
@@ -1584,7 +1595,8 @@ export const DICTS = {
         "session.addSet.confirm": "Set toevoegen",
         "session.restSeconds": "Rust (seconden)",
         "session.seconds": "seconden",
-        "session.error.invalidRest": "Rust moet nul of een positief geheel getal zijn."
+        "session.error.invalidRest": "Rust moet nul of een positief geheel getal zijn.",
+        "session.rest.skip": "Rust overslaan"
     },
 
     pl: {
@@ -1716,7 +1728,8 @@ export const DICTS = {
         "session.addSet.confirm": "Dodaj serię",
         "session.restSeconds": "Przerwa (sekundy)",
         "session.seconds": "sekundy",
-        "session.error.invalidRest": "Przerwa musi być zerem lub dodatnią liczbą całkowitą."
+        "session.error.invalidRest": "Przerwa musi być zerem lub dodatnią liczbą całkowitą.",
+        "session.rest.skip": "Pomiń przerwę"
     },
 
     tr: {
@@ -1848,6 +1861,7 @@ export const DICTS = {
         "session.addSet.confirm": "Set ekle",
         "session.restSeconds": "Dinlenme (saniye)",
         "session.seconds": "saniye",
-        "session.error.invalidRest": "Dinlenme sıfır veya pozitif bir tam sayı olmalıdır."
+        "session.error.invalidRest": "Dinlenme sıfır veya pozitif bir tam sayı olmalıdır.",
+        "session.rest.skip": "Dinlenmeyi atla"
     }
 };
