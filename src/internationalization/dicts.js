@@ -133,7 +133,9 @@ export const DICTS = {
         "session.restSeconds": "Rest (seconds)",
         "session.seconds": "seconds",
         "session.error.invalidRest": "Rest must be zero or a positive whole number.",
-        "session.rest.skip": "Skip rest"
+        "session.rest.skip": "Skip rest",
+        "session.notification.title": "Workout in progress",
+        "session.notification.tapToReturn": "Tap to return to workout"
     },
 
     es: {
@@ -266,7 +268,9 @@ export const DICTS = {
         "session.restSeconds": "Descanso (segundos)",
         "session.seconds": "segundos",
         "session.error.invalidRest": "El descanso debe ser un número entero positivo o cero.",
-        "session.rest.skip": "Saltar descanso"
+        "session.rest.skip": "Saltar descanso",
+        "session.notification.title": "Entrenamiento en curso",
+        "session.notification.tapToReturn": "Toca para volver al entrenamiento"
     },
 
     pt: {
@@ -399,7 +403,9 @@ export const DICTS = {
         "session.restSeconds": "Descanso (segundos)",
         "session.seconds": "segundos",
         "session.error.invalidRest": "O descanso deve ser um número inteiro positivo ou zero.",
-        "session.rest.skip": "Pular descanso"
+        "session.rest.skip": "Pular descanso",
+        "session.notification.title": "Treino em andamento",
+        "session.notification.tapToReturn": "Toque para retornar ao treino"
     },
 
     ja: {
@@ -532,7 +538,9 @@ export const DICTS = {
         "session.restSeconds": "休憩（秒）",
         "session.seconds": "秒",
         "session.error.invalidRest": "休憩は0以上の正の整数で入力してください。",
-        "session.rest.skip": "休憩をスキップ"
+        "session.rest.skip": "休憩をスキップ",
+        "session.notification.title": "トレーニング進行中",
+        "session.notification.tapToReturn": "タップしてトレーニングに戻る"
     },
 
     zh: {
@@ -665,7 +673,9 @@ export const DICTS = {
         "session.restSeconds": "休息（秒）",
         "session.seconds": "秒",
         "session.error.invalidRest": "休息时间必须是零或正整数。",
-        "session.rest.skip": "跳过休息"
+        "session.rest.skip": "跳过休息",
+        "session.notification.title": "训练进行中",
+        "session.notification.tapToReturn": "点击返回训练"
     },
 
     ar: {
@@ -798,7 +808,9 @@ export const DICTS = {
         "session.restSeconds": "راحة (ثوانٍ)",
         "session.seconds": "ثوانٍ",
         "session.error.invalidRest": "يجب أن تكون الراحة رقمًا صحيحًا موجبًا أو صفرًا.",
-        "session.rest.skip": "تخطي الراحة"
+        "session.rest.skip": "تخطي الراحة",
+        "session.notification.title": "التمرين جارٍ",
+        "session.notification.tapToReturn": "انقر للعودة إلى التمرين"
     },
 
     hi: {
@@ -931,7 +943,9 @@ export const DICTS = {
         "session.restSeconds": "आराम (सेकंड)",
         "session.seconds": "सेकंड",
         "session.error.invalidRest": "आराम शून्य या धनात्मक पूर्ण संख्या होनी चाहिए।",
-        "session.rest.skip": "आराम छोड़ें"
+        "session.rest.skip": "आराम छोड़ें",
+        "session.notification.title": "वर्कआउट जारी है",
+        "session.notification.tapToReturn": "वर्कआउट पर वापस जाने के लिए टैप करें"
     },
 
     de: {
@@ -1064,7 +1078,9 @@ export const DICTS = {
         "session.restSeconds": "Pause (Sekunden)",
         "session.seconds": "Sekunden",
         "session.error.invalidRest": "Die Pause muss null oder eine positive ganze Zahl sein.",
-        "session.rest.skip": "Pause überspringen"
+        "session.rest.skip": "Pause überspringen",
+        "session.notification.title": "Training läuft",
+        "session.notification.tapToReturn": "Tippe, um zum Training zurückzukehren"
     },
 
     fr: {
@@ -1197,7 +1213,9 @@ export const DICTS = {
         "session.restSeconds": "Repos (secondes)",
         "session.seconds": "secondes",
         "session.error.invalidRest": "Le repos doit être un nombre entier positif ou zéro.",
-        "session.rest.skip": "Passer le repos"
+        "session.rest.skip": "Passer le repos",
+        "session.notification.title": "Entraînement en cours",
+        "session.notification.tapToReturn": "Appuyez pour revenir à l'entraînement"
     },
 
     ru: {
@@ -1330,7 +1348,9 @@ export const DICTS = {
         "session.restSeconds": "Отдых (сек.)",
         "session.seconds": "секунды",
         "session.error.invalidRest": "Отдых должен быть нулём или положительным целым числом.",
-        "session.rest.skip": "Пропустить отдых"
+        "session.rest.skip": "Пропустить отдых",
+        "session.notification.title": "Тренировка продолжается",
+        "session.notification.tapToReturn": "Нажмите, чтобы вернуться к тренировке"
     },
 
     it: {
@@ -1463,7 +1483,9 @@ export const DICTS = {
         "session.restSeconds": "Recupero (secondi)",
         "session.seconds": "secondi",
         "session.error.invalidRest": "Il recupero deve essere zero o un numero intero positivo.",
-        "session.rest.skip": "Salta recupero"
+        "session.rest.skip": "Salta recupero",
+        "session.notification.title": "Allenamento in corso",
+        "session.notification.tapToReturn": "Tocca per tornare all'allenamento"
     },
 
     nl: {
@@ -1596,7 +1618,9 @@ export const DICTS = {
         "session.restSeconds": "Rust (seconden)",
         "session.seconds": "seconden",
         "session.error.invalidRest": "Rust moet nul of een positief geheel getal zijn.",
-        "session.rest.skip": "Rust overslaan"
+        "session.rest.skip": "Rust overslaan",
+        "session.notification.title": "Training gaande",
+        "session.notification.tapToReturn": "Tik om terug te keren naar de training"
     },
 
     pl: {
@@ -1729,7 +1753,9 @@ export const DICTS = {
         "session.restSeconds": "Przerwa (sekundy)",
         "session.seconds": "sekundy",
         "session.error.invalidRest": "Przerwa musi być zerem lub dodatnią liczbą całkowitą.",
-        "session.rest.skip": "Pomiń przerwę"
+        "session.rest.skip": "Pomiń przerwę",
+        "session.notification.title": "Trening w toku",
+        "session.notification.tapToReturn": "Stuknij, aby wrócić do treningu"
     },
 
     tr: {
@@ -1862,6 +1888,8 @@ export const DICTS = {
         "session.restSeconds": "Dinlenme (saniye)",
         "session.seconds": "saniye",
         "session.error.invalidRest": "Dinlenme sıfır veya pozitif bir tam sayı olmalıdır.",
-        "session.rest.skip": "Dinlenmeyi atla"
+        "session.rest.skip": "Dinlenmeyi atla",
+        "session.notification.title": "Antrenman devam ediyor",
+        "session.notification.tapToReturn": "Antrenmana dönmek için dokunun"
     }
 };

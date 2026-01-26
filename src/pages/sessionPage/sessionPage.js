@@ -54,6 +54,79 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
     let setStartEpochMs = null;
     let setElapsedMs = 0;
     let setTickHandle = null;
+    // --- service worker notification state ---
+    let swReady = false;
+    let lastNotifyTs = 0;
+
+    if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("/sw.js").then(() => {
+            swReady = true;
+        }).catch(() => { });
+    }
+
+    navigator.serviceWorker?.addEventListener("message", (e) => {
+        if (e.data?.type === "SKIP_REST" && restRunning) {
+            restRunning = false;
+            restPaused = false;
+            restRemainingMs = 0;
+            restStartEpochMs = null;
+            stopRestTick();
+
+            if (running) startSetTimer({ reset: true });
+
+            updateCurrentSetTimerUI();
+            renderCurrent();
+            syncCurrentSetControls();
+        }
+    });
+
+    async function ensureNotificationPermission() {
+        if (!("Notification" in window)) return false;
+        if (Notification.permission === "granted") return true;
+        if (Notification.permission === "denied") return false;
+
+        const res = await Notification.requestPermission();
+        return res === "granted";
+    }
+
+    function notifySessionState() {
+        if (!swReady || !navigator.serviceWorker.controller) return;
+        if (document.visibilityState === "visible") return;
+
+        const now = Date.now();
+        if (now - lastNotifyTs < 1000) return; // throttle to 1s
+        lastNotifyTs = now;
+
+        const routine = currentRoutineId ? routineStore.getById(currentRoutineId) : null;
+        if (!routine) return;
+
+        const series = routine.series?.[currentSeriesIndex];
+        const rg = series?.repGroups?.[currentRepGroupIndex];
+
+        const exercise = resolveExerciseName(series);
+        const setLabel = rg ? `${t("session.set")} ${currentRepGroupIndex + 1}` : "";
+
+        let body;
+        if (restRunning) {
+            body = `${exercise} · ${setLabel} · ${t("session.currentSet.restTimer")} ${formatMs(restRemainingMs)}`;
+        } else {
+            body = `${exercise} · ${setLabel} · ${t("session.currentSet.timer")} ${formatMs(setElapsedMs)}`;
+        }
+
+        navigator.serviceWorker.controller.postMessage({
+            type: "SESSION_UPDATE",
+            payload: {
+                title: t("session.title") || "Workout session",
+                body,
+                restRunning,
+            }
+        });
+    }
+
+    function clearSessionNotification() {
+        if (!navigator.serviceWorker?.controller) return;
+        navigator.serviceWorker.controller.postMessage({ type: "SESSION_END" });
+    }
 
     function stopSetTick() {
         if (setTickHandle) {
@@ -125,11 +198,16 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
     function updateTimerUI() {
         timerEl.textContent = formatMs(elapsedMs);
         syncStartPauseLabel();
+        notifySessionState();
     }
 
     function startTimer() {
         if (running) return;
-        if (!hasInitiated) hasInitiated = true;
+
+        if (!hasInitiated) {
+            hasInitiated = true;
+            ensureNotificationPermission();
+        }
 
         running = true;
 
@@ -167,6 +245,7 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         startEpochMs = null;
         elapsedMs = 0;
         updateTimerUI();
+        clearSessionNotification();
     }
 
     function resetRestTimer() {
@@ -235,6 +314,7 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
                 renderCurrent();
                 syncCurrentSetControls();
             }
+            notifySessionState();
             return;
         }
 
@@ -1048,6 +1128,7 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
 
     return {
         render(params) {
+            clearSessionNotification();
             resetTimer();
             resetRestTimer();
             resetSetTimer();
