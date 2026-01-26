@@ -609,3 +609,8 @@ body .isReordering {
 .input--error {
     border-color: var(--danger, #ef4444);
 }
+
+.addSetBtn:hover {
+    opacity: 1;
+    border-color: var(--accent);
+}

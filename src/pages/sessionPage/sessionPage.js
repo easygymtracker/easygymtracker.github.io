@@ -6,6 +6,7 @@ import { escapeHtml } from "/src/ui/dom.js";
 import { formatMs } from "/src/utils/numberFormat.js";
 import { attachDragReorder, moveItem } from "/src/ui/common/reorderUtils.js";
 import { openSessionSetModal } from "/src/ui/components/sessionSetModal.js";
+import { RepGroup, Laterality } from "/src/models/repGroup.js";
 
 export function mountSessionPage({ routineStore, exerciseStore }) {
     const titleEl = document.getElementById("sessionTitle");
@@ -510,67 +511,142 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         }
 
         // ----- All sets subsection (your existing squares flow) -----
-        const flow = groups.map((rg2, repIdx) => {
-            const st = statusForRep(currentSeriesIndex, repIdx);
+        const flow = groups
+            .map((rg2, repIdx) => {
+                const st = statusForRep(currentSeriesIndex, repIdx);
 
-            const weight = resolveRepValue(rg2, "targetWeight");
-            const reps = resolveRepValue(rg2, "targetReps");
-            const weightTxt = formatSideValue(weight);
-            const repsTxt = formatSideValue(reps);
+                const weight = resolveRepValue(rg2, "targetWeight");
+                const reps = resolveRepValue(rg2, "targetReps");
+                const weightTxt = formatSideValue(weight);
+                const repsTxt = formatSideValue(reps);
 
-            const border =
-                st === "active" ? "rgba(96, 165, 250, 0.55)"
-                    : st === "done" ? "rgba(34, 197, 94, 0.55)"
-                        : "var(--border)";
+                const border =
+                    st === "active"
+                        ? "rgba(96, 165, 250, 0.55)"
+                        : st === "done"
+                            ? "rgba(34, 197, 94, 0.55)"
+                            : "var(--border)";
 
-            const bg =
-                st === "active" ? "rgba(96, 165, 250, 0.10)"
-                    : st === "done" ? "rgba(34, 197, 94, 0.08)"
-                        : "rgba(255, 255, 255, 0.02)";
+                const bg =
+                    st === "active"
+                        ? "rgba(96, 165, 250, 0.10)"
+                        : st === "done"
+                            ? "rgba(34, 197, 94, 0.08)"
+                            : "rgba(255, 255, 255, 0.02)";
 
-            const square = `
+                const addBefore = `
+                    <button
+                        type="button"
+                        class="addSetBtn"
+                        data-action="add-set"
+                        data-insert-idx="${repIdx}"
+                        aria-label="${escapeHtml(t("session.addSet") || "Add set")}"
+                        style="
+                        min-width:44px;
+                        height:64px;
+                        border-radius:12px;
+                        border:1px dashed var(--border);
+                        background:transparent;
+                        color:var(--muted);
+                        font-size:22px;
+                        font-weight:700;
+                        cursor:pointer;
+                        "
+                    >
+                        +
+                    </button>
+                    `;
+
+                const square = `
+                    <button
+                        type="button"
+                        data-action="focus-current-rep"
+                        data-rep-idx="${repIdx}"
+                        aria-label="${escapeHtml((t("session.set") || "Set"))} ${repIdx + 1}"
+                        style="
+                        min-width: 64px;
+                        height: 64px;
+                        border-radius: 12px;
+                        border: 1px solid ${border};
+                        background: ${bg};
+                        color: var(--text);
+                        display: grid;
+                        grid-template-rows: auto 1fr;
+                        align-content: start;
+                        gap: 4px;
+                        padding: 6px;
+                        "
+                    >
+                        <div style="font-size:12px; font-weight:800; line-height:1;">
+                        ${repIdx + 1}
+                        </div>
+                        <div style="font-size:11px; line-height:1.15; text-align:left;">
+                        <div>
+                            <span class="muted">${escapeHtml(weightLabel)}:</span>
+                            ${escapeHtml(weightTxt)}
+                        </div>
+                        <div>
+                            <span class="muted">${escapeHtml(repsLabel)}:</span>
+                            ${escapeHtml(repsTxt)}
+                        </div>
+                        </div>
+                    </button>
+                    `;
+
+                const restSeconds =
+                    typeof rg2?.restSecondsAfter === "number" ? rg2.restSecondsAfter : 0;
+
+                const between =
+                    repIdx < groups.length - 1
+                        ? `
+                        <div
+                            aria-hidden="true"
+                            style="
+                            display:flex;
+                            flex-direction:column;
+                            align-items:center;
+                            justify-content:center;
+                            gap:6px;
+                            min-width:44px;
+                            "
+                        >
+                            <div style="font-size:18px; line-height:1; color: var(--muted);">
+                            →
+                            </div>
+                            ${restSeconds > 0
+                            ? `<div style="font-size:12px; color: var(--muted); font-weight:700; line-height:1;">${restSeconds}s</div>`
+                            : `<div style="font-size:12px; color: var(--muted); opacity:0.65; font-weight:700; line-height:1;">—</div>`
+                        }
+                        </div>
+                        `
+                        : "";
+
+                return addBefore + square + between;
+            })
+            .join("") +
+            `
+                <!-- ➕ Add-set button at END -->
                 <button
-                    type="button"
-                    data-action="focus-current-rep"
-                    data-rep-idx="${repIdx}"
-                    aria-label="${escapeHtml((t("session.set") || "Set"))} ${repIdx + 1}"
-                    style="
-                    min-width: 64px;
-                    height: 64px;
-                    border-radius: 12px;
-                    border: 1px solid ${border};
-                    background: ${bg};
-                    color: var(--text);
-                    display: grid;
-                    grid-template-rows: auto 1fr;
-                    align-content: start;
-                    gap: 4px;
-                    padding: 6px;
-                    "
+                type="button"
+                class="addSetBtn"
+                data-action="add-set"
+                data-insert-idx="${groups.length}"
+                aria-label="${escapeHtml(t("session.addSet") || "Add set")}"
+                style="
+                    min-width:44px;
+                    height:64px;
+                    border-radius:12px;
+                    border:1px dashed var(--border);
+                    background:transparent;
+                    color:var(--muted);
+                    font-size:22px;
+                    font-weight:700;
+                    cursor:pointer;
+                "
                 >
-                    <div style="font-size:12px; font-weight:800; line-height:1;">${repIdx + 1}</div>
-                    <div style="font-size:11px; line-height:1.15; text-align:left;">
-                    <div><span class="muted">${escapeHtml(weightLabel)}:</span> ${escapeHtml(weightTxt)}</div>
-                    <div><span class="muted">${escapeHtml(repsLabel)}:</span> ${escapeHtml(repsTxt)}</div>
-                    </div>
+                +
                 </button>
-                `;
-
-            const restSeconds = typeof rg2?.restSecondsAfter === "number" ? rg2.restSecondsAfter : 0;
-            const between = (repIdx < groups.length - 1)
-                ? `
-                    <div aria-hidden="true" style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; min-width:44px;">
-                        <div style="font-size:18px; line-height:1; color: var(--muted);">→</div>
-                        ${restSeconds > 0
-                    ? `<div style="font-size:12px; color: var(--muted); font-weight:700; line-height:1;">${restSeconds}s</div>`
-                    : `<div style="font-size:12px; color: var(--muted); opacity:0.65; font-weight:700; line-height:1;">—</div>`
-                }
-                    </div>
-                    `
-                : "";
-
-            return square + between;
-        }).join("");
+            `;
 
         const allSetsLabel = escapeHtml(t("session.allSets") || "All sets");
 
@@ -627,14 +703,67 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
     }
 
     currentSectionEl?.addEventListener("click", async (e) => {
-        const completeBtn = e.target.closest('[data-action="complete-current-set"]');
-        if (!completeBtn) return;
-        if (!running || startEpochMs == null || restRunning || !setRunning) return;
-
         const routine = currentRoutineId ? routineStore.getById(currentRoutineId) : null;
         if (!routine) return;
 
         const s = routine.series?.[currentSeriesIndex];
+        if (!s) return;
+
+        const addBtn = e.target.closest('[data-action="add-set"]');
+        if (addBtn) {
+            const insertIdx = Number(addBtn.dataset.insertIdx);
+            if (!Number.isInteger(insertIdx)) return;
+
+            const groups = s.repGroups ?? [];
+
+            // Prefer previous, otherwise next
+            const ref =
+                groups[insertIdx - 1] ??
+                groups[insertIdx] ??
+                null;
+
+            const baseReps =
+                ref?.getLatestHistory?.()?.reps ??
+                ref?.targetReps ??
+                null;
+
+            const baseWeight =
+                ref?.getLatestHistory?.()?.weight ??
+                ref?.targetWeight ??
+                null;
+
+            const performed = await openSessionSetModal({
+                exerciseName: resolveExerciseName(s),
+                setIndex: insertIdx + 1,
+                laterality: ref?.laterality ?? Laterality.BILATERAL,
+                initialReps: baseReps,
+                initialWeight: baseWeight,
+                mode: "create",
+            });
+
+            if (!performed) return;
+
+            const newRepGroup = new RepGroup({
+                exerciseId: s.exerciseId,          // ✅ REQUIRED
+                laterality: ref?.laterality ?? Laterality.BILATERAL,
+                targetReps: performed.reps,
+                targetWeight: performed.weight,
+                restSecondsAfter: 0,
+                history: [],
+            });
+
+            s.repGroups.splice(insertIdx, 0, newRepGroup);
+            routineStore.update(routine);
+
+            currentRepGroupIndex = insertIdx;
+            renderCurrent();
+            return;
+        }
+
+        const completeBtn = e.target.closest('[data-action="complete-current-set"]');
+        if (!completeBtn) return;
+        if (!running || startEpochMs == null || restRunning || !setRunning) return;
+
         const rg = s?.repGroups?.[currentRepGroupIndex];
         if (!s || !rg) return;
         if (isRepDone(currentSeriesIndex, currentRepGroupIndex)) return;

@@ -128,6 +128,8 @@ export const DICTS = {
         "session.currentSet.subtitle": "Enter what you actually performed to track your progress.",
         "session.error.invalidReps": "Reps must be a positive whole number.",
         "session.error.invalidWeight": "Weight must be zero or a positive number.",
+        "session.addSet": "Add set",
+        "session.addSet.confirm": "Add set",
     },
 
     es: {
@@ -255,6 +257,8 @@ export const DICTS = {
         "session.currentSet.subtitle": "Introduce lo que realmente realizaste para seguir tu progreso.",
         "session.error.invalidReps": "Las repeticiones deben ser un número entero positivo.",
         "session.error.invalidWeight": "El peso debe ser cero o un número positivo.",
+        "session.addSet": "Añadir serie",
+        "session.addSet.confirm": "Añadir serie",
     },
 
     pt: {
@@ -382,6 +386,8 @@ export const DICTS = {
         "session.currentSet.subtitle": "Informe o que você realmente executou para acompanhar seu progresso.",
         "session.error.invalidReps": "As repetições devem ser um número inteiro positivo.",
         "session.error.invalidWeight": "O peso deve ser zero ou um número positivo.",
+        "session.addSet": "Adicionar série",
+        "session.addSet.confirm": "Adicionar série",
     },
 
     ja: {
@@ -509,6 +515,8 @@ export const DICTS = {
         "session.currentSet.subtitle": "実際に行った内容を入力して、進捗を記録しましょう。",
         "session.error.invalidReps": "回数は正の整数で入力してください。",
         "session.error.invalidWeight": "重量は0以上の数値で入力してください。",
+        "session.addSet": "セットを追加",
+        "session.addSet.confirm": "セットを追加",
     },
 
     zh: {
@@ -636,6 +644,8 @@ export const DICTS = {
         "session.currentSet.subtitle": "请输入你实际完成的内容，以跟踪你的训练进度。",
         "session.error.invalidReps": "次数必须是正整数。",
         "session.error.invalidWeight": "重量必须是零或正数。",
+        "session.addSet": "添加组",
+        "session.addSet.confirm": "添加组",
     },
 
     ar: {
@@ -763,6 +773,8 @@ export const DICTS = {
         "session.currentSet.subtitle": "أدخل ما قمت به فعليًا لتتبع تقدمك.",
         "session.error.invalidReps": "يجب أن يكون عدد التكرارات رقمًا صحيحًا موجبًا.",
         "session.error.invalidWeight": "يجب أن يكون الوزن صفرًا أو رقمًا موجبًا.",
+        "session.addSet": "إضافة مجموعة",
+        "session.addSet.confirm": "إضافة مجموعة",
     },
 
     hi: {
@@ -890,6 +902,8 @@ export const DICTS = {
         "session.currentSet.subtitle": "अपनी प्रगति को ट्रैक करने के लिए आपने वास्तव में जो किया उसे दर्ज करें।",
         "session.error.invalidReps": "रेप्स एक धनात्मक पूर्ण संख्या होनी चाहिए।",
         "session.error.invalidWeight": "वजन शून्य या धनात्मक संख्या होना चाहिए।",
+        "session.addSet": "सेट जोड़ें",
+        "session.addSet.confirm": "सेट जोड़ें",
     },
 
     de: {
@@ -1017,6 +1031,8 @@ export const DICTS = {
         "session.currentSet.subtitle": "Gib ein, was du tatsächlich ausgeführt hast, um deinen Fortschritt zu verfolgen.",
         "session.error.invalidReps": "Wiederholungen müssen eine positive ganze Zahl sein.",
         "session.error.invalidWeight": "Das Gewicht muss null oder eine positive Zahl sein.",
+        "session.addSet": "Satz hinzufügen",
+        "session.addSet.confirm": "Satz hinzufügen",
     },
 
     fr: {
@@ -1144,6 +1160,8 @@ export const DICTS = {
         "session.currentSet.subtitle": "Indique ce que vous avez réellement effectué pour suivre vos performances.",
         "session.error.invalidReps": "Les répétitions doivent être un nombre entier positif.",
         "session.error.invalidWeight": "Le poids doit être zéro ou un nombre positif.",
+        "session.addSet": "Ajouter une série",
+        "session.addSet.confirm": "Ajouter une série",
     },
 
     ru: {
@@ -1271,6 +1289,8 @@ export const DICTS = {
         "session.currentSet.subtitle": "Введите то, что вы действительно выполнили, чтобы отслеживать прогресс.",
         "session.error.invalidReps": "Повторы должны быть положительным целым числом.",
         "session.error.invalidWeight": "Вес должен быть равен нулю или положительным числом.",
+        "session.addSet": "Добавить подход",
+        "session.addSet.confirm": "Добавить подход",
     },
 
     it: {
@@ -1398,6 +1418,8 @@ export const DICTS = {
         "session.currentSet.subtitle": "Inserisci ciò che hai effettivamente eseguito per tenere traccia dei progressi.",
         "session.error.invalidReps": "Le ripetizioni devono essere un numero intero positivo.",
         "session.error.invalidWeight": "Il peso deve essere zero o un numero positivo.",
+        "session.addSet": "Aggiungi serie",
+        "session.addSet.confirm": "Aggiungi serie",
     },
 
     nl: {
@@ -1525,6 +1547,8 @@ export const DICTS = {
         "session.currentSet.subtitle": "Voer in wat je daadwerkelijk hebt uitgevoerd om je voortgang bij te houden.",
         "session.error.invalidReps": "Herhalingen moeten een positief geheel getal zijn.",
         "session.error.invalidWeight": "Het gewicht moet nul of een positief getal zijn.",
+        "session.addSet": "Set toevoegen",
+        "session.addSet.confirm": "Set toevoegen",
     },
 
     pl: {
@@ -1652,6 +1676,8 @@ export const DICTS = {
         "session.currentSet.subtitle": "Wprowadź to, co faktycznie wykonałeś, aby śledzić postępy.",
         "session.error.invalidReps": "Powtórzenia muszą być dodatnią liczbą całkowitą.",
         "session.error.invalidWeight": "Ciężar musi być zerem lub liczbą dodatnią.",
+        "session.addSet": "Dodaj serię",
+        "session.addSet.confirm": "Dodaj serię",
     },
 
     tr: {
@@ -1779,5 +1805,7 @@ export const DICTS = {
         "session.currentSet.subtitle": "Performansını takip etmek için gerçekten yaptığını gir.",
         "session.error.invalidReps": "Tekrar sayısı pozitif bir tam sayı olmalıdır.",
         "session.error.invalidWeight": "Ağırlık sıfır veya pozitif bir sayı olmalıdır.",
+        "session.addSet": "Set ekle",
+        "session.addSet.confirm": "Set ekle",
     }
 };

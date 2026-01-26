@@ -9,6 +9,7 @@ export function openSessionSetModal({
   laterality,
   initialReps,
   initialWeight,
+  mode = "edit",
 }) {
   return new Promise((resolve) => {
     const overlay = document.createElement("div");
@@ -18,13 +19,20 @@ export function openSessionSetModal({
     modal.className = "modalCard";
 
     modal.innerHTML = `
-      <h3>${escapeHtml(t("session.currentSet.done"))}</h3>
+      <h3>
+        ${escapeHtml(
+      mode === "create"
+        ? (t("session.addSet") || "Add set")
+        : t("session.currentSet.done")
+    )
+      }
+      </h3>
 
       <p class="muted">
         ${escapeHtml(
-      t("session.currentSet.subtitle") ||
-      "Enter what you actually performed to track your progress."
-    )}
+        t("session.currentSet.subtitle") ||
+        "Enter what you actually performed to track your progress."
+      )}
       </p>
 
       <p class="muted" style="margin-top:4px;">
@@ -92,10 +100,18 @@ export function openSessionSetModal({
           type="button"
           class="currentSetDoneIconBtn"
           data-action="confirm"
-          aria-label="${escapeHtml(t("session.currentSet.done"))}"
+          aria-label="${escapeHtml(
+                mode === "create"
+                  ? (t("session.addSet.confirm") || "Add set")
+                  : t("session.currentSet.done")
+              )}"
         >
           <span class="currentSetDoneIcon" aria-hidden="true">✓</span>
-          ${escapeHtml(t("session.currentSet.done"))}
+          ${escapeHtml(
+                mode === "create"
+                  ? (t("session.addSet.confirm") || "Add set")
+                  : t("session.currentSet.done")
+              )}
         </button>
       </div>
     `;
