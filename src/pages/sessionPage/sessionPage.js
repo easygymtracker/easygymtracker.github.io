@@ -258,6 +258,33 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         updateCurrentSetTimerUI();
     }
 
+    function isWorkoutComplete(routine) {
+        const series = Array.isArray(routine?.series) ? routine.series : [];
+        if (!series.length) return true;
+
+        return series.every((s, sIdx) => {
+            const groups = Array.isArray(s?.repGroups) ? s.repGroups : [];
+            if (!groups.length) return true;
+            return groups.every((_, rIdx) => isRepDone(sIdx, rIdx));
+        });
+    }
+
+    function endWorkoutSession() {
+        running = false;
+
+        stopTick();
+        stopSetTick();
+        stopRestTick();
+
+        resetRestTimer();
+        resetSetTimer();
+
+        clearSessionNotification();
+
+        renderCurrent();
+    }
+
+
     function stopRestTick() {
         if (restTickHandle) {
             clearInterval(restTickHandle);
@@ -923,6 +950,12 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
 
         markRepDone(currentSeriesIndex, currentRepGroupIndex);
         recomputeCompletedSeries(routine);
+
+        if (isWorkoutComplete(routine)) {
+            endWorkoutSession();
+            return;
+        }
+
         advanceToNext(routine);
 
         resetSetTimer();
