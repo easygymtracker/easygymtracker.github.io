@@ -15,7 +15,8 @@ self.addEventListener("message", (event) => {
             body: payload.body,
             tag: "active-session",
             renotify: false,
-            silent: true,
+            silent: false,
+            renotify: false,
             icon: "/icons/icon-192.png",
             badge: "/icons/badge.png",
             actions: payload.restRunning
@@ -29,6 +30,8 @@ self.addEventListener("message", (event) => {
             .then(n => n.forEach(notif => notif.close()));
         lastPayload = null;
     }
+
+    console.log("SW received message:", payload);
 });
 
 self.addEventListener("notificationclick", (event) => {

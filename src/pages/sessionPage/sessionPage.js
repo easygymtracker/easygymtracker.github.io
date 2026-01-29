@@ -59,17 +59,26 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
     let lastNotifyTs = 0;
 
     let swControllerReady = false;
+    let pendingSwMessages = [];
+
+    function postToServiceWorker(msg) {
+        if (navigator.serviceWorker.controller) {
+            navigator.serviceWorker.controller.postMessage(msg);
+        } else {
+            pendingSwMessages.push(msg);
+        }
+    }
 
     if ("serviceWorker" in navigator) {
-        navigator.serviceWorker.register("/sw.js").then(() => {
-            if (navigator.serviceWorker.controller) {
-                swControllerReady = true;
-            } else {
-                navigator.serviceWorker.addEventListener("controllerchange", () => {
-                    swControllerReady = true;
-                });
-            }
-        }).catch(() => { });
+        navigator.serviceWorker.register("/sw.js").catch(() => { });
+
+        navigator.serviceWorker.addEventListener("controllerchange", () => {
+            swControllerReady = true;
+            pendingSwMessages.forEach(m =>
+                navigator.serviceWorker.controller?.postMessage(m)
+            );
+            pendingSwMessages.length = 0;
+        });
     }
 
     navigator.serviceWorker?.addEventListener("message", (e) => {
@@ -122,7 +131,7 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
             body = `${exercise} · ${setLabel} · ${t("session.currentSet.timer")} ${formatMs(setElapsedMs)}`;
         }
 
-        navigator.serviceWorker.controller.postMessage({
+        postToServiceWorker({
             type: "SESSION_UPDATE",
             payload: {
                 title: t("session.title") || "Workout session",
