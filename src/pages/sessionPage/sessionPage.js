@@ -913,7 +913,9 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
             s.repGroups.splice(insertIdx, 0, newRepGroup);
             routineStore.update(routine);
 
-            currentRepGroupIndex = insertIdx;
+            if (insertIdx <= currentRepGroupIndex) {
+                currentRepGroupIndex = insertIdx;
+            }
             renderCurrent();
             return;
         }
