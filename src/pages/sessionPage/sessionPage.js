@@ -58,9 +58,17 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
     let swReady = false;
     let lastNotifyTs = 0;
 
+    let swControllerReady = false;
+
     if ("serviceWorker" in navigator) {
         navigator.serviceWorker.register("/sw.js").then(() => {
-            swReady = true;
+            if (navigator.serviceWorker.controller) {
+                swControllerReady = true;
+            } else {
+                navigator.serviceWorker.addEventListener("controllerchange", () => {
+                    swControllerReady = true;
+                });
+            }
         }).catch(() => { });
     }
 
@@ -90,7 +98,8 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
     }
 
     function notifySessionState() {
-        if (!swReady || !navigator.serviceWorker.controller) return;
+        if (!swControllerReady) return;
+        if (Notification.permission !== "granted") return;
         if (document.visibilityState === "visible") return;
 
         const now = Date.now();
