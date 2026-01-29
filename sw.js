@@ -61,17 +61,29 @@ self.addEventListener("message", (event) => {
 });
 
 self.addEventListener("notificationclick", (event) => {
+    const action = event.action;
     event.notification.close();
 
     event.waitUntil(
-        self.clients.matchAll({ type: "window", includeUncontrolled: true })
-            .then((clients) => {
-                if (clients.length > 0) {
-                    clients[0].focus();
-                } else {
-                    self.clients.openWindow("/");
-                }
-            })
+        (async () => {
+            const clientsList = await self.clients.matchAll({
+                type: "window",
+                includeUncontrolled: true,
+            });
+
+            let client = clientsList[0];
+            if (!client) {
+                client = await self.clients.openWindow("/");
+            } else {
+                await client.focus();
+            }
+
+            if (action === "COMPLETE_SET") {
+                client.postMessage({
+                    type: "NOTIFICATION_COMPLETE_SET",
+                });
+            }
+        })()
     );
 });
 
@@ -83,6 +95,13 @@ function showOrUpdateNotification({ title, body }) {
         requireInteraction: true,
         icon: NOTIFICATION_ICON,
         badge: NOTIFICATION_BADGE,
+
+        actions: [
+            {
+                action: "COMPLETE_SET",
+                title: "Set done",
+            },
+        ],
     });
 }
 

@@ -66,6 +66,14 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         return res === "granted";
     }
 
+    navigator.serviceWorker?.addEventListener("message", (e) => {
+        if (!e.data?.type) return;
+
+        if (e.data.type === "NOTIFICATION_COMPLETE_SET") {
+            handleQuickCompleteFromNotification();
+        }
+    });
+
     function notifySessionState() {
         if (!hasInitiated) return;
         if (!navigator.serviceWorker?.controller) return;
@@ -73,7 +81,7 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         if (document.visibilityState === "visible") return;
 
         const now = Date.now();
-        if (now - lastNotifyTs < 1000) return;
+        if (now - lastNotifyTs <= 500) return;
         lastNotifyTs = now;
 
         const routine = currentRoutineId
@@ -818,6 +826,90 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         btn.setAttribute("aria-label", label);
     }
 
+    function commitCurrentSet({
+        reps,
+        weight,
+        restSecondsAfterOverride = null,
+        saveHistory = true,
+    }) {
+        const routine = currentRoutineId
+            ? routineStore.getById(currentRoutineId)
+            : null;
+        if (!routine) return;
+
+        const s = routine.series?.[currentSeriesIndex];
+        if (!s) return;
+
+        const rg = s.repGroups?.[currentRepGroupIndex];
+        if (!rg) return;
+
+        if (saveHistory) {
+            rg.upsertHistory(new Date().toISOString(), {
+                reps,
+                weight,
+            });
+        }
+
+        if (typeof restSecondsAfterOverride === "number") {
+            rg.restSecondsAfter = restSecondsAfterOverride;
+        }
+
+        routineStore.update(routine);
+
+        const isLast = currentRepGroupIndex >= s.repGroups.length - 1;
+        const restToRun = isLast
+            ? (typeof s.restSecondsAfter === "number" ? s.restSecondsAfter : 0)
+            : (typeof rg.restSecondsAfter === "number" ? rg.restSecondsAfter : 0);
+
+        markRepDone(currentSeriesIndex, currentRepGroupIndex);
+        recomputeCompletedSeries(routine);
+
+        if (isWorkoutComplete(routine)) {
+            endWorkoutSession();
+            return;
+        }
+
+        advanceToNext(routine);
+
+        resetSetTimer();
+        startRest(restToRun);
+        renderCurrent();
+    }
+
+    function handleQuickCompleteFromNotification() {
+        if (!hasInitiated) return;
+        if (!running) return;
+        if (restRunning) return;
+        if (!setRunning) return;
+
+        const routine = currentRoutineId
+            ? routineStore.getById(currentRoutineId)
+            : null;
+        if (!routine) return;
+
+        const s = routine.series?.[currentSeriesIndex];
+        const rg = s?.repGroups?.[currentRepGroupIndex];
+        if (!rg) return;
+
+        const latest = rg.getLatestHistory?.();
+
+        const reps =
+            latest?.reps ??
+            rg.targetReps ??
+            0;
+
+        const weight =
+            latest?.weight ??
+            rg.targetWeight ??
+            null;
+
+        commitCurrentSet({
+            reps,
+            weight,
+            saveHistory: true,
+        });
+    }
+
     currentSectionEl?.addEventListener("click", async (e) => {
         const routine = currentRoutineId ? routineStore.getById(currentRoutineId) : null;
         if (!routine) return;
@@ -920,47 +1012,12 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
 
         if (!performed) return;
 
-        if (performed.changed) {
-            console.group("[Session] RepGroup history updated");
-            console.log("Exercise:", resolveExerciseName(s));
-            console.log("Series index:", currentSeriesIndex);
-            console.log("Set index:", currentRepGroupIndex);
-            console.log("Previous:", {
-                reps: baseReps,
-                weight: baseWeight,
-            });
-            console.log("New:", {
-                reps: performed.reps,
-                weight: performed.weight,
-            });
-            console.log("Timestamp:", new Date().toISOString());
-            console.groupEnd();
-            rg.upsertHistory(new Date().toISOString(), {
-                reps: performed.reps,
-                weight: performed.weight,
-            });
-            rg.restSecondsAfter = performed.restSecondsAfter ?? rg.restSecondsAfter;
-            routineStore.update(routine);
-        }
-
-        const isLast = currentRepGroupIndex >= s.repGroups.length - 1;
-        const restToRun = isLast
-            ? (typeof s.restSecondsAfter === "number" ? s.restSecondsAfter : 0)
-            : (typeof rg.restSecondsAfter === "number" ? rg.restSecondsAfter : 0);
-
-        markRepDone(currentSeriesIndex, currentRepGroupIndex);
-        recomputeCompletedSeries(routine);
-
-        if (isWorkoutComplete(routine)) {
-            endWorkoutSession();
-            return;
-        }
-
-        advanceToNext(routine);
-
-        resetSetTimer();
-        startRest(restToRun);
-        renderCurrent();
+        commitCurrentSet({
+            reps: performed.reps,
+            weight: performed.weight,
+            restSecondsAfterOverride: performed.restSecondsAfter ?? null,
+            saveHistory: performed.changed,
+        });
     });
 
     function renderRepGroupList(seriesIdx, s) {
