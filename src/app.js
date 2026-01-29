@@ -12,11 +12,64 @@ import { mountRoutineDetailPage } from "./pages/routinesPage/routineDetailPage.j
 
 import { setLocale, getLocale, getLocaleFromUrl, translateDocument, t } from "./internationalization/i18n.js";
 
-// --- stores ---
+// -----------------------------------------------------------------------------
+// Service Worker registration + diagnostics
+// -----------------------------------------------------------------------------
+if ("serviceWorker" in navigator) {
+    console.log("[SW] serviceWorker supported");
+
+    window.addEventListener("load", async () => {
+        try {
+            const reg = await navigator.serviceWorker.register("/sw.js");
+            console.log("[SW] registered:", reg.scope);
+
+            // When the SW is ready (installed + activated)
+            navigator.serviceWorker.ready.then(() => {
+                console.log("[SW] ready");
+            });
+
+            // Log initial controller state
+            if (navigator.serviceWorker.controller) {
+                console.log("[SW] controller present on first load");
+            } else {
+                console.log("[SW] controller is NULL on first load");
+            }
+
+            // Listen for controller takeover
+            navigator.serviceWorker.addEventListener("controllerchange", () => {
+                console.log("[SW] controller changed — page now controlled");
+            });
+
+            // Periodic message to SW (test / heartbeat)
+            setInterval(() => {
+                if (navigator.serviceWorker.controller) {
+                    navigator.serviceWorker.controller.postMessage({
+                        type: "APP_HEARTBEAT",
+                        timestamp: Date.now(),
+                    });
+                    console.log("[SW] heartbeat sent");
+                } else {
+                    console.log("[SW] heartbeat skipped — no controller yet");
+                }
+            }, 3000); // 30 seconds
+
+        } catch (err) {
+            console.error("[SW] registration failed:", err);
+        }
+    });
+} else {
+    console.warn("[SW] serviceWorker NOT supported");
+}
+
+// -----------------------------------------------------------------------------
+// Stores
+// -----------------------------------------------------------------------------
 const routineStore = createRoutineStore();
 const exerciseStore = createExerciseStore();
 
-// --- top toolbar actions (global) ---
+// -----------------------------------------------------------------------------
+// Top toolbar actions (global)
+// -----------------------------------------------------------------------------
 const btnClearAll = document.getElementById("btnClearAll");
 
 btnClearAll.addEventListener("click", () => {
@@ -66,7 +119,9 @@ uploadInput.addEventListener("change", async () => {
     }
 });
 
-// --- mount pages once ---
+// -----------------------------------------------------------------------------
+// Mount pages once
+// -----------------------------------------------------------------------------
 const pages = {
     routines: mountRoutinesPage({ routineStore, exerciseStore }),
     "routine-new": mountRoutineNewPage({ routineStore }),
@@ -74,7 +129,9 @@ const pages = {
     session: mountSessionPage({ routineStore, exerciseStore }),
 };
 
-// --- route rendering ---
+// -----------------------------------------------------------------------------
+// Routing
+// -----------------------------------------------------------------------------
 function showRoute(name) {
     document.querySelectorAll(".route").forEach((el) => {
         el.style.display = (el.dataset.route === name) ? "" : "none";
