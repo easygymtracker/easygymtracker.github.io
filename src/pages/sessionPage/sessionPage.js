@@ -54,48 +54,8 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
     let setStartEpochMs = null;
     let setElapsedMs = 0;
     let setTickHandle = null;
-    // --- service worker notification state ---
-    let swReady = false;
+    // --- notification throttling ---
     let lastNotifyTs = 0;
-
-    let swControllerReady = false;
-    let pendingSwMessages = [];
-
-    function postToServiceWorker(msg) {
-        if (navigator.serviceWorker.controller) {
-            navigator.serviceWorker.controller.postMessage(msg);
-        } else {
-            pendingSwMessages.push(msg);
-        }
-    }
-
-    if ("serviceWorker" in navigator) {
-        navigator.serviceWorker.register("/sw.js").catch(() => { });
-
-        navigator.serviceWorker.addEventListener("controllerchange", () => {
-            swControllerReady = true;
-            pendingSwMessages.forEach(m =>
-                navigator.serviceWorker.controller?.postMessage(m)
-            );
-            pendingSwMessages.length = 0;
-        });
-    }
-
-    navigator.serviceWorker?.addEventListener("message", (e) => {
-        if (e.data?.type === "SKIP_REST" && restRunning) {
-            restRunning = false;
-            restPaused = false;
-            restRemainingMs = 0;
-            restStartEpochMs = null;
-            stopRestTick();
-
-            if (running) startSetTimer({ reset: true });
-
-            updateCurrentSetTimerUI();
-            renderCurrent();
-            syncCurrentSetControls();
-        }
-    });
 
     async function ensureNotificationPermission() {
         if (!("Notification" in window)) return false;
@@ -107,31 +67,48 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
     }
 
     function notifySessionState() {
-        if (!swControllerReady) return;
+        if (!hasInitiated) return;
+        if (!navigator.serviceWorker?.controller) return;
         if (Notification.permission !== "granted") return;
         if (document.visibilityState === "visible") return;
 
         const now = Date.now();
-        if (now - lastNotifyTs < 1000) return; // throttle to 1s
+        if (now - lastNotifyTs < 1000) return;
         lastNotifyTs = now;
 
-        const routine = currentRoutineId ? routineStore.getById(currentRoutineId) : null;
+        const routine = currentRoutineId
+            ? routineStore.getById(currentRoutineId)
+            : null;
         if (!routine) return;
 
         const series = routine.series?.[currentSeriesIndex];
-        const rg = series?.repGroups?.[currentRepGroupIndex];
+        if (!series) return;
+
+        const rg = series.repGroups?.[currentRepGroupIndex] ?? null;
 
         const exercise = resolveExerciseName(series);
-        const setLabel = rg ? `${t("session.set")} ${currentRepGroupIndex + 1}` : "";
+        const setLabel = rg
+            ? `${t("session.set")} ${currentRepGroupIndex + 1}`
+            : "";
+
+        let weightTxt = "—";
+        let repsTxt = "—";
+
+        if (rg) {
+            const weight = resolveRepValue(rg, "targetWeight");
+            const reps = resolveRepValue(rg, "targetReps");
+            weightTxt = formatSideValue(weight);
+            repsTxt = formatSideValue(reps);
+        }
 
         let body;
         if (restRunning) {
-            body = `${exercise} · ${setLabel} · ${t("session.currentSet.restTimer")} ${formatMs(restRemainingMs)}`;
+            body = `${exercise} · ${setLabel} · ${weightTxt} × ${repsTxt} · ${t("session.currentSet.restTimer")} ${formatMs(restRemainingMs)}`;
         } else {
-            body = `${exercise} · ${setLabel} · ${t("session.currentSet.timer")} ${formatMs(setElapsedMs)}`;
+            body = `${exercise} · ${setLabel} · ${weightTxt} × ${repsTxt} · ${formatMs(setElapsedMs)}`;
         }
 
-        postToServiceWorker({
+        navigator.serviceWorker.controller.postMessage({
             type: "SESSION_UPDATE",
             payload: {
                 title: t("session.title") || "Workout session",

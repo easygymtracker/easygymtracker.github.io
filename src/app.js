@@ -39,20 +39,6 @@ if ("serviceWorker" in navigator) {
             navigator.serviceWorker.addEventListener("controllerchange", () => {
                 console.log("[SW] controller changed — page now controlled");
             });
-
-            // Periodic message to SW (test / heartbeat)
-            setInterval(() => {
-                if (navigator.serviceWorker.controller) {
-                    navigator.serviceWorker.controller.postMessage({
-                        type: "APP_HEARTBEAT",
-                        timestamp: Date.now(),
-                    });
-                    console.log("[SW] heartbeat sent");
-                } else {
-                    console.log("[SW] heartbeat skipped — no controller yet");
-                }
-            }, 3000); // 30 seconds
-
         } catch (err) {
             console.error("[SW] registration failed:", err);
         }

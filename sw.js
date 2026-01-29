@@ -7,34 +7,30 @@ const NOTIFICATION_TAG = "workout-session";
 const NOTIFICATION_ICON = "/icons/icon-192.png";
 const NOTIFICATION_BADGE = "/icons/icon-192.png";
 
-// -----------------------------------------------------------------------------
-// Install
-// -----------------------------------------------------------------------------
 self.addEventListener("install", () => {
     console.log("[SW] installed");
     self.skipWaiting();
 });
 
-// -----------------------------------------------------------------------------
-// Activate
-// -----------------------------------------------------------------------------
 self.addEventListener("activate", (event) => {
     console.log("[SW] activated");
     event.waitUntil(self.clients.claim());
 });
 
-// -----------------------------------------------------------------------------
-// Message handling
-// -----------------------------------------------------------------------------
 self.addEventListener("message", (event) => {
     const data = event.data;
     if (!data || !data.type) return;
 
     switch (data.type) {
 
-        // -------------------------------------------------------------
-        // Explicit notification trigger (manual / test)
-        // -------------------------------------------------------------
+        case "SESSION_UPDATE": {
+            showOrUpdateNotification({
+                title: data.payload?.title ?? "Workout session",
+                body: data.payload?.body ?? "",
+            });
+            break;
+        }
+
         case "SHOW_NOTIFICATION": {
             showOrUpdateNotification({
                 title: data.title || "Workout",
@@ -43,31 +39,12 @@ self.addEventListener("message", (event) => {
             break;
         }
 
-        // -------------------------------------------------------------
-        // App heartbeat (periodic)
-        // -------------------------------------------------------------
         case "APP_HEARTBEAT": {
             lastHeartbeatTs = data.timestamp || Date.now();
-
-            if (!sessionStartTs) {
-                sessionStartTs = lastHeartbeatTs;
-                console.log("[SW] session started");
-            }
-
-            const elapsedMs = lastHeartbeatTs - sessionStartTs;
-            const timeLabel = formatElapsed(elapsedMs);
-
-            showOrUpdateNotification({
-                title: "Workout in progress",
-                body: `Elapsed time: ${timeLabel}`,
-            });
-
+            // Heartbeat is informational only — no notifications here
             break;
         }
 
-        // -------------------------------------------------------------
-        // Optional: explicit session end
-        // -------------------------------------------------------------
         case "SESSION_END": {
             sessionStartTs = null;
             lastHeartbeatTs = null;
@@ -83,9 +60,6 @@ self.addEventListener("message", (event) => {
     }
 });
 
-// -----------------------------------------------------------------------------
-// Notification click
-// -----------------------------------------------------------------------------
 self.addEventListener("notificationclick", (event) => {
     event.notification.close();
 
@@ -101,13 +75,10 @@ self.addEventListener("notificationclick", (event) => {
     );
 });
 
-// -----------------------------------------------------------------------------
-// Helpers
-// -----------------------------------------------------------------------------
 function showOrUpdateNotification({ title, body }) {
     self.registration.showNotification(title, {
         body,
-        tag: NOTIFICATION_TAG,        // <-- ensures update, not stack
+        tag: NOTIFICATION_TAG,
         renotify: true,
         requireInteraction: true,
         icon: NOTIFICATION_ICON,
