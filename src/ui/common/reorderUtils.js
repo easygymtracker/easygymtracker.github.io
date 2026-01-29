@@ -1,7 +1,7 @@
 // ui/common/reorderUtils.js
 
 /**
- * Move one item in an array from index `from` to index `to` (in-place).
+ * Move one item in an array from index from to index to (in-place).
  */
 export function moveItem(arr, from, to) {
   if (!Array.isArray(arr)) return;
@@ -23,9 +23,11 @@ export function flashMoved(el, className, ms = 350) {
 }
 
 function isTouchLike() {
-  return typeof window !== "undefined" &&
+  return (
+    typeof window !== "undefined" &&
     "matchMedia" in window &&
-    window.matchMedia("(pointer: coarse)").matches;
+    window.matchMedia("(pointer: coarse)").matches
+  );
 }
 
 function rowFromPoint(rowSelector, x, y) {
@@ -36,12 +38,9 @@ function rowFromPoint(rowSelector, x, y) {
 function closestFromEventTarget(target, selector) {
   if (!target) return null;
   if (target.nodeType === 1) return target.closest(selector);
-  if (target.nodeType === 3) return target.parentElement?.closest(selector) ?? null;
+  if (target.nodeType === 3)
+    return target.parentElement?.closest(selector) ?? null;
   return null;
-}
-
-function getRowByIndex(containerEl, rowSelector, idx) {
-  return containerEl.querySelector(`${rowSelector}[data-index="${idx}"]`);
 }
 
 /**
@@ -53,7 +52,6 @@ function createDragGhostFromRow(rowEl) {
   const rect = rowEl.getBoundingClientRect();
   const ghost = rowEl.cloneNode(true);
 
-  // Keep it visually consistent but "floating"
   ghost.style.position = "fixed";
   ghost.style.left = "0px";
   ghost.style.top = "0px";
@@ -101,34 +99,18 @@ function clearTakenStyle(rowEl) {
 
 function moveGhost(ghostEl, x, y, offsetX, offsetY) {
   if (!ghostEl) return;
-  const gx = x - (offsetX || 0);
-  const gy = y - (offsetY || 0);
-  ghostEl.style.transform = `translate(${gx}px, ${gy}px)`;
+  ghostEl.style.transform = `translate(${x - offsetX}px, ${y - offsetY}px)`;
 }
 
 /**
- * Attach drag-and-drop reorder behavior to a container that renders rows with:
- *   - `rowSelector` (default: ".routineRow[data-index]")
- *   - `data-index` attributes
- *
- * On drop, calls `onReorder(fromIdx, toIdx)`.
- *
- * Mobile support:
- *   - Long-press to enter "reorder mode"
- *   - Drag finger over rows to choose destination
- *   - Calls onReorder ONCE on release
- *
- * Visual support:
- *   - The dragged item is "taken" from the list (dimmed)
- *   - A ghost clone follows cursor/finger
+ * Attach drag-and-drop reorder behavior
  */
-export function attachDragReorder(containerEl, {
-  rowSelector = '.routineRow[data-index]',
-  onReorder,
-  longPressMs = 220,
-} = {}) {
+export function attachDragReorder(
+  containerEl,
+  { rowSelector = ".routineRow[data-index]", onReorder, longPressMs = 220 } = {}
+) {
   if (!containerEl) return () => { };
-  if (typeof onReorder !== 'function') return () => { };
+  if (typeof onReorder !== "function") return () => { };
 
   // -----------------------
   // Shared ghost state
@@ -151,6 +133,11 @@ export function attachDragReorder(containerEl, {
     offsetY = 0;
   }
 
+  function ensureSingleGhost(rowEl) {
+    cleanupGhost(); // 🔒 idempotent guarantee
+    ghostEl = createDragGhostFromRow(rowEl);
+  }
+
   // -----------------------
   // Desktop HTML5 DnD
   // -----------------------
@@ -160,22 +147,18 @@ export function attachDragReorder(containerEl, {
     const row = closestFromEventTarget(e.target, rowSelector);
     if (!row) return;
 
-    dragFromIndex = Number(row.getAttribute('data-index'));
+    dragFromIndex = Number(row.getAttribute("data-index"));
 
-    // make the row look "taken"
     sourceRowEl = row;
     applyTakenStyle(sourceRowEl);
 
-    // compute cursor offset inside row
     const rect = row.getBoundingClientRect();
-    offsetX = (typeof e.clientX === "number") ? (e.clientX - rect.left) : 12;
-    offsetY = (typeof e.clientY === "number") ? (e.clientY - rect.top) : 12;
+    offsetX = e.clientX - rect.left;
+    offsetY = e.clientY - rect.top;
 
-    // create ghost + place initially
-    ghostEl = createDragGhostFromRow(row);
+    ensureSingleGhost(row);
     moveGhost(ghostEl, e.clientX, e.clientY, offsetX, offsetY);
 
-    // keep default DnD behavior, but try to hide the browser drag image
     try {
       const img = new Image();
       img.src =
@@ -183,8 +166,8 @@ export function attachDragReorder(containerEl, {
       e.dataTransfer.setDragImage(img, 0, 0);
     } catch { }
 
-    e.dataTransfer.effectAllowed = 'move';
-    e.dataTransfer.setData('text/plain', String(dragFromIndex));
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", String(dragFromIndex));
   }
 
   function onDragEnd() {
@@ -196,53 +179,39 @@ export function attachDragReorder(containerEl, {
     const row = closestFromEventTarget(e.target, rowSelector);
     if (!row) return;
     e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
-
-    // update ghost position on dragover (works in most browsers)
-    if (ghostEl && typeof e.clientX === "number" && typeof e.clientY === "number") {
-      moveGhost(ghostEl, e.clientX, e.clientY, offsetX, offsetY);
-    }
-  }
-
-  // extra: update ghost even when over gaps / container background
-  function onDocDragOver(e) {
-    if (!ghostEl) return;
-    if (typeof e.clientX !== "number" || typeof e.clientY !== "number") return;
     moveGhost(ghostEl, e.clientX, e.clientY, offsetX, offsetY);
   }
 
   function onDrop(e) {
-    const targetRow = closestFromEventTarget(e.target, rowSelector);
-    if (!targetRow) return;
+    const row = closestFromEventTarget(e.target, rowSelector);
+    if (!row) return;
     e.preventDefault();
 
-    const toIdx = Number(targetRow.getAttribute('data-index'));
-    let fromIdx = dragFromIndex;
+    const toIdx = Number(row.getAttribute("data-index"));
+    const fromIdx =
+      dragFromIndex ??
+      Number(e.dataTransfer.getData("text/plain"));
 
-    if (!Number.isInteger(fromIdx)) {
-      fromIdx = Number(e.dataTransfer.getData('text/plain'));
+    if (Number.isInteger(fromIdx) && Number.isInteger(toIdx)) {
+      onReorder(fromIdx, toIdx);
     }
 
-    if (!Number.isInteger(fromIdx) || !Number.isInteger(toIdx)) return;
-
-    onReorder(fromIdx, toIdx);
     cleanupGhost();
   }
 
-  containerEl.addEventListener('dragstart', onDragStart);
-  containerEl.addEventListener('dragend', onDragEnd);
-  containerEl.addEventListener('dragover', onDragOver);
-  containerEl.addEventListener('drop', onDrop);
-  document.addEventListener('dragover', onDocDragOver);
+  containerEl.addEventListener("dragstart", onDragStart);
+  containerEl.addEventListener("dragend", onDragEnd);
+  containerEl.addEventListener("dragover", onDragOver);
+  containerEl.addEventListener("drop", onDrop);
 
   // -----------------------
-  // Mobile long-press reorder (single call)
+  // Mobile long-press reorder
   // -----------------------
   let pressTimer = null;
   let armed = false;
 
-  let fromIdx = null;       // fixed (start index)
-  let pendingToIdx = null;  // tracked during drag
+  let fromIdx = null;
+  let pendingToIdx = null;
 
   let startX = 0;
   let startY = 0;
@@ -256,11 +225,6 @@ export function attachDragReorder(containerEl, {
     }
   }
 
-  function preventContextMenu(e) {
-    if (!armed) return;
-    e.preventDefault();
-  }
-
   function cleanupMobile() {
     clearPressTimer();
     armed = false;
@@ -270,35 +234,40 @@ export function attachDragReorder(containerEl, {
     containerEl.classList.remove("isReordering");
     containerEl.style.userSelect = "";
     containerEl.style.touchAction = "";
-    containerEl.removeEventListener("contextmenu", preventContextMenu);
 
     cleanupGhost();
   }
 
-  function armReorder(startRow) {
+  function armReorder(row) {
     if (armed) return;
-    cleanupGhost();
 
     armed = true;
-    containerEl.classList.add("isReordering");
 
+    // 🔒 kill any ghost created by parallel event paths
+    cleanupGhost();
+
+    containerEl.classList.add("isReordering");
     containerEl.style.userSelect = "none";
     containerEl.style.touchAction = "none";
-    containerEl.addEventListener("contextmenu", preventContextMenu, { passive: false });
 
-    sourceRowEl = startRow;
-    applyTakenStyle(sourceRowEl);
-    ghostEl = createDragGhostFromRow(startRow);
+    sourceRowEl = row;
+    applyTakenStyle(row);
+
+    ensureSingleGhost(row);
   }
 
   function commitIfNeeded() {
-    if (!armed) return;
-    if (!Number.isInteger(fromIdx) || !Number.isInteger(pendingToIdx)) return;
-    if (fromIdx === pendingToIdx) return;
-    onReorder(fromIdx, pendingToIdx);
+    if (
+      armed &&
+      Number.isInteger(fromIdx) &&
+      Number.isInteger(pendingToIdx) &&
+      fromIdx !== pendingToIdx
+    ) {
+      onReorder(fromIdx, pendingToIdx);
+    }
   }
 
-  // ---- Pointer Events path ----
+  // ---- Pointer Events ----
   let pointerId = null;
 
   function onPointerDown(e) {
@@ -320,50 +289,42 @@ export function attachDragReorder(containerEl, {
     offsetX = e.clientX - rect.left;
     offsetY = e.clientY - rect.top;
 
-    armed = false;
-    containerEl.style.userSelect = "none";
-
     clearPressTimer();
     pressTimer = setTimeout(() => {
-      clearPressTimer();
       armReorder(row);
       moveGhost(ghostEl, startX, startY, offsetX, offsetY);
-      try { row.setPointerCapture(pointerId); } catch { }
+      try {
+        row.setPointerCapture(pointerId);
+      } catch { }
     }, longPressMs);
   }
 
   function onPointerMove(e) {
-    if (!isTouchLike()) return;
-    if (pointerId == null || e.pointerId !== pointerId) return;
-
-    if (!armed) {
-      const dx = Math.abs(e.clientX - startX);
-      const dy = Math.abs(e.clientY - startY);
-      if (dx > CANCEL_DRIFT_PX || dy > CANCEL_DRIFT_PX) {
-        cleanupMobile();
-        pointerId = null;
+    if (!armed || e.pointerId !== pointerId) {
+      if (pointerId != null && !armed) {
+        const dx = Math.abs(e.clientX - startX);
+        const dy = Math.abs(e.clientY - startY);
+        if (dx > CANCEL_DRIFT_PX || dy > CANCEL_DRIFT_PX) {
+          cleanupMobile();
+          pointerId = null;
+        }
       }
       return;
     }
 
     e.preventDefault();
 
-    // move ghost
     moveGhost(ghostEl, e.clientX, e.clientY, offsetX, offsetY);
 
-    // track destination
-    const targetRow = rowFromPoint(rowSelector, e.clientX, e.clientY);
-    if (!targetRow) return;
+    const row = rowFromPoint(rowSelector, e.clientX, e.clientY);
+    if (!row) return;
 
-    const toIdx = Number(targetRow.getAttribute("data-index"));
-    if (!Number.isInteger(toIdx)) return;
-
-    pendingToIdx = toIdx;
+    const idx = Number(row.getAttribute("data-index"));
+    if (Number.isInteger(idx)) pendingToIdx = idx;
   }
 
   function onPointerUp(e) {
-    if (!isTouchLike()) return;
-    if (pointerId == null || e.pointerId !== pointerId) return;
+    if (e.pointerId !== pointerId) return;
 
     clearPressTimer();
     commitIfNeeded();
@@ -372,9 +333,7 @@ export function attachDragReorder(containerEl, {
   }
 
   function onPointerCancel(e) {
-    if (!isTouchLike()) return;
-    if (pointerId == null || e.pointerId !== pointerId) return;
-
+    if (e.pointerId !== pointerId) return;
     cleanupMobile();
     pointerId = null;
   }
@@ -382,7 +341,9 @@ export function attachDragReorder(containerEl, {
   containerEl.addEventListener("pointerdown", onPointerDown, { passive: false });
   containerEl.addEventListener("pointermove", onPointerMove, { passive: false });
   containerEl.addEventListener("pointerup", onPointerUp, { passive: true });
-  containerEl.addEventListener("pointercancel", onPointerCancel, { passive: true });
+  containerEl.addEventListener("pointercancel", onPointerCancel, {
+    passive: true,
+  });
 
   // ---- Touch Events fallback ----
   function onTouchStart(e) {
@@ -403,12 +364,8 @@ export function attachDragReorder(containerEl, {
     offsetX = t0.clientX - rect.left;
     offsetY = t0.clientY - rect.top;
 
-    armed = false;
-    containerEl.style.userSelect = "none";
-
     clearPressTimer();
     pressTimer = setTimeout(() => {
-      clearPressTimer();
       armReorder(row);
       moveGhost(ghostEl, startX, startY, offsetX, offsetY);
     }, longPressMs);
@@ -429,17 +386,13 @@ export function attachDragReorder(containerEl, {
 
     e.preventDefault();
 
-    // move ghost
     moveGhost(ghostEl, t0.clientX, t0.clientY, offsetX, offsetY);
 
-    // track destination
-    const targetRow = rowFromPoint(rowSelector, t0.clientX, t0.clientY);
-    if (!targetRow) return;
+    const row = rowFromPoint(rowSelector, t0.clientX, t0.clientY);
+    if (!row) return;
 
-    const toIdx = Number(targetRow.getAttribute("data-index"));
-    if (!Number.isInteger(toIdx)) return;
-
-    pendingToIdx = toIdx;
+    const idx = Number(row.getAttribute("data-index"));
+    if (Number.isInteger(idx)) pendingToIdx = idx;
   }
 
   function onTouchEnd() {
@@ -458,11 +411,10 @@ export function attachDragReorder(containerEl, {
   containerEl.addEventListener("touchcancel", onTouchCancel, { passive: true });
 
   return () => {
-    containerEl.removeEventListener('dragstart', onDragStart);
-    containerEl.removeEventListener('dragend', onDragEnd);
-    containerEl.removeEventListener('dragover', onDragOver);
-    containerEl.removeEventListener('drop', onDrop);
-    document.removeEventListener('dragover', onDocDragOver);
+    containerEl.removeEventListener("dragstart", onDragStart);
+    containerEl.removeEventListener("dragend", onDragEnd);
+    containerEl.removeEventListener("dragover", onDragOver);
+    containerEl.removeEventListener("drop", onDrop);
 
     containerEl.removeEventListener("pointerdown", onPointerDown);
     containerEl.removeEventListener("pointermove", onPointerMove);
