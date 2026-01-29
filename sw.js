@@ -27,6 +27,7 @@ self.addEventListener("message", (event) => {
             showOrUpdateNotification({
                 title: data.payload?.title ?? "Workout session",
                 body: data.payload?.body ?? "",
+                restRunning: data.payload?.restRunning || false,
             });
             break;
         }
@@ -35,6 +36,7 @@ self.addEventListener("message", (event) => {
             showOrUpdateNotification({
                 title: data.title || "Workout",
                 body: data.body || "",
+                restRunning: data.restRunning || false,
             });
             break;
         }
@@ -87,7 +89,7 @@ self.addEventListener("notificationclick", (event) => {
     );
 });
 
-function showOrUpdateNotification({ title, body }) {
+function showOrUpdateNotification({ title, body, restRunning = false }) {
     self.registration.showNotification(title, {
         body,
         tag: NOTIFICATION_TAG,
@@ -95,13 +97,14 @@ function showOrUpdateNotification({ title, body }) {
         requireInteraction: true,
         icon: NOTIFICATION_ICON,
         badge: NOTIFICATION_BADGE,
-
-        actions: [
-            {
-                action: "COMPLETE_SET",
-                title: "Set done",
-            },
-        ],
+        actions: restRunning
+            ? []
+            : [
+                {
+                    action: "COMPLETE_SET",
+                    title: "Set done",
+                },
+            ],
     });
 }
 

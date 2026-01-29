@@ -109,12 +109,21 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
             repsTxt = formatSideValue(reps);
         }
 
-        let body;
-        if (restRunning) {
-            body = `${exercise} · ${setLabel} · ${weightTxt} × ${repsTxt} · ${t("session.currentSet.restTimer")} ${formatMs(restRemainingMs)}`;
-        } else {
-            body = `${exercise} · ${setLabel} · ${weightTxt} × ${repsTxt} · ${formatMs(setElapsedMs)}`;
-        }
+        const timerTxt = restRunning
+            ? `⏳ ${formatMs(restRemainingMs)}`
+            : `⏱ ${formatMs(setElapsedMs)}`;
+
+        const restTxt = restRunning ? "DESCANSO" : "";
+
+        const body = [
+            timerTxt,
+            restTxt,
+            `${weightTxt} × ${repsTxt}`,
+            exercise,
+            `${t("session.set")} ${currentRepGroupIndex + 1}`,
+        ]
+            .filter(Boolean)
+            .join(" - ");
 
         navigator.serviceWorker.controller.postMessage({
             type: "SESSION_UPDATE",
