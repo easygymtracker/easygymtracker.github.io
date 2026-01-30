@@ -222,6 +222,9 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
     let completedRepGroups = new Map();
     let sessionSeriesOrder = null;
 
+    // --- UI state: which series blocks have expanded repGroup lists ---
+    let expandedSeries = new Set();
+
     function stopTick() {
         if (tickHandle) {
             clearInterval(tickHandle);
@@ -1208,6 +1211,16 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         const repItem = e.target.closest(".repGroupItem");
         const seriesItem = e.target.closest(".seriesItem");
 
+        if (seriesItem) {
+            const sIdx = Number(seriesItem.dataset.seriesIdx);
+            if (Number.isFinite(sIdx)) {
+                if (expandedSeries.has(sIdx)) expandedSeries.delete(sIdx);
+                else expandedSeries.add(sIdx);
+                renderCurrent();
+                return;
+            }
+        }
+
         const completeRepBtn = e.target.closest('[data-action="complete-rep"]');
         if (completeRepBtn && repItem) {
             const sIdx = Number(repItem.dataset.seriesIdx);
@@ -1310,7 +1323,7 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
                 const status = statusForSeries(idx, routine);
                 const statusIcon = status === "done" ? "✓" : status === "active" ? "▶" : "•";
 
-                const showSublist = idx === currentSeriesIndex;
+                const isExpanded = expandedSeries.has(idx);
 
                 return `
         <div class="seriesBlock" data-index="${displayIdx}" data-series-idx="${idx}" draggable="true" style="cursor:grab;">
@@ -1325,8 +1338,8 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
             </div>
           </div>
 
-          <div class="seriesSublist ${showSublist ? "" : "is-collapsed"}">
-            ${showSublist ? renderRepGroupList(idx, s) : ""}
+          <div class="seriesSublist ${isExpanded ? "" : "is-collapsed"}">
+            ${isExpanded ? renderRepGroupList(idx, s) : ""}
           </div>
         </div>
       `;
@@ -1365,6 +1378,8 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
             completedRepGroups = new Map();
             sessionSeriesOrder = null;
 
+            expandedSeries = new Set();
+
             const routine = routineId ? routineStore.getById(routineId) : null;
             if (!routine) return;
 
@@ -1376,6 +1391,8 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
                 currentSeriesIndex = pick.seriesIdx;
                 currentRepGroupIndex = pick.repIdx;
             }
+
+            expandedSeries.add(currentSeriesIndex);
 
             renderSeriesList(routine);
         },
