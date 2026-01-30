@@ -303,6 +303,24 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         updateCurrentSetTimerUI();
     }
 
+    function endRestAndResumeSet({ resetSet = true } = {}) {
+        restRunning = false;
+        restPaused = false;
+        restRemainingMs = 0;
+        restDurationMs = 0;
+        restStartEpochMs = null;
+        hasVibratedForRestEnd = false;
+        lastNotifiedRestSecond = null;
+        stopRestTick();
+
+        if (running) startSetTimer({ reset: resetSet });
+
+        updateCurrentSetTimerUI();
+        renderCurrent();
+        syncCurrentSetControls();
+        notifySessionState();
+    }
+
     function isWorkoutComplete(routine) {
         const series = Array.isArray(routine?.series) ? routine.series : [];
         if (!series.length) return true;
@@ -366,8 +384,16 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         if (restRunning) {
             labelEl.textContent = t("session.currentSet.restTimer") || "Rest timer";
 
+            if ((restRemainingMs ?? 0) <= 0) {
+                endRestAndResumeSet({ resetSet: true });
+                return;
+            }
+
             if (restPaused) {
                 valueEl.textContent = formatMs(Math.max(0, restRemainingMs));
+                if ((restRemainingMs ?? 0) <= 0) {
+                    endRestAndResumeSet({ resetSet: true });
+                }
                 return;
             }
 
@@ -405,14 +431,11 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
 
     function startRest(seconds) {
         resetSetTimer();
+
         const s = Number(seconds);
+
         if (!Number.isFinite(s) || s <= 0) {
-            restRunning = false;
-            restPaused = false;
-            restRemainingMs = 0;
-            stopRestTick();
-            updateCurrentSetTimerUI();
-            syncCurrentSetControls();
+            endRestAndResumeSet({ resetSet: true });
             return;
         }
 
@@ -442,6 +465,11 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         const elapsed = now - restStartEpochMs;
         restRemainingMs = Math.max(0, restRemainingMs - elapsed);
 
+        if (restRemainingMs <= 0) {
+            endRestAndResumeSet({ resetSet: true });
+            return;
+        }
+
         restPaused = true;
         stopRestTick();
         updateCurrentSetTimerUI();
@@ -449,12 +477,9 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
 
     function resumeRestTimer() {
         if (!restRunning || !restPaused) return;
+
         if (restRemainingMs <= 0) {
-            restRunning = false;
-            restPaused = false;
-            stopRestTick();
-            updateCurrentSetTimerUI();
-            renderCurrent();
+            endRestAndResumeSet({ resetSet: true });
             return;
         }
 
@@ -1023,19 +1048,7 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
 
         const skipRestBtn = e.target.closest('[data-action="skip-rest"]');
         if (skipRestBtn && restRunning) {
-            restRunning = false;
-            restPaused = false;
-            restRemainingMs = 0;
-            restStartEpochMs = null;
-            stopRestTick();
-
-            if (running) {
-                startSetTimer({ reset: true });
-            }
-
-            updateCurrentSetTimerUI();
-            renderCurrent();
-            syncCurrentSetControls();
+            endRestAndResumeSet({ resetSet: true });
             return;
         }
 
@@ -1206,13 +1219,8 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
             return;
         }
 
-        if (repItem) {
-            return;
-        }
-
-        if (seriesItem) {
-            return;
-        }
+        if (repItem) return;
+        if (seriesItem) return;
     });
 
     function reorderSeriesAndSave(fromIdx, toIdx) {
