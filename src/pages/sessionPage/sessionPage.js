@@ -146,7 +146,7 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
             restTxt,
             `${weightTxt} × ${repsTxt}`,
             exercise,
-            `${t("session.set")} ${currentRepGroupIndex + 1}`,
+            setLabel,
         ]
             .filter(Boolean)
             .join(" - ");
@@ -516,38 +516,73 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         completedSeries = nextCompleted;
     }
 
-    function advanceToNext(routine) {
-        const series = routine?.series ?? [];
-        const sMax = series.length;
+    function ensureSessionSeriesOrder(routine) {
+        const series = Array.isArray(routine?.series) ? routine.series : [];
+        if (!sessionSeriesOrder || sessionSeriesOrder.length !== series.length) {
+            sessionSeriesOrder = series.map((_, i) => i);
+        }
+        return sessionSeriesOrder;
+    }
 
-        // 1) next rep in same series
-        const groups = Array.isArray(series[currentSeriesIndex]?.repGroups)
-            ? series[currentSeriesIndex].repGroups
+    function getFirstIncompleteRepIndex(seriesIdx, routine) {
+        const groups = Array.isArray(routine?.series?.[seriesIdx]?.repGroups)
+            ? routine.series[seriesIdx].repGroups
             : [];
+        if (!groups.length) return null;
 
-        let r = currentRepGroupIndex + 1;
-        while (r < groups.length && isRepDone(currentSeriesIndex, r)) r += 1;
+        for (let i = 0; i < groups.length; i += 1) {
+            if (!isRepDone(seriesIdx, i)) return i;
+        }
+        return null;
+    }
 
-        if (r < groups.length) {
-            currentRepGroupIndex = r;
+    function getNextIncompleteRepAfter(seriesIdx, startAfterRepIdx, routine) {
+        const groups = Array.isArray(routine?.series?.[seriesIdx]?.repGroups)
+            ? routine.series[seriesIdx].repGroups
+            : [];
+        if (!groups.length) return null;
+
+        for (let i = (startAfterRepIdx ?? -1) + 1; i < groups.length; i += 1) {
+            if (!isRepDone(seriesIdx, i)) return i;
+        }
+        return null;
+    }
+
+    function pickTopMostIncomplete(routine) {
+        const order = ensureSessionSeriesOrder(routine);
+        for (const seriesIdx of order) {
+            const repIdx = getFirstIncompleteRepIndex(seriesIdx, routine);
+            if (repIdx != null) {
+                return { seriesIdx, repIdx };
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Advance rules:
+     * - Prefer next incomplete rep in the SAME current series (after current rep).
+     * - If none, but the current series still has any incomplete rep (earlier holes), go to the first incomplete in that series.
+     * - If current series is fully complete, jump to the TOP-most series (by sessionSeriesOrder) that is not fully complete.
+     */
+    function advanceToNext(routine) {
+        if (!routine) return;
+
+        const nextInSame = getNextIncompleteRepAfter(currentSeriesIndex, currentRepGroupIndex, routine);
+        if (nextInSame != null) {
+            currentRepGroupIndex = nextInSame;
             return;
         }
-
-        // 2) next series that has an incomplete rep
-        let s = currentSeriesIndex + 1;
-        while (s < sMax) {
-            const g = Array.isArray(series[s]?.repGroups) ? series[s].repGroups : [];
-            let first = 0;
-            while (first < g.length && isRepDone(s, first)) first += 1;
-
-            if (first < g.length) {
-                currentSeriesIndex = s;
-                currentRepGroupIndex = first;
-                return;
-            }
-            s += 1;
+        const firstInSame = getFirstIncompleteRepIndex(currentSeriesIndex, routine);
+        if (firstInSame != null) {
+            currentRepGroupIndex = firstInSame;
+            return;
         }
-        // If we're here, everything after is done; keep position as-is.
+        const pick = pickTopMostIncomplete(routine);
+        if (pick) {
+            currentSeriesIndex = pick.seriesIdx;
+            currentRepGroupIndex = pick.repIdx;
+        }
     }
 
     function resolveExerciseName(seriesItem) {
@@ -621,7 +656,7 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
 
             const timerLabel = t("session.currentSet.timer") || "Set timer";
             const hasStarted = startEpochMs != null;
-            const canComplete = setRunning === true && running === true && restRunning === false;
+            const canComplete = hasStarted && running && setRunning && !restRunning;
             const isDisabled = !canComplete;
 
             const btnLabel = !hasStarted
@@ -1166,7 +1201,7 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         if (!routine) return;
 
         const series = Array.isArray(routine.series) ? routine.series : [];
-        if (!sessionSeriesOrder) sessionSeriesOrder = series.map((_, i) => i);
+        ensureSessionSeriesOrder(routine);
 
         const n = sessionSeriesOrder.length;
         if (
@@ -1176,13 +1211,18 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
 
         moveItem(sessionSeriesOrder, fromIdx, toIdx);
 
-        if (sessionSeriesOrder.length > 0) {
-            const currentHasProgress =
-                currentSeriesIndex != null &&
-                hasCompletedAnyRep(currentSeriesIndex);
+        const currentHasProgress =
+            currentSeriesIndex != null &&
+            hasCompletedAnyRep(currentSeriesIndex);
 
-            if (!currentHasProgress) {
-                currentSeriesIndex = sessionSeriesOrder[0];
+        if (!currentHasProgress) {
+            recomputeCompletedSeries(routine);
+            const pick = pickTopMostIncomplete(routine);
+            if (pick) {
+                currentSeriesIndex = pick.seriesIdx;
+                currentRepGroupIndex = pick.repIdx;
+            } else {
+                currentSeriesIndex = sessionSeriesOrder[0] ?? 0;
                 currentRepGroupIndex = 0;
             }
         }
@@ -1198,10 +1238,7 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
 
     function renderSeriesList(routine) {
         const series = Array.isArray(routine?.series) ? routine.series : [];
-
-        if (!sessionSeriesOrder || sessionSeriesOrder.length !== series.length) {
-            sessionSeriesOrder = series.map((_, i) => i);
-        }
+        ensureSessionSeriesOrder(routine);
 
         emptyEl.style.display = series.length ? "none" : "";
         listEl.innerHTML = "";
@@ -1239,7 +1276,7 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
                 const showSublist = idx === currentSeriesIndex;
 
                 return `
-        <div class="seriesBlock" data-index="${displayIdx}" draggable="true" style="cursor:grab;">
+        <div class="seriesBlock" data-index="${displayIdx}" data-series-idx="${idx}" draggable="true" style="cursor:grab;">
           <div class="seriesItem seriesItem--${status}" data-series-idx="${idx}">
             <div class="seriesItemMeta">
               <h4>${idx + 1}. ${escapeHtml(name)}${desc}</h4>
@@ -1262,7 +1299,8 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         requestAnimationFrame(() => {
             const active =
                 listEl.querySelector(".repGroupItem--active") ||
-                listEl.querySelector('.seriesBlock[data-series-idx="' + currentSeriesIndex + '"]');
+                listEl.querySelector('.seriesBlock[data-series-idx="' + currentSeriesIndex + '"]') ||
+                listEl.querySelector('.seriesItem[data-series-idx="' + currentSeriesIndex + '"]');
             active?.scrollIntoView?.({ block: "nearest" });
         });
     }
@@ -1294,6 +1332,14 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
             if (!routine) return;
 
             metaEl.textContent = routine.description || "—";
+
+            ensureSessionSeriesOrder(routine);
+            const pick = pickTopMostIncomplete(routine);
+            if (pick) {
+                currentSeriesIndex = pick.seriesIdx;
+                currentRepGroupIndex = pick.repIdx;
+            }
+
             renderSeriesList(routine);
         },
     };
