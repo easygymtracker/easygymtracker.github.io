@@ -19,7 +19,6 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
     const emptyEl = document.getElementById("sessionEmpty");
     const notFoundEl = document.getElementById("sessionNotFound");
 
-    // --- insert "current exercise" section just below the timer ROW (not inside it) ---
     const sessionFormEl = timerEl?.closest(".form");
     const timerRowEl = sessionFormEl ? sessionFormEl.querySelector(":scope > div") : null;
 
@@ -36,29 +35,27 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         sessionFormEl.insertAdjacentElement("afterbegin", currentSectionEl);
     }
 
-    // --- timer state ---
     let hasInitiated = false;
     let running = false;
     let startEpochMs = null;
     let elapsedMs = 0;
     let tickHandle = null;
-    // --- rest timer state ---
+
     let restRunning = false;
     let restStartEpochMs = null;
     let restDurationMs = 0;
     let restTickHandle = null;
     let restPaused = false;
     let restRemainingMs = 0;
-    // --- set timer state (increasing) ---
+
     let setRunning = false;
     let setStartEpochMs = null;
     let setElapsedMs = 0;
     let setTickHandle = null;
-    // --- notification throttling ---
+
     let lastNotifyTs = 0;
     let lastNotifiedRestSecond = null;
 
-    // --- vibration on rest end ---
     let hasVibratedForRestEnd = false;
     function vibrateRestEnd() {
         if (!("vibrate" in navigator)) return;
@@ -139,7 +136,7 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
             ? `⏳ ${formatMs(restRemainingLiveMs)}`
             : `⏱ ${formatMs(setElapsedMs)}`;
 
-        const restTxt = restRunning ? "DESCANSO" : "";
+        const restTxt = restRunning ? (t("session.rest") || "Rest") : "";
 
         const body = [
             timerTxt,
@@ -214,7 +211,6 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         syncCurrentSetControls();
     }
 
-    // --- session progress state ---
     let currentRoutineId = null;
     let currentSeriesIndex = 0;
     let currentRepGroupIndex = 0;
@@ -222,7 +218,6 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
     let completedRepGroups = new Map();
     let sessionSeriesOrder = null;
 
-    // --- UI state: which series blocks have expanded repGroup lists ---
     let expandedSeries = new Set();
 
     function stopTick() {
@@ -364,13 +359,13 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
     function normalizeWeight(w) {
         if (w === null) return null;
         if (typeof w === "number") return w;
-        return { left: w.left ?? null, right: w.right ?? null };
+        return { left: w?.left ?? null, right: w?.right ?? null };
     }
 
     function normalizeReps(r) {
         if (r === null) return null;
         if (typeof r === "number") return r;
-        return { left: r.left ?? null, right: r.right ?? null };
+        return { left: r?.left ?? null, right: r?.right ?? null };
     }
 
     function isSameWeight(a, b) {
@@ -469,7 +464,6 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
     function pauseRestTimer() {
         if (!restRunning || restPaused) return;
 
-        // compute remaining and freeze it
         const now = Date.now();
         const elapsed = now - restStartEpochMs;
         restRemainingMs = Math.max(0, restRemainingMs - elapsed);
@@ -517,6 +511,17 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
     function markRepDone(seriesIdx, repIdx) {
         if (!completedRepGroups.has(seriesIdx)) completedRepGroups.set(seriesIdx, new Set());
         completedRepGroups.get(seriesIdx).add(repIdx);
+    }
+
+    function shiftCompletedAfterInsert(seriesIdx, insertIdx) {
+        const done = completedRepGroups.get(seriesIdx);
+        if (!done || done.size === 0) return;
+
+        const shifted = new Set();
+        for (const idx of done) {
+            shifted.add(idx >= insertIdx ? idx + 1 : idx);
+        }
+        completedRepGroups.set(seriesIdx, shifted);
     }
 
     function statusForRep(seriesIdx, repIdx) {
@@ -593,12 +598,6 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         return null;
     }
 
-    /**
-     * Advance rules:
-     * - Prefer next incomplete rep in the SAME current series (after current rep).
-     * - If none, but the current series still has any incomplete rep (earlier holes), go to the first incomplete in that series.
-     * - If current series is fully complete, jump to the TOP-most series (by sessionSeriesOrder) that is not fully complete.
-     */
     function advanceToNext(routine) {
         if (!routine) return;
 
@@ -642,7 +641,7 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         return String(v);
     }
 
-    function resolveRepValue(repGroup, field /* "targetWeight" | "targetReps" */) {
+    function resolveRepValue(repGroup, field) {
         const hist = Array.isArray(repGroup?.history) ? repGroup.history : [];
         const last = hist.length ? hist[hist.length - 1] : null;
 
@@ -680,7 +679,6 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         const weightLabel = t("session.weight") || "Weight";
         const repsLabel = t("session.reps") || "Reps";
 
-        // ----- Current set subsection (only if a set exists) -----
         let currentSetHtml = "";
         if (rg) {
             const weight = resolveRepValue(rg, "targetWeight");
@@ -754,7 +752,6 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
             `;
         }
 
-        // ----- All sets subsection (your existing squares flow) -----
         const flow = groups
             .map((rg2, repIdx) => {
                 const st = statusForRep(currentSeriesIndex, repIdx);
@@ -869,7 +866,6 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
             })
             .join("") +
             `
-                <!-- ➕ Add-set button at END -->
                 <button
                 type="button"
                 class="addSetBtn"
@@ -1078,7 +1074,6 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
 
             const groups = s.repGroups ?? [];
 
-            // Prefer previous, otherwise next
             const ref =
                 groups[insertIdx - 1] ??
                 groups[insertIdx] ??
@@ -1116,6 +1111,9 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
             });
 
             s.repGroups.splice(insertIdx, 0, newRepGroup);
+
+            shiftCompletedAfterInsert(currentSeriesIndex, insertIdx);
+
             routineStore.update(routine);
 
             if (insertIdx <= currentRepGroupIndex) {
@@ -1286,7 +1284,6 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         renderSeriesList(routine);
     }
 
-    // Attach once (no need to reattach on each render)
     attachDragReorder(listEl, {
         rowSelector: '.seriesBlock[data-index]',
         onReorder: (fromIdx, toIdx) => reorderSeriesAndSave(fromIdx, toIdx),
