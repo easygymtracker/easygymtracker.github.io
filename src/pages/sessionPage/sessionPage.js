@@ -971,8 +971,18 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         const rg = s.repGroups?.[currentRepGroupIndex];
         if (!rg) return;
 
+        const isLastRepGroup = currentRepGroupIndex >= (s.repGroups?.length ?? 0) - 1;
+
         if (updateRepGroupFields) {
             persistRepGroupTargets(rg, { reps, weight, restSecondsAfterOverride });
+
+            if (
+                isLastRepGroup &&
+                typeof restSecondsAfterOverride === "number" &&
+                Number.isFinite(restSecondsAfterOverride)
+            ) {
+                s.restSecondsAfter = restSecondsAfterOverride;
+            }
         }
 
         if (saveHistory) {
