@@ -195,7 +195,6 @@
 
         <section id="seriesEditor" style="display: none;">
           <div class="pageHeader" style="border: none; padding: 0; margin-bottom: 10px;">
-            <!-- Title is dynamic (includes exercise # + exercise name); keep as-is. -->
             <h2 id="seriesEditorTitle">Edit exercise</h2>
             <button class="btn" id="btnCloseSeriesEditor" data-i18n="common.close">Close</button>
           </div>
@@ -249,10 +248,20 @@
               </select>
             </div>
 
-            <div class="field">
+            <div class="field" id="rgRepsSingleWrap">
               <label for="rgTargetReps" data-i18n="repGroup.targetRepsLabel">Target reps</label>
               <input id="rgTargetReps" type="number" min="1" step="1" data-i18n="repGroup.targetRepsPlaceholder"
                 data-i18n-attr="placeholder" placeholder="e.g., 10" />
+            </div>
+
+            <div class="field" id="rgRepsTupleWrap" style="display: none;">
+              <label data-i18n="repGroup.targetRepsTupleLabel">Target reps (left / right)</label>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <input id="rgRepsLeft" type="number" min="1" step="1" data-i18n="repGroup.targetRepsLeftPlaceholder"
+                  data-i18n-attr="placeholder" placeholder="Left" />
+                <input id="rgRepsRight" type="number" min="1" step="1" data-i18n="repGroup.targetRepsRightPlaceholder"
+                  data-i18n-attr="placeholder" placeholder="Right" />
+              </div>
             </div>
 
             <div class="field" id="rgWeightSingleWrap">
@@ -305,7 +314,8 @@
         <div class="divider"></div>
 
         <div class="form" style="padding-top: 0;">
-          <div class="sessionTimerRow" style="display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap;">
+          <div class="sessionTimerRow"
+            style="display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap;">
             <div>
               <div style="font-size:12px; color: var(--muted); margin-bottom:6px;" data-i18n="session.timer.label">Timer
               </div>

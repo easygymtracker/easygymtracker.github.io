@@ -35,7 +35,6 @@ export class SetSeries {
         this.repGroups.forEach((g) => {
             assert(g instanceof RepGroup, "SetSeries.repGroups must contain RepGroup instances");
             assert(g.exerciseId === this.exerciseId, "RepGroup.exerciseId must match SetSeries.exerciseId");
-            // RepGroup validates its own restSecondsAfter + history internally
         });
 
         assert(

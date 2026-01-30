@@ -367,6 +367,12 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         return { left: w.left ?? null, right: w.right ?? null };
     }
 
+    function normalizeReps(r) {
+        if (r === null) return null;
+        if (typeof r === "number") return r;
+        return { left: r.left ?? null, right: r.right ?? null };
+    }
+
     function isSameWeight(a, b) {
         const wa = normalizeWeight(a);
         const wb = normalizeWeight(b);
@@ -943,12 +949,12 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
     function persistRepGroupTargets(rg, { reps, weight, restSecondsAfterOverride = null }) {
         if (!rg) return;
 
-        if (typeof reps === "number" && Number.isFinite(reps)) {
-            rg.targetReps = reps;
+        if (reps !== undefined) {
+            rg.targetReps = normalizeReps(reps);
         }
 
         if (weight !== undefined) {
-            rg.targetWeight = weight;
+            rg.targetWeight = normalizeWeight(weight);
         }
 
         if (typeof restSecondsAfterOverride === "number" && Number.isFinite(restSecondsAfterOverride)) {
@@ -1037,7 +1043,7 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         const reps =
             latest?.reps ??
             rg.targetReps ??
-            0;
+            null;
 
         const weight =
             latest?.weight ??

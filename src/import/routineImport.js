@@ -12,6 +12,36 @@ function newId(prefix) {
     return `${prefix}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
 }
 
+function toFiniteNumberOr(fallback, v) {
+    const n = typeof v === "string" && v.trim() !== "" ? Number(v) : v;
+    return Number.isFinite(n) ? n : fallback;
+}
+
+function normalizeTuple(v, { coerce = (x) => x } = {}) {
+    if (v == null) return null;
+
+    if (typeof v === "object") {
+        const left = v.left ?? null;
+        const right = v.right ?? null;
+        return {
+            left: left == null ? null : coerce(left),
+            right: right == null ? null : coerce(right),
+        };
+    }
+
+    return coerce(v);
+}
+
+function coerceInt(v) {
+    const n = typeof v === "string" && v.trim() !== "" ? Number(v) : v;
+    return Number.isFinite(n) ? Math.trunc(n) : n;
+}
+
+function coerceNumber(v) {
+    const n = typeof v === "string" && v.trim() !== "" ? Number(v) : v;
+    return Number.isFinite(n) ? n : n;
+}
+
 export function importRoutineFromExport({ rawText, routineStore, exerciseStore }) {
     let parsed;
     try {
@@ -43,19 +73,27 @@ export function importRoutineFromExport({ rawText, routineStore, exerciseStore }
             id: newId("ss"),
             exerciseId: exercise.id,
             description: String(s.description ?? ""),
-            restSecondsAfter: Number(s.restSecondsAfter ?? 0),
+            restSecondsAfter: toFiniteNumberOr(0, s.restSecondsAfter ?? 0),
             repGroups: [],
         });
 
         for (const g of s.repGroups ?? []) {
+            const history = Array.isArray(g.history)
+                ? g.history.map((e) => ({
+                    ...e,
+                    reps: normalizeTuple(e.reps, { coerce: coerceInt }),
+                    weight: normalizeTuple(e.weight, { coerce: coerceNumber }),
+                }))
+                : [];
+
             const rg = new RepGroup({
                 id: newId("rg"),
                 exerciseId: exercise.id,
                 laterality: g.laterality,
-                targetReps: g.targetReps ?? null,
-                targetWeight: g.targetWeight ?? null,
-                restSecondsAfter: Number(g.restSecondsAfter ?? 0),
-                history: Array.isArray(g.history) ? g.history.map((e) => ({ ...e })) : [],
+                targetReps: normalizeTuple(g.targetReps ?? null, { coerce: coerceInt }),
+                targetWeight: normalizeTuple(g.targetWeight ?? null, { coerce: coerceNumber }),
+                restSecondsAfter: toFiniteNumberOr(0, g.restSecondsAfter ?? 0),
+                history,
             });
 
             ss.repGroups.push(rg);

@@ -17,24 +17,66 @@ function isIsoDateTime(s) {
     return Number.isFinite(t);
 }
 
-function isWeightTuple(w) {
+function isPlainObject(x) {
+    return x !== null && typeof x === "object" && Object.getPrototypeOf(x) === Object.prototype;
+}
+
+function isLRTuple(x) {
     return (
-        w &&
-        typeof w === "object" &&
-        Object.prototype.hasOwnProperty.call(w, "left") &&
-        Object.prototype.hasOwnProperty.call(w, "right")
+        isPlainObject(x) &&
+        Object.prototype.hasOwnProperty.call(x, "left") &&
+        Object.prototype.hasOwnProperty.call(x, "right")
     );
+}
+
+function cloneLR(x) {
+    if (x === null) return null;
+    if (isFiniteNumber(x)) return x;
+    return { left: x.left ?? null, right: x.right ?? null };
+}
+
+function cloneEntry(e) {
+    return {
+        dateTime: e.dateTime,
+        reps: cloneLR(e.reps),
+        weight: cloneLR(e.weight),
+    };
 }
 
 function validateWeight(w) {
     if (w === null) return;
     if (isFiniteNumber(w)) return;
-    if (isWeightTuple(w)) {
+
+    if (isLRTuple(w)) {
         assert(w.left === null || isFiniteNumber(w.left), "weight.left must be number|null");
         assert(w.right === null || isFiniteNumber(w.right), "weight.right must be number|null");
         return;
     }
+
     throw new Error("weight must be null, number, or {left,right}");
+}
+
+function validateReps(r) {
+    if (r === null) return;
+
+    if (isFiniteNumber(r)) {
+        assert(Number.isInteger(r) && r > 0, "reps must be a positive integer");
+        return;
+    }
+
+    if (isLRTuple(r)) {
+        assert(
+            r.left === null || (isFiniteNumber(r.left) && Number.isInteger(r.left) && r.left > 0),
+            "reps.left must be positive int|null"
+        );
+        assert(
+            r.right === null || (isFiniteNumber(r.right) && Number.isInteger(r.right) && r.right > 0),
+            "reps.right must be positive int|null"
+        );
+        return;
+    }
+
+    throw new Error("reps must be null, positive integer, or {left,right}");
 }
 
 /**
@@ -62,12 +104,12 @@ export class RepGroup {
         this.exerciseId = exerciseId;
         this.laterality = laterality;
 
-        this.targetReps = targetReps;
-        this.targetWeight = targetWeight;
+        this.targetReps = cloneLR(targetReps);
+        this.targetWeight = cloneLR(targetWeight);
 
         this.restSecondsAfter = restSecondsAfter;
 
-        this.history = history.map((e) => ({ ...e }));
+        this.history = history.map(cloneEntry);
 
         this.validate();
     }
@@ -81,9 +123,7 @@ export class RepGroup {
             "RepGroup.laterality must be 'unilateral' or 'bilateral'"
         );
 
-        if (this.targetReps !== null) {
-            assert(isFiniteNumber(this.targetReps) && this.targetReps > 0, "targetReps must be null or a positive number");
-        }
+        validateReps(this.targetReps);
         validateWeight(this.targetWeight);
 
         assert(
@@ -94,7 +134,7 @@ export class RepGroup {
         assert(Array.isArray(this.history), "RepGroup.history must be an array");
         for (const e of this.history) {
             assert(isIsoDateTime(e.dateTime), "history.dateTime must be an ISO 8601 date-time string");
-            assert(isFiniteNumber(e.reps) && e.reps > 0, "history.reps must be a positive number");
+            validateReps(e.reps);
             validateWeight(e.weight);
         }
 
@@ -108,15 +148,18 @@ export class RepGroup {
      * This updates if dateTime already exists; otherwise inserts.
      *
      * @param {string} dateTime ISO 8601 date-time string
-     * @param {{ reps:number, weight:null|number|{left:number|null,right:number|null} }} data
+     * @param {{
+     *   reps: null | number | {left:number|null,right:number|null},
+     *   weight: null | number | {left:number|null,right:number|null}
+     * }} data
      */
     upsertHistory(dateTime, { reps, weight }) {
         assert(isIsoDateTime(dateTime), "dateTime must be an ISO 8601 date-time string");
-        assert(isFiniteNumber(reps) && reps > 0, "reps must be a positive number");
+        validateReps(reps);
         validateWeight(weight);
 
         const idx = this.history.findIndex((e) => e.dateTime === dateTime);
-        const entry = { dateTime, reps, weight };
+        const entry = cloneEntry({ dateTime, reps, weight });
 
         if (idx >= 0) this.history[idx] = entry;
         else this.history.push(entry);
@@ -136,9 +179,17 @@ export class RepGroup {
     }
 
     static normalizeWeightTuple(weight) {
+        validateWeight(weight);
         if (weight === null) return { left: null, right: null };
         if (isFiniteNumber(weight)) return { left: weight, right: weight };
         return { left: weight.left, right: weight.right };
+    }
+
+    static normalizeRepsTuple(reps) {
+        validateReps(reps);
+        if (reps === null) return { left: null, right: null };
+        if (Number.isInteger(reps)) return { left: reps, right: reps };
+        return { left: reps.left, right: reps.right };
     }
 
     toJSON() {

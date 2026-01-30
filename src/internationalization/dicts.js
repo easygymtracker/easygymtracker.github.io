@@ -54,13 +54,16 @@ export const DICTS = {
         "repGroup.lateralityLabel": "Laterality",
         "repGroup.laterality.bilateral": "Bilateral",
         "repGroup.laterality.unilateral": "Unilateral",
+
         "repGroup.targetRepsLabel": "Target reps",
         "repGroup.targetRepsPlaceholder": "e.g., 10",
+
         "repGroup.targetWeightSingleLabel": "Target weight",
         "repGroup.targetWeightSinglePlaceholder": "e.g., 30",
         "repGroup.targetWeightTupleLabel": "Target weight (left / right)",
         "repGroup.targetWeightLeftPlaceholder": "Left",
         "repGroup.targetWeightRightPlaceholder": "Right",
+
         "repGroup.restAfterLabel": "Rest after set (seconds)",
         "repGroup.restAfterPlaceholder": "0",
 
@@ -138,6 +141,12 @@ export const DICTS = {
         "session.notification.tapToReturn": "Tap to return to workout",
         "session.currentSet.complete": "Complete set",
         "session.notification.setDone": "Set done",
+
+        "repGroup.targetRepsTupleLabel": "Target reps (left / right)",
+        "repGroup.targetRepsLeftPlaceholder": "Left",
+        "repGroup.targetRepsRightPlaceholder": "Right",
+        "session.enterRepsLeft": "Left reps",
+        "session.enterRepsRight": "Right reps",
     },
 
     es: {
@@ -275,6 +284,12 @@ export const DICTS = {
         "session.notification.tapToReturn": "Toca para volver al entrenamiento",
         "session.currentSet.complete": "Completar serie",
         "session.notification.setDone": "Serie completada",
+
+        "repGroup.targetRepsTupleLabel": "Repeticiones objetivo (izquierda / derecha)",
+        "repGroup.targetRepsLeftPlaceholder": "Izquierda",
+        "repGroup.targetRepsRightPlaceholder": "Derecha",
+        "session.enterRepsLeft": "Repeticiones izquierda", 
+        "session.enterRepsRight": "Repeticiones derecha",
     },
 
     pt: {
@@ -412,6 +427,12 @@ export const DICTS = {
         "session.notification.tapToReturn": "Toque para retornar ao treino",
         "session.currentSet.complete": "Completar série",
         "session.notification.setDone": "Série concluída",
+
+        "repGroup.targetRepsTupleLabel": "Repetições alvo (esquerda / direita)",
+        "repGroup.targetRepsLeftPlaceholder": "Esquerda",
+        "repGroup.targetRepsRightPlaceholder": "Direita",
+        "session.enterRepsLeft": "Repetições esquerda",
+        "session.enterRepsRight": "Repetições direita",
     },
 
     ja: {
@@ -549,6 +570,12 @@ export const DICTS = {
         "session.notification.tapToReturn": "タップしてトレーニングに戻る",
         "session.currentSet.complete": "セット完了",
         "session.notification.setDone": "セット完了",
+
+        "repGroup.targetRepsTupleLabel": "目標回数（左 / 右）",
+        "repGroup.targetRepsLeftPlaceholder": "左",
+        "repGroup.targetRepsRightPlaceholder": "右",
+        "session.enterRepsLeft": "左の回数",
+        "session.enterRepsRight": "右の回数",
     },
 
     zh: {
@@ -686,6 +713,12 @@ export const DICTS = {
         "session.notification.tapToReturn": "点击返回训练",
         "session.currentSet.complete": "完成组",
         "session.notification.setDone": "组已完成",
+
+        "repGroup.targetRepsTupleLabel": "目标次数（左 / 右）",
+        "repGroup.targetRepsLeftPlaceholder": "左",
+        "repGroup.targetRepsRightPlaceholder": "右",
+        "session.enterRepsLeft": "左侧次数",
+        "session.enterRepsRight": "右侧次数",
     },
 
     ar: {
@@ -823,6 +856,12 @@ export const DICTS = {
         "session.notification.tapToReturn": "انقر للعودة إلى التمرين",
         "session.currentSet.complete": "إكمال المجموعة",
         "session.notification.setDone": "تم إكمال المجموعة",
+
+        "repGroup.targetRepsTupleLabel": "التكرارات المستهدفة (يسار / يمين)",
+        "repGroup.targetRepsLeftPlaceholder": "يسار",
+        "repGroup.targetRepsRightPlaceholder": "يمين",
+        "session.enterRepsLeft": "تكرارات الجهة اليسرى",
+        "session.enterRepsRight": "تكرارات الجهة اليمنى",
     },
 
     hi: {
@@ -960,6 +999,12 @@ export const DICTS = {
         "session.notification.tapToReturn": "वर्कआउट पर वापस जाने के लिए टैप करें",
         "session.currentSet.complete": "सेट पूरा करें",
         "session.notification.setDone": "सेट पूरा हो गया",
+
+        "repGroup.targetRepsTupleLabel": "लक्ष्य रेप्स (बायाँ / दायाँ)",
+        "repGroup.targetRepsLeftPlaceholder": "बायाँ",
+        "repGroup.targetRepsRightPlaceholder": "दायाँ",
+        "session.enterRepsLeft": "बायाँ रेप्स",
+        "session.enterRepsRight": "दायाँ रेप्स",
     },
 
     de: {
@@ -1097,6 +1142,12 @@ export const DICTS = {
         "session.notification.tapToReturn": "Tippe, um zum Training zurückzukehren",
         "session.currentSet.complete": "Satz abgeschlossen",
         "session.notification.setDone": "Satz abgeschlossen",
+
+        "repGroup.targetRepsTupleLabel": "Ziel-Wiederholungen (links / rechts)",
+        "repGroup.targetRepsLeftPlaceholder": "Links",
+        "repGroup.targetRepsRightPlaceholder": "Rechts",
+        "session.enterRepsLeft": "Linke Wiederholungen",
+        "session.enterRepsRight": "Rechte Wiederholungen",
     },
 
     fr: {
@@ -1234,6 +1285,12 @@ export const DICTS = {
         "session.notification.tapToReturn": "Appuyez pour revenir à l'entraînement",
         "session.currentSet.complete": "Série terminée",
         "session.notification.setDone": "Série terminée",
+
+        "repGroup.targetRepsTupleLabel": "Répétitions cibles (gauche / droite)",
+        "repGroup.targetRepsLeftPlaceholder": "Gauche",
+        "repGroup.targetRepsRightPlaceholder": "Droite",
+        "session.enterRepsLeft": "Répétitions gauche",
+        "session.enterRepsRight": "Répétitions droite",
     },
 
     ru: {
@@ -1371,6 +1428,12 @@ export const DICTS = {
         "session.notification.tapToReturn": "Нажмите, чтобы вернуться к тренировке",
         "session.currentSet.complete": "Подход завершён",
         "session.notification.setDone": "Подход завершён",
+
+        "repGroup.targetRepsTupleLabel": "Целевые повторы (лев./прав.)",
+        "repGroup.targetRepsLeftPlaceholder": "Лев.",
+        "repGroup.targetRepsRightPlaceholder": "Прав.",
+        "session.enterRepsLeft": "Повторы слева",
+        "session.enterRepsRight": "Повторы справа",
     },
 
     it: {
@@ -1508,6 +1571,12 @@ export const DICTS = {
         "session.notification.tapToReturn": "Tocca per tornare all'allenamento",
         "session.currentSet.complete": "Serie completata",
         "session.notification.setDone": "Serie completata",
+
+        "repGroup.targetRepsTupleLabel": "Ripetizioni obiettivo (sinistra / destra)",
+        "repGroup.targetRepsLeftPlaceholder": "Sinistra",
+        "repGroup.targetRepsRightPlaceholder": "Destra",
+        "session.enterRepsLeft": "Ripetizioni sinistre",
+        "session.enterRepsRight": "Ripetizioni destre",
     },
 
     nl: {
@@ -1645,6 +1714,12 @@ export const DICTS = {
         "session.notification.tapToReturn": "Tik om terug te keren naar de training",
         "session.currentSet.complete": "Set voltooid",
         "session.notification.setDone": "Set voltooid",
+
+        "repGroup.targetRepsTupleLabel": "Doelreps (links / rechts)",
+        "repGroup.targetRepsLeftPlaceholder": "Links",
+        "repGroup.targetRepsRightPlaceholder": "Rechts",
+        "session.enterRepsLeft": "Linker herhalingen",
+        "session.enterRepsRight": "Rechter herhalingen",
     },
 
     pl: {
@@ -1782,6 +1857,12 @@ export const DICTS = {
         "session.notification.tapToReturn": "Stuknij, aby wrócić do treningu",
         "session.currentSet.complete": "Seria ukończona",
         "session.notification.setDone": "Seria ukończona",
+
+        "repGroup.targetRepsTupleLabel": "Docelowe powtórzenia (lewa / prawa)",
+        "repGroup.targetRepsLeftPlaceholder": "Lewa",
+        "repGroup.targetRepsRightPlaceholder": "Prawa",
+        "session.enterRepsLeft": "Lewa powtórzenia",
+        "session.enterRepsRight": "Prawa powtórzenia",
     },
 
     tr: {
@@ -1919,5 +2000,11 @@ export const DICTS = {
         "session.notification.tapToReturn": "Antrenmana dönmek için dokunun",
         "session.currentSet.complete": "Set tamamlandı",
         "session.notification.setDone": "Set tamamlandı",
+
+        "repGroup.targetRepsTupleLabel": "Hedef tekrarlar (sol / sağ)",
+        "repGroup.targetRepsLeftPlaceholder": "Sol",
+        "repGroup.targetRepsRightPlaceholder": "Sağ",
+        "session.enterRepsLeft": "Sol tekrarlar",
+        "session.enterRepsRight": "Sağ tekrarlar",
     }
 };

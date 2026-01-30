@@ -58,6 +58,17 @@ function upsertPerformedHistory(repGroup, reps, weight) {
     repGroup.history.sort((a, b) => Date.parse(a.dateTime) - Date.parse(b.dateTime));
 }
 
+function formatRepsForSummary(reps) {
+    if (reps == null) return t("common.dash");
+    if (typeof reps === "number") return String(reps);
+    if (typeof reps === "object") {
+        const l = reps.left ?? t("common.dash");
+        const r = reps.right ?? t("common.dash");
+        return `${l} / ${r}`;
+    }
+    return String(reps);
+}
+
 export function createSeriesEditorView({
     routineStore,
     exerciseStore,
@@ -76,12 +87,19 @@ export function createSeriesEditorView({
     const repGroupEmpty = document.getElementById("repGroupEmpty");
 
     const rgLaterality = document.getElementById("rgLaterality");
+
+    const rgRepsSingleWrap = document.getElementById("rgRepsSingleWrap");
+    const rgRepsTupleWrap = document.getElementById("rgRepsTupleWrap");
     const rgTargetReps = document.getElementById("rgTargetReps");
+    const rgRepsLeft = document.getElementById("rgRepsLeft");
+    const rgRepsRight = document.getElementById("rgRepsRight");
+
     const rgWeightSingleWrap = document.getElementById("rgWeightSingleWrap");
     const rgWeightTupleWrap = document.getElementById("rgWeightTupleWrap");
     const rgWeightSingle = document.getElementById("rgWeightSingle");
     const rgWeightLeft = document.getElementById("rgWeightLeft");
     const rgWeightRight = document.getElementById("rgWeightRight");
+
     const rgRestAfter = document.getElementById("rgRestAfter");
     const btnAddRepGroup = document.getElementById("btnAddRepGroup");
 
@@ -105,13 +123,53 @@ export function createSeriesEditorView({
         syncLateralityUI();
     });
 
+    function parseRepsFromFields(laterality) {
+        if (laterality === Laterality.UNILATERAL) {
+            const lRaw = String(rgRepsLeft?.value ?? "").trim();
+            const rRaw = String(rgRepsRight?.value ?? "").trim();
+
+            const left = lRaw === "" ? null : toPositiveInt(lRaw);
+            const right = rRaw === "" ? null : toPositiveInt(rRaw);
+
+            if (lRaw !== "" && !left) return null;
+            if (rRaw !== "" && !right) return null;
+            if (left == null && right == null) return null;
+
+            return { left, right };
+        }
+
+        const v = toPositiveInt(String(rgTargetReps?.value ?? "").trim());
+        return v || null;
+    }
+
+    function setRepsFieldsFromValue(reps, laterality) {
+        if (laterality === Laterality.UNILATERAL) {
+            const obj = (reps && typeof reps === "object")
+                ? { left: reps.left ?? null, right: reps.right ?? null }
+                : (typeof reps === "number" ? { left: reps, right: reps } : { left: null, right: null });
+
+            if (rgRepsLeft) rgRepsLeft.value = obj.left ?? "";
+            if (rgRepsRight) rgRepsRight.value = obj.right ?? "";
+            if (rgTargetReps) rgTargetReps.value = "";
+            return;
+        }
+
+        if (rgTargetReps) rgTargetReps.value = typeof reps === "number" ? String(reps) : "";
+        if (rgRepsLeft) rgRepsLeft.value = "";
+        if (rgRepsRight) rgRepsRight.value = "";
+    }
+
     function syncLateralityUI() {
         const lat = String(rgLaterality.value);
 
         if (lat === Laterality.UNILATERAL) {
+            if (rgRepsSingleWrap) rgRepsSingleWrap.style.display = "none";
+            if (rgRepsTupleWrap) rgRepsTupleWrap.style.display = "";
             rgWeightSingleWrap.style.display = "none";
             rgWeightTupleWrap.style.display = "";
         } else {
+            if (rgRepsSingleWrap) rgRepsSingleWrap.style.display = "";
+            if (rgRepsTupleWrap) rgRepsTupleWrap.style.display = "none";
             rgWeightSingleWrap.style.display = "";
             rgWeightTupleWrap.style.display = "none";
         }
@@ -123,11 +181,10 @@ export function createSeriesEditorView({
 
         editingRepGroupIndex = repGroupIndex;
 
-        // Laterality drives the UI; keep it consistent with the repGroup being edited.
         rgLaterality.value = String(g.laterality);
         syncLateralityUI();
 
-        rgTargetReps.value = String(g.targetReps ?? "");
+        setRepsFieldsFromValue(g.targetReps, String(g.laterality));
 
         if (typeof g.targetWeight === "number") {
             rgWeightSingle.value = String(g.targetWeight);
@@ -145,7 +202,6 @@ export function createSeriesEditorView({
 
         rgRestAfter.value = String(Number(g.restSecondsAfter ?? 0));
 
-        // Keep editing simple: don't allow switching laterality while editing.
         rgLaterality.disabled = true;
 
         btnAddRepGroup.textContent = escapeHtml(t("common.save"));
@@ -159,8 +215,10 @@ export function createSeriesEditorView({
         btnAddRepGroup.textContent = defaultAddRepGroupBtnLabel;
         if (btnCancelRepGroupEdit) btnCancelRepGroupEdit.style.display = "none";
 
-        // Clear form
-        rgTargetReps.value = "";
+        if (rgTargetReps) rgTargetReps.value = "";
+        if (rgRepsLeft) rgRepsLeft.value = "";
+        if (rgRepsRight) rgRepsRight.value = "";
+
         rgWeightSingle.value = "";
         rgWeightLeft.value = "";
         rgWeightRight.value = "";
@@ -292,14 +350,13 @@ export function createSeriesEditorView({
 
         const isEditing = Number.isInteger(editingRepGroupIndex);
 
-        // When editing, keep laterality fixed to the repGroup being edited.
         const laterality = isEditing
             ? String(s.repGroups?.[editingRepGroupIndex]?.laterality)
             : String(rgLaterality.value);
 
-        const targetReps = toPositiveInt(rgTargetReps.value);
+        const targetReps = parseRepsFromFields(laterality);
         if (!targetReps) {
-            flashInvalid(rgTargetReps);
+            flashInvalid(laterality === Laterality.UNILATERAL ? (rgRepsLeft || rgRepsRight) : rgTargetReps);
             return;
         }
 
@@ -361,7 +418,9 @@ export function createSeriesEditorView({
         s.repGroups.push(rg);
         routineStore.update(routine);
 
-        rgTargetReps.value = "";
+        if (rgTargetReps) rgTargetReps.value = "";
+        if (rgRepsLeft) rgRepsLeft.value = "";
+        if (rgRepsRight) rgRepsRight.value = "";
         rgWeightSingle.value = "";
         rgWeightLeft.value = "";
         rgWeightRight.value = "";
@@ -411,7 +470,6 @@ export function createSeriesEditorView({
 
             s.repGroups.splice(idx, 1);
 
-            // Keep edit index stable if we removed something before it
             if (Number.isInteger(editingRepGroupIndex)) {
                 if (idx === editingRepGroupIndex) {
                     exitRepGroupEditMode();
@@ -439,7 +497,7 @@ export function createSeriesEditorView({
         for (let i = 0; i < items.length; i++) {
             const g = items[i];
 
-            const reps = g.targetReps ?? t("common.dash");
+            const reps = formatRepsForSummary(g.targetReps);
             const restSeconds = Number(g.restSecondsAfter ?? 0);
 
             let weightText = t("common.dash");

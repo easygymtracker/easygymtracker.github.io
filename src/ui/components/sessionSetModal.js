@@ -3,6 +3,23 @@
 import { t } from "/src/internationalization/i18n.js";
 import { escapeHtml } from "/src/ui/dom.js";
 
+function normalizeTuple(v) {
+  if (v == null) return { left: null, right: null };
+  if (typeof v === "number") return { left: v, right: v };
+  return { left: v.left ?? null, right: v.right ?? null };
+}
+
+function parseIntOrNull(s) {
+  if (s === "" || s == null) return null;
+  const n = Number(s);
+  if (!Number.isInteger(n)) return NaN;
+  return n;
+}
+
+function sameValue(a, b) {
+  return JSON.stringify(a) === JSON.stringify(b);
+}
+
 export function openSessionSetModal({
   exerciseName,
   setIndex,
@@ -19,37 +36,70 @@ export function openSessionSetModal({
     const modal = document.createElement("div");
     modal.className = "modalCard";
 
+    const initialRepsTuple = normalizeTuple(initialReps);
+    const initialWeightTuple = normalizeTuple(initialWeight);
+
+    const repsValue = laterality === "unilateral"
+      ? ""
+      : (typeof initialReps === "number" ? initialReps : (initialRepsTuple.left ?? ""));
+
     modal.innerHTML = `
       <h3>
         ${escapeHtml(
       mode === "create"
         ? (t("session.addSet") || "Add set")
         : t("session.currentSet.done")
-    )
-      }
+    )}
       </h3>
 
       <p class="muted">
         ${escapeHtml(
-        t("session.currentSet.subtitle") ||
-        "Enter what you actually performed to track your progress."
-      )}
+      t("session.currentSet.subtitle") ||
+      "Enter what you actually performed to track your progress."
+    )}
       </p>
 
       <p class="muted" style="margin-top:4px;">
         ${escapeHtml(exerciseName)} · ${escapeHtml(t("session.set"))} ${setIndex}
       </p>
 
-      <label>
-        ${escapeHtml(t("session.reps"))}
-        <input
-          type="number"
-          min="1"
-          step="1"
-          value="${initialReps ?? ""}"
-          data-field="reps"
-        />
-      </label>
+      ${laterality === "unilateral"
+        ? `
+        <div class="row">
+          <label>
+            ${escapeHtml(t("session.repsLeft") || `${t("session.reps")} (L)`)}
+            <input
+              type="number"
+              min="1"
+              step="1"
+              value="${initialRepsTuple.left ?? ""}"
+              data-field="reps-left"
+            />
+          </label>
+          <label>
+            ${escapeHtml(t("session.repsRight") || `${t("session.reps")} (R)`)}
+            <input
+              type="number"
+              min="1"
+              step="1"
+              value="${initialRepsTuple.right ?? ""}"
+              data-field="reps-right"
+            />
+          </label>
+        </div>
+      `
+        : `
+        <label>
+          ${escapeHtml(t("session.reps"))}
+          <input
+            type="number"
+            min="1"
+            step="1"
+            value="${repsValue ?? ""}"
+            data-field="reps"
+          />
+        </label>
+      `}
 
       ${laterality === "unilateral"
         ? `
@@ -60,7 +110,7 @@ export function openSessionSetModal({
               type="number"
               min="0"
               step="any"
-              value="${initialWeight?.left ?? ""}"
+              value="${initialWeightTuple.left ?? ""}"
               data-field="weight-left"
             />
           </label>
@@ -70,7 +120,7 @@ export function openSessionSetModal({
               type="number"
               min="0"
               step="any"
-              value="${initialWeight?.right ?? ""}"
+              value="${initialWeightTuple.right ?? ""}"
               data-field="weight-right"
             />
           </label>
@@ -83,12 +133,11 @@ export function openSessionSetModal({
             type="number"
             min="0"
             step="any"
-            value="${initialWeight ?? ""}"
+            value="${typeof initialWeight === "number" ? initialWeight : (initialWeightTuple.left ?? "")}"
             data-field="weight"
           />
         </label>
-      `
-      }
+      `}
 
       <label>
         ${escapeHtml(t("session.rest"))} (${escapeHtml(t("session.seconds") || "seconds")})
@@ -113,17 +162,17 @@ export function openSessionSetModal({
           class="currentSetDoneIconBtn"
           data-action="confirm"
           aria-label="${escapeHtml(
-        mode === "create"
-          ? (t("session.addSet.confirm") || "Add set")
-          : t("session.currentSet.done")
-      )}"
+          mode === "create"
+            ? (t("session.addSet.confirm") || "Add set")
+            : t("session.currentSet.done")
+        )}"
         >
           <span class="currentSetDoneIcon" aria-hidden="true">✓</span>
           ${escapeHtml(
-        mode === "create"
-          ? (t("session.addSet.confirm") || "Add set")
-          : t("session.currentSet.done")
-      )}
+          mode === "create"
+            ? (t("session.addSet.confirm") || "Add set")
+            : t("session.currentSet.done")
+        )}
         </button>
       </div>
     `;
@@ -141,10 +190,15 @@ export function openSessionSetModal({
     document.addEventListener("keydown", onKeyDown);
 
     const errorEl = modal.querySelector(".modalError");
-    const repsInput = modal.querySelector('[data-field="reps"]');
-    const restInput = modal.querySelector('[data-field="rest"]');
-    const weightInput = modal.querySelector('[data-field="weight"]');
     const confirmBtn = modal.querySelector('[data-action="confirm"]');
+
+    const repsInput = modal.querySelector('[data-field="reps"]');
+    const repsLeftInput = modal.querySelector('[data-field="reps-left"]');
+    const repsRightInput = modal.querySelector('[data-field="reps-right"]');
+
+    const restInput = modal.querySelector('[data-field="rest"]');
+
+    const weightInput = modal.querySelector('[data-field="weight"]');
     const weightLeftInput = modal.querySelector('[data-field="weight-left"]');
     const weightRightInput = modal.querySelector('[data-field="weight-right"]');
 
@@ -163,7 +217,7 @@ export function openSessionSetModal({
       input.classList.toggle("input--error", invalid);
     }
 
-    function validateReps(live = false) {
+    function validateRepsBilateral(live = false) {
       const v = Number(repsInput.value);
       const invalid = !Number.isInteger(v) || v <= 0;
       markInvalid(repsInput, invalid);
@@ -174,6 +228,35 @@ export function openSessionSetModal({
         );
       }
       return !invalid;
+    }
+
+    function validateRepsUnilateral(live = false) {
+      const lRaw = repsLeftInput.value;
+      const rRaw = repsRightInput.value;
+
+      const l = parseIntOrNull(lRaw);
+      const r = parseIntOrNull(rRaw);
+
+      const lInvalid = Number.isNaN(l) || (l !== null && l <= 0);
+      const rInvalid = Number.isNaN(r) || (r !== null && r <= 0);
+
+      const bothEmpty = (lRaw === "" && rRaw === "");
+      markInvalid(repsLeftInput, lInvalid || (bothEmpty && live));
+      markInvalid(repsRightInput, rInvalid || (bothEmpty && live));
+
+      if ((lInvalid || rInvalid || bothEmpty) && live) {
+        showError(
+          t("session.error.invalidReps") ||
+          "Reps must be a positive whole number."
+        );
+      }
+
+      return !lInvalid && !rInvalid && !bothEmpty;
+    }
+
+    function validateReps(live = false) {
+      if (laterality === "unilateral") return validateRepsUnilateral(live);
+      return validateRepsBilateral(live);
     }
 
     function validateWeightInput(input, live = false) {
@@ -239,7 +322,17 @@ export function openSessionSetModal({
       confirmBtn.disabled = !validateAll(false);
     }
 
-    repsInput.addEventListener("input", () => {
+    repsInput?.addEventListener("input", () => {
+      validateAll(true);
+      syncConfirmState();
+    });
+
+    repsLeftInput?.addEventListener("input", () => {
+      validateAll(true);
+      syncConfirmState();
+    });
+
+    repsRightInput?.addEventListener("input", () => {
       validateAll(true);
       syncConfirmState();
     });
@@ -275,7 +368,15 @@ export function openSessionSetModal({
     modal.querySelector('[data-action="confirm"]').onclick = () => {
       if (!validateAll(false)) return;
 
-      const reps = Number(repsInput.value);
+      let reps;
+      if (laterality === "unilateral") {
+        reps = {
+          left: repsLeftInput.value === "" ? null : Number(repsLeftInput.value),
+          right: repsRightInput.value === "" ? null : Number(repsRightInput.value),
+        };
+      } else {
+        reps = Number(repsInput.value);
+      }
 
       let weight;
       if (laterality === "unilateral") {
@@ -290,12 +391,27 @@ export function openSessionSetModal({
       const restSecondsAfter =
         restInput.value === "" ? 0 : Number(restInput.value);
 
+      const repsChanged =
+        laterality === "unilateral"
+          ? !sameValue(normalizeTuple(reps), normalizeTuple(initialReps))
+          : reps !== (typeof initialReps === "number" ? initialReps : (normalizeTuple(initialReps).left ?? null));
+
+      const weightChanged =
+        laterality === "unilateral"
+          ? !sameValue(normalizeTuple(weight), normalizeTuple(initialWeight))
+          : !sameValue(
+            weight,
+            typeof initialWeight === "number" ? initialWeight : (normalizeTuple(initialWeight).left ?? null)
+          );
+
       const changed =
-        reps !== initialReps ||
-        JSON.stringify(weight) !== JSON.stringify(initialWeight) ||
-        restSecondsAfter !== initialRestSeconds;
+        repsChanged ||
+        weightChanged ||
+        restSecondsAfter !== (initialRestSeconds ?? 0);
 
       close({ reps, weight, restSecondsAfter, changed });
     };
+
+    syncConfirmState();
   });
 }
