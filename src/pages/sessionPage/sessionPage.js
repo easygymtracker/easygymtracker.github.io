@@ -912,11 +912,28 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         btn.setAttribute("aria-label", label);
     }
 
+    function persistRepGroupTargets(rg, { reps, weight, restSecondsAfterOverride = null }) {
+        if (!rg) return;
+
+        if (typeof reps === "number" && Number.isFinite(reps)) {
+            rg.targetReps = reps;
+        }
+
+        if (weight !== undefined) {
+            rg.targetWeight = weight;
+        }
+
+        if (typeof restSecondsAfterOverride === "number" && Number.isFinite(restSecondsAfterOverride)) {
+            rg.restSecondsAfter = restSecondsAfterOverride;
+        }
+    }
+
     function commitCurrentSet({
         reps,
         weight,
         restSecondsAfterOverride = null,
         saveHistory = true,
+        updateRepGroupFields = false,
     }) {
         const routine = currentRoutineId
             ? routineStore.getById(currentRoutineId)
@@ -929,15 +946,15 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         const rg = s.repGroups?.[currentRepGroupIndex];
         if (!rg) return;
 
+        if (updateRepGroupFields) {
+            persistRepGroupTargets(rg, { reps, weight, restSecondsAfterOverride });
+        }
+
         if (saveHistory) {
             rg.upsertHistory(new Date().toISOString(), {
                 reps,
                 weight,
             });
-        }
-
-        if (typeof restSecondsAfterOverride === "number") {
-            rg.restSecondsAfter = restSecondsAfterOverride;
         }
 
         routineStore.update(routine);
@@ -993,6 +1010,7 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
             reps,
             weight,
             saveHistory: true,
+            updateRepGroupFields: false,
         });
     }
 
@@ -1103,6 +1121,7 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
             weight: performed.weight,
             restSecondsAfterOverride: performed.restSecondsAfter ?? null,
             saveHistory: performed.changed,
+            updateRepGroupFields: performed.changed === true,
         });
     });
 
