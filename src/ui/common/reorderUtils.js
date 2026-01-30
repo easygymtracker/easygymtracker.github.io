@@ -53,7 +53,7 @@ function createDragGhostFromRow(rowEl) {
   const ghost = rowEl.cloneNode(true);
 
   ghost.style.position = "fixed";
-  ghost.style.left = "0px";
+  ghost.style.left = `${rect.left}px`;
   ghost.style.top = "0px";
   ghost.style.width = `${rect.width}px`;
   ghost.style.height = `${rect.height}px`;
@@ -61,7 +61,7 @@ function createDragGhostFromRow(rowEl) {
   ghost.style.pointerEvents = "none";
   ghost.style.zIndex = "9999";
   ghost.style.boxSizing = "border-box";
-  ghost.style.transform = `translate(${rect.left}px, ${rect.top}px)`;
+  ghost.style.transform = `translateY(${rect.top}px)`;
   ghost.style.opacity = "0.95";
   ghost.style.filter = "drop-shadow(0 10px 18px rgba(0,0,0,0.25))";
   ghost.style.transition = "transform 0.02s linear";
@@ -97,9 +97,9 @@ function clearTakenStyle(rowEl) {
   }
 }
 
-function moveGhost(ghostEl, x, y, offsetX, offsetY) {
+function moveGhost(ghostEl, y, offsetY) {
   if (!ghostEl) return;
-  ghostEl.style.transform = `translate(${x - offsetX}px, ${y - offsetY}px)`;
+  ghostEl.style.transform = `translateY(${y - offsetY}px)`;
 }
 
 /**
@@ -157,7 +157,11 @@ export function attachDragReorder(
     offsetY = e.clientY - rect.top;
 
     ensureSingleGhost(row);
-    moveGhost(ghostEl, e.clientX, e.clientY, offsetX, offsetY);
+
+    const left = row.getBoundingClientRect().left;
+    ghostEl.style.left = `${left}px`;
+
+    moveGhost(ghostEl, e.clientY, offsetY);
 
     try {
       const img = new Image();
@@ -179,7 +183,13 @@ export function attachDragReorder(
     const row = closestFromEventTarget(e.target, rowSelector);
     if (!row) return;
     e.preventDefault();
-    moveGhost(ghostEl, e.clientX, e.clientY, offsetX, offsetY);
+
+    if (sourceRowEl && ghostEl) {
+      const left = sourceRowEl.getBoundingClientRect().left;
+      ghostEl.style.left = `${left}px`;
+    }
+
+    moveGhost(ghostEl, e.clientY, offsetY);
   }
 
   function onDrop(e) {
@@ -254,6 +264,9 @@ export function attachDragReorder(
     applyTakenStyle(row);
 
     ensureSingleGhost(row);
+
+    const left = row.getBoundingClientRect().left;
+    ghostEl.style.left = `${left}px`;
   }
 
   function commitIfNeeded() {
@@ -292,7 +305,14 @@ export function attachDragReorder(
     clearPressTimer();
     pressTimer = setTimeout(() => {
       armReorder(row);
-      moveGhost(ghostEl, startX, startY, offsetX, offsetY);
+
+      if (sourceRowEl && ghostEl) {
+        const left = sourceRowEl.getBoundingClientRect().left;
+        ghostEl.style.left = `${left}px`;
+      }
+
+      moveGhost(ghostEl, startY, offsetY);
+
       try {
         row.setPointerCapture(pointerId);
       } catch { }
@@ -314,7 +334,12 @@ export function attachDragReorder(
 
     e.preventDefault();
 
-    moveGhost(ghostEl, e.clientX, e.clientY, offsetX, offsetY);
+    if (sourceRowEl && ghostEl) {
+      const left = sourceRowEl.getBoundingClientRect().left;
+      ghostEl.style.left = `${left}px`;
+    }
+
+    moveGhost(ghostEl, e.clientY, offsetY);
 
     const row = rowFromPoint(rowSelector, e.clientX, e.clientY);
     if (!row) return;
@@ -367,7 +392,13 @@ export function attachDragReorder(
     clearPressTimer();
     pressTimer = setTimeout(() => {
       armReorder(row);
-      moveGhost(ghostEl, startX, startY, offsetX, offsetY);
+
+      if (sourceRowEl && ghostEl) {
+        const left = sourceRowEl.getBoundingClientRect().left;
+        ghostEl.style.left = `${left}px`;
+      }
+
+      moveGhost(ghostEl, startY, offsetY);
     }, longPressMs);
   }
 
@@ -386,7 +417,12 @@ export function attachDragReorder(
 
     e.preventDefault();
 
-    moveGhost(ghostEl, t0.clientX, t0.clientY, offsetX, offsetY);
+    if (sourceRowEl && ghostEl) {
+      const left = sourceRowEl.getBoundingClientRect().left;
+      ghostEl.style.left = `${left}px`;
+    }
+
+    moveGhost(ghostEl, t0.clientY, offsetY);
 
     const row = rowFromPoint(rowSelector, t0.clientX, t0.clientY);
     if (!row) return;
