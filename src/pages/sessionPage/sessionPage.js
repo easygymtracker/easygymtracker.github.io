@@ -56,6 +56,7 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
     let setTickHandle = null;
     // --- notification throttling ---
     let lastNotifyTs = 0;
+    let lastNotifiedRestSecond = null;
 
     async function ensureNotificationPermission() {
         if (!("Notification" in window)) return false;
@@ -81,8 +82,15 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         if (document.visibilityState === "visible") return;
 
         const now = Date.now();
-        if (now - lastNotifyTs <= 500) return;
-        lastNotifyTs = now;
+
+        if (restRunning) {
+            const sec = Math.floor(restRemainingMs / 1000);
+            if (sec === lastNotifiedRestSecond) return;
+            lastNotifiedRestSecond = sec;
+        } else {
+            if (now - lastNotifyTs <= 500) return;
+            lastNotifyTs = now;
+        }
 
         const routine = currentRoutineId
             ? routineStore.getById(currentRoutineId)
