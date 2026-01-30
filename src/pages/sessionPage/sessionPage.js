@@ -58,6 +58,16 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
     let lastNotifyTs = 0;
     let lastNotifiedRestSecond = null;
 
+    // --- vibration on rest end ---
+    let hasVibratedForRestEnd = false;
+    function vibrateRestEnd() {
+        if (!("vibrate" in navigator)) return;
+        try {
+            navigator.vibrate([150, 80, 150]);
+        } catch {
+        }
+    }
+
     async function ensureNotificationPermission() {
         if (!("Notification" in window)) return false;
         if (Notification.permission === "granted") return true;
@@ -83,11 +93,19 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
 
         const now = Date.now();
 
+        let restRemainingLiveMs = restRemainingMs;
+
+        if (restRunning && !restPaused && restStartEpochMs != null) {
+            const elapsed = now - restStartEpochMs;
+            restRemainingLiveMs = Math.max(0, restRemainingMs - elapsed);
+        }
+
         if (restRunning) {
-            const sec = Math.floor(restRemainingMs / 1000);
+            const sec = Math.ceil(restRemainingLiveMs / 1000);
             if (sec === lastNotifiedRestSecond) return;
             lastNotifiedRestSecond = sec;
         } else {
+            lastNotifiedRestSecond = null;
             if (now - lastNotifyTs <= 500) return;
             lastNotifyTs = now;
         }
@@ -118,7 +136,7 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         }
 
         const timerTxt = restRunning
-            ? `⏳ ${formatMs(restRemainingMs)}`
+            ? `⏳ ${formatMs(restRemainingLiveMs)}`
             : `⏱ ${formatMs(setElapsedMs)}`;
 
         const restTxt = restRunning ? "DESCANSO" : "";
@@ -133,12 +151,18 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
             .filter(Boolean)
             .join(" - ");
 
+        const actionTitle =
+            t("session.notification.setDone") ||
+            t("session.currentSet.complete") ||
+            "Set done";
+
         navigator.serviceWorker.controller.postMessage({
             type: "SESSION_UPDATE",
             payload: {
                 title: t("session.title") || "Workout session",
                 body,
                 restRunning,
+                actionTitle,
             }
         });
     }
@@ -274,6 +298,7 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         restStartEpochMs = null;
         restDurationMs = 0;
         restRemainingMs = 0;
+        hasVibratedForRestEnd = false;
         stopRestTick();
         updateCurrentSetTimerUI();
     }
@@ -358,12 +383,18 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
                 restRemainingMs = 0;
                 stopRestTick();
 
+                if (!hasVibratedForRestEnd) {
+                    hasVibratedForRestEnd = true;
+                    vibrateRestEnd();
+                }
+
                 if (running) startSetTimer({ reset: true });
 
                 updateCurrentSetTimerUI();
                 renderCurrent();
                 syncCurrentSetControls();
             }
+
             notifySessionState();
             return;
         }
@@ -390,6 +421,8 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         restDurationMs = Math.round(s * 1000);
         restRemainingMs = restDurationMs;
         restStartEpochMs = Date.now();
+        hasVibratedForRestEnd = false;
+        lastNotifiedRestSecond = null;
 
         stopRestTick();
         restTickHandle = window.setInterval(() => {
@@ -427,6 +460,7 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
 
         restPaused = false;
         restStartEpochMs = Date.now();
+        lastNotifiedRestSecond = null;
 
         stopRestTick();
         restTickHandle = window.setInterval(() => {

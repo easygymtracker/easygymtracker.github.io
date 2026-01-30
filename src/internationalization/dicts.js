@@ -135,7 +135,9 @@ export const DICTS = {
         "session.error.invalidRest": "Rest must be zero or a positive whole number.",
         "session.rest.skip": "Skip rest",
         "session.notification.title": "Workout in progress",
-        "session.notification.tapToReturn": "Tap to return to workout"
+        "session.notification.tapToReturn": "Tap to return to workout",
+        "session.currentSet.complete": "Complete set",
+        "session.notification.setDone": "Set done",
     },
 
     es: {
@@ -270,7 +272,9 @@ export const DICTS = {
         "session.error.invalidRest": "El descanso debe ser un número entero positivo o cero.",
         "session.rest.skip": "Saltar descanso",
         "session.notification.title": "Entrenamiento en curso",
-        "session.notification.tapToReturn": "Toca para volver al entrenamiento"
+        "session.notification.tapToReturn": "Toca para volver al entrenamiento",
+        "session.currentSet.complete": "Completar serie",
+        "session.notification.setDone": "Serie completada",
     },
 
     pt: {
@@ -405,7 +409,9 @@ export const DICTS = {
         "session.error.invalidRest": "O descanso deve ser um número inteiro positivo ou zero.",
         "session.rest.skip": "Pular descanso",
         "session.notification.title": "Treino em andamento",
-        "session.notification.tapToReturn": "Toque para retornar ao treino"
+        "session.notification.tapToReturn": "Toque para retornar ao treino",
+        "session.currentSet.complete": "Completar série",
+        "session.notification.setDone": "Série concluída",
     },
 
     ja: {
@@ -540,7 +546,9 @@ export const DICTS = {
         "session.error.invalidRest": "休憩は0以上の正の整数で入力してください。",
         "session.rest.skip": "休憩をスキップ",
         "session.notification.title": "トレーニング進行中",
-        "session.notification.tapToReturn": "タップしてトレーニングに戻る"
+        "session.notification.tapToReturn": "タップしてトレーニングに戻る",
+        "session.currentSet.complete": "セット完了",
+        "session.notification.setDone": "セット完了",
     },
 
     zh: {
@@ -675,7 +683,9 @@ export const DICTS = {
         "session.error.invalidRest": "休息时间必须是零或正整数。",
         "session.rest.skip": "跳过休息",
         "session.notification.title": "训练进行中",
-        "session.notification.tapToReturn": "点击返回训练"
+        "session.notification.tapToReturn": "点击返回训练",
+        "session.currentSet.complete": "完成组",
+        "session.notification.setDone": "组已完成",
     },
 
     ar: {
@@ -810,7 +820,9 @@ export const DICTS = {
         "session.error.invalidRest": "يجب أن تكون الراحة رقمًا صحيحًا موجبًا أو صفرًا.",
         "session.rest.skip": "تخطي الراحة",
         "session.notification.title": "التمرين جارٍ",
-        "session.notification.tapToReturn": "انقر للعودة إلى التمرين"
+        "session.notification.tapToReturn": "انقر للعودة إلى التمرين",
+        "session.currentSet.complete": "إكمال المجموعة",
+        "session.notification.setDone": "تم إكمال المجموعة",
     },
 
     hi: {
@@ -945,7 +957,9 @@ export const DICTS = {
         "session.error.invalidRest": "आराम शून्य या धनात्मक पूर्ण संख्या होनी चाहिए।",
         "session.rest.skip": "आराम छोड़ें",
         "session.notification.title": "वर्कआउट जारी है",
-        "session.notification.tapToReturn": "वर्कआउट पर वापस जाने के लिए टैप करें"
+        "session.notification.tapToReturn": "वर्कआउट पर वापस जाने के लिए टैप करें",
+        "session.currentSet.complete": "सेट पूरा करें",
+        "session.notification.setDone": "सेट पूरा हो गया",
     },
 
     de: {
@@ -1080,7 +1094,9 @@ export const DICTS = {
         "session.error.invalidRest": "Die Pause muss null oder eine positive ganze Zahl sein.",
         "session.rest.skip": "Pause überspringen",
         "session.notification.title": "Training läuft",
-        "session.notification.tapToReturn": "Tippe, um zum Training zurückzukehren"
+        "session.notification.tapToReturn": "Tippe, um zum Training zurückzukehren",
+        "session.currentSet.complete": "Satz abgeschlossen",
+        "session.notification.setDone": "Satz abgeschlossen",
     },
 
     fr: {
@@ -1215,7 +1231,9 @@ export const DICTS = {
         "session.error.invalidRest": "Le repos doit être un nombre entier positif ou zéro.",
         "session.rest.skip": "Passer le repos",
         "session.notification.title": "Entraînement en cours",
-        "session.notification.tapToReturn": "Appuyez pour revenir à l'entraînement"
+        "session.notification.tapToReturn": "Appuyez pour revenir à l'entraînement",
+        "session.currentSet.complete": "Série terminée",
+        "session.notification.setDone": "Série terminée",
     },
 
     ru: {
@@ -1350,7 +1368,9 @@ export const DICTS = {
         "session.error.invalidRest": "Отдых должен быть нулём или положительным целым числом.",
         "session.rest.skip": "Пропустить отдых",
         "session.notification.title": "Тренировка продолжается",
-        "session.notification.tapToReturn": "Нажмите, чтобы вернуться к тренировке"
+        "session.notification.tapToReturn": "Нажмите, чтобы вернуться к тренировке",
+        "session.currentSet.complete": "Подход завершён",
+        "session.notification.setDone": "Подход завершён",
     },
 
     it: {
@@ -1485,7 +1505,9 @@ export const DICTS = {
         "session.error.invalidRest": "Il recupero deve essere zero o un numero intero positivo.",
         "session.rest.skip": "Salta recupero",
         "session.notification.title": "Allenamento in corso",
-        "session.notification.tapToReturn": "Tocca per tornare all'allenamento"
+        "session.notification.tapToReturn": "Tocca per tornare all'allenamento",
+        "session.currentSet.complete": "Serie completata",
+        "session.notification.setDone": "Serie completata",
     },
 
     nl: {
@@ -1620,7 +1642,9 @@ export const DICTS = {
         "session.error.invalidRest": "Rust moet nul of een positief geheel getal zijn.",
         "session.rest.skip": "Rust overslaan",
         "session.notification.title": "Training gaande",
-        "session.notification.tapToReturn": "Tik om terug te keren naar de training"
+        "session.notification.tapToReturn": "Tik om terug te keren naar de training",
+        "session.currentSet.complete": "Set voltooid",
+        "session.notification.setDone": "Set voltooid",
     },
 
     pl: {
@@ -1755,7 +1779,9 @@ export const DICTS = {
         "session.error.invalidRest": "Przerwa musi być zerem lub dodatnią liczbą całkowitą.",
         "session.rest.skip": "Pomiń przerwę",
         "session.notification.title": "Trening w toku",
-        "session.notification.tapToReturn": "Stuknij, aby wrócić do treningu"
+        "session.notification.tapToReturn": "Stuknij, aby wrócić do treningu",
+        "session.currentSet.complete": "Seria ukończona",
+        "session.notification.setDone": "Seria ukończona",
     },
 
     tr: {
@@ -1890,6 +1916,8 @@ export const DICTS = {
         "session.error.invalidRest": "Dinlenme sıfır veya pozitif bir tam sayı olmalıdır.",
         "session.rest.skip": "Dinlenmeyi atla",
         "session.notification.title": "Antrenman devam ediyor",
-        "session.notification.tapToReturn": "Antrenmana dönmek için dokunun"
+        "session.notification.tapToReturn": "Antrenmana dönmek için dokunun",
+        "session.currentSet.complete": "Set tamamlandı",
+        "session.notification.setDone": "Set tamamlandı",
     }
 };
