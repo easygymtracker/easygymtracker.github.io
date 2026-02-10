@@ -24,7 +24,34 @@ function parseHash() {
     return { name: "routines", params: {} };
 }
 
+let leaveGuard = null;
+
+export function setLeaveGuard(fn) {
+    leaveGuard = typeof fn === "function" ? fn : null;
+}
+
+export function clearLeaveGuard() {
+    leaveGuard = null;
+}
+
+function canLeave({ fromHash, toHash, reason }) {
+    if (!leaveGuard) return true;
+    try {
+        return leaveGuard({ fromHash, toHash, reason }) !== false;
+    } catch {
+        // Fail open to avoid trapping the user due to guard errors
+        return true;
+    }
+}
+
 export function navigate(hash) {
+    const fromHash = location.hash || "#/routines";
+    const toHash = hash;
+
+    if (toHash === fromHash) return;
+
+    if (!canLeave({ fromHash, toHash, reason: "navigate" })) return;
+
     location.hash = hash;
 }
 
@@ -50,12 +77,23 @@ export function startRouter({ defaultHash = "#/routines", onRoute }) {
         onRoute(route);
     }
 
+    if (!location.hash) location.hash = defaultHash;
+    let lastHash = location.hash;
+
     window.addEventListener("hashchange", () => {
+        const fromHash = lastHash;
+        const toHash = location.hash;
+
+        if (toHash !== fromHash && !canLeave({ fromHash, toHash, reason: "hashchange" })) {
+            history.replaceState(null, "", fromHash);
+            return;
+        }
+
+        lastHash = toHash;
         onNavigate.emit();
     });
 
     onNavigate.subscribe(render);
 
-    if (!location.hash) location.hash = defaultHash;
     render();
 }

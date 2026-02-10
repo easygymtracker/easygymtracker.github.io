@@ -67,7 +67,7 @@ export function openSessionSetModal({
         ? `
         <div class="row">
           <label>
-            ${escapeHtml(t("session.repsLeft") || `${t("session.reps")} (L)`)}
+            ${escapeHtml(t("session.enterRepsLeft") || `${t("session.reps")} (L)`)}
             <input
               type="number"
               min="1"
@@ -77,7 +77,7 @@ export function openSessionSetModal({
             />
           </label>
           <label>
-            ${escapeHtml(t("session.repsRight") || `${t("session.reps")} (R)`)}
+            ${escapeHtml(t("session.enterRepsRight") || `${t("session.reps")} (R)`)}
             <input
               type="number"
               min="1"

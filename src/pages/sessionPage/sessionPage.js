@@ -7,6 +7,7 @@ import { formatMs } from "/src/utils/numberFormat.js";
 import { attachDragReorder, moveItem } from "/src/ui/common/reorderUtils.js";
 import { openSessionSetModal } from "/src/ui/components/sessionSetModal.js";
 import { RepGroup, Laterality } from "/src/models/repGroup.js";
+import { setLeaveGuard, clearLeaveGuard } from "/src/router.js";
 
 export function mountSessionPage({ routineStore, exerciseStore }) {
     const titleEl = document.getElementById("sessionTitle");
@@ -81,6 +82,44 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
             handleQuickCompleteFromNotification();
         }
     });
+
+    function isOnSessionRoute() {
+        return (location.hash || "").startsWith("#/session/");
+    }
+
+    function shouldBlockLeaving() {
+        return hasInitiated === true;
+    }
+
+    function confirmLeaveSession() {
+        const msg =
+            t("confirm.leaveSession") ||
+            t("confirm.leaveWorkout") ||
+            "Leave workout session?";
+        return confirm(msg);
+    }
+
+    setLeaveGuard(({ fromHash, toHash }) => {
+        const fromIsSession = (fromHash || "").startsWith("#/session/");
+        const toIsSession = (toHash || "").startsWith("#/session/");
+
+        if (!fromIsSession) return true;
+        if (toIsSession) return true;
+
+        if (!shouldBlockLeaving()) return true;
+
+        return confirmLeaveSession();
+    });
+
+    function onBeforeUnload(e) {
+        if (!isOnSessionRoute()) return;
+        if (!shouldBlockLeaving()) return;
+
+        e.preventDefault();
+        e.returnValue = "";
+    }
+    window.addEventListener("beforeunload", onBeforeUnload);
+
 
     function notifySessionState() {
         if (!hasInitiated) return;
@@ -341,7 +380,7 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         resetSetTimer();
 
         clearSessionNotification();
-
+        hasInitiated = false;
         renderCurrent();
     }
 

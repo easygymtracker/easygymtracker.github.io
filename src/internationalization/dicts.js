@@ -147,6 +147,8 @@ export const DICTS = {
         "repGroup.targetRepsRightPlaceholder": "Right",
         "session.enterRepsLeft": "Left reps",
         "session.enterRepsRight": "Right reps",
+
+        "confirm.leaveSession": "Leave workout session? Your current session will be interrupted.",
     },
 
     es: {
@@ -290,6 +292,8 @@ export const DICTS = {
         "repGroup.targetRepsRightPlaceholder": "Derecha",
         "session.enterRepsLeft": "Repeticiones izquierda", 
         "session.enterRepsRight": "Repeticiones derecha",
+
+        "confirm.leaveSession": "¿Salir de la sesión de entrenamiento? Tu sesión actual se interrumpirá.",
     },
 
     pt: {
@@ -433,6 +437,8 @@ export const DICTS = {
         "repGroup.targetRepsRightPlaceholder": "Direita",
         "session.enterRepsLeft": "Repetições esquerda",
         "session.enterRepsRight": "Repetições direita",
+
+        "confirm.leaveSession": "Sair da sessão de treino? Sua sessão atual será interrompida.",
     },
 
     ja: {
@@ -576,6 +582,8 @@ export const DICTS = {
         "repGroup.targetRepsRightPlaceholder": "右",
         "session.enterRepsLeft": "左の回数",
         "session.enterRepsRight": "右の回数",
+
+        "confirm.leaveSession": "トレーニングセッションを終了しますか？現在のセッションは中断されます。",
     },
 
     zh: {
@@ -719,6 +727,8 @@ export const DICTS = {
         "repGroup.targetRepsRightPlaceholder": "右",
         "session.enterRepsLeft": "左侧次数",
         "session.enterRepsRight": "右侧次数",
+
+        "confirm.leaveSession": "离开训练会话？你当前的会话将被中断。",
     },
 
     ar: {
@@ -862,6 +872,8 @@ export const DICTS = {
         "repGroup.targetRepsRightPlaceholder": "يمين",
         "session.enterRepsLeft": "تكرارات الجهة اليسرى",
         "session.enterRepsRight": "تكرارات الجهة اليمنى",
+
+        "confirm.leaveSession": "هل تريد مغادرة جلسة التمرين؟ سيتم إيقاف جلستك الحالية.",
     },
 
     hi: {
@@ -1005,6 +1017,8 @@ export const DICTS = {
         "repGroup.targetRepsRightPlaceholder": "दायाँ",
         "session.enterRepsLeft": "बायाँ रेप्स",
         "session.enterRepsRight": "दायाँ रेप्स",
+
+        "confirm.leaveSession": "वर्कआउट सत्र छोड़ें? आपका वर्तमान सत्र बाधित हो जाएगा।",
     },
 
     de: {
@@ -1148,6 +1162,8 @@ export const DICTS = {
         "repGroup.targetRepsRightPlaceholder": "Rechts",
         "session.enterRepsLeft": "Linke Wiederholungen",
         "session.enterRepsRight": "Rechte Wiederholungen",
+
+        "confirm.leaveSession": "Trainingseinheit verlassen? Deine aktuelle Sitzung wird unterbrochen.",
     },
 
     fr: {
@@ -1291,6 +1307,8 @@ export const DICTS = {
         "repGroup.targetRepsRightPlaceholder": "Droite",
         "session.enterRepsLeft": "Répétitions gauche",
         "session.enterRepsRight": "Répétitions droite",
+
+        "confirm.leaveSession": "Quitter la séance d'entraînement ? Votre session actuelle sera interrompue.",
     },
 
     ru: {
@@ -1434,6 +1452,8 @@ export const DICTS = {
         "repGroup.targetRepsRightPlaceholder": "Прав.",
         "session.enterRepsLeft": "Повторы слева",
         "session.enterRepsRight": "Повторы справа",
+
+        "confirm.leaveSession": "Покинуть тренировочную сессию? Ваша текущая сессия будет прервана.",
     },
 
     it: {
@@ -1577,6 +1597,8 @@ export const DICTS = {
         "repGroup.targetRepsRightPlaceholder": "Destra",
         "session.enterRepsLeft": "Ripetizioni sinistre",
         "session.enterRepsRight": "Ripetizioni destre",
+
+        "confirm.leaveSession": "Lasciare la sessione di allenamento? La tua sessione attuale sarà interrotta.",
     },
 
     nl: {
@@ -1720,6 +1742,8 @@ export const DICTS = {
         "repGroup.targetRepsRightPlaceholder": "Rechts",
         "session.enterRepsLeft": "Linker herhalingen",
         "session.enterRepsRight": "Rechter herhalingen",
+
+        "confirm.leaveSession": "Sessie verlaten? Je huidige sessie wordt onderbroken.",
     },
 
     pl: {
@@ -1863,6 +1887,8 @@ export const DICTS = {
         "repGroup.targetRepsRightPlaceholder": "Prawa",
         "session.enterRepsLeft": "Lewa powtórzenia",
         "session.enterRepsRight": "Prawa powtórzenia",
+
+        "confirm.leaveSession": "Opuszczać sesję treningową? Twoja obecna sesja zostanie przerwana.",
     },
 
     tr: {
@@ -2006,5 +2032,7 @@ export const DICTS = {
         "repGroup.targetRepsRightPlaceholder": "Sağ",
         "session.enterRepsLeft": "Sol tekrarlar",
         "session.enterRepsRight": "Sağ tekrarlar",
+
+        "confirm.leaveSession": "Antrenman oturumundan ayrılmak istiyor musunuz? Mevcut oturumunuz kesintiye uğrayacak.",
     }
 };
