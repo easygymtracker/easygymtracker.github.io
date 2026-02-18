@@ -8,6 +8,7 @@ import { attachDragReorder, moveItem } from "/src/ui/common/reorderUtils.js";
 import { openSessionSetModal } from "/src/ui/components/sessionSetModal.js";
 import { RepGroup, Laterality } from "/src/models/repGroup.js";
 import { setLeaveGuard, clearLeaveGuard } from "/src/router.js";
+import { mountRepGroupHistoryCharts } from "/src/ui/components/repGroupHistoryChart.js";
 
 export function mountSessionPage({ routineStore, exerciseStore }) {
     const titleEl = document.getElementById("sessionTitle");
@@ -56,6 +57,8 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
 
     let lastNotifyTs = 0;
     let lastNotifiedRestSecond = null;
+
+    let cleanupCharts = null;
 
     let hasVibratedForRestEnd = false;
     function vibrateRestEnd() {
@@ -466,6 +469,9 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
     }
 
     function endWorkoutSession() {
+        cleanupCharts?.();
+        cleanupCharts = null;
+
         running = false;
 
         stopTick();
@@ -909,6 +915,14 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
                         </button>
                     </div>
                 </div>
+
+                 <div class="currentExerciseSubdivider"></div>
+
+                <div
+                  class="currentSetHistoryChartsMount"
+                  data-mount="repgroup-history-charts"
+                  style="margin-top:10px;"
+                ></div>
             `;
         }
 
@@ -1075,6 +1089,13 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
                 ${flow || `<span class="muted">${escapeHtml(t("session.noSets") || "No sets")}</span>`}
             </div>
         `;
+
+        cleanupCharts?.();
+        cleanupCharts = null;
+        const chartsMountEl = currentSectionEl.querySelector('[data-mount="repgroup-history-charts"]');
+        if (chartsMountEl && rg) {
+            cleanupCharts = mountRepGroupHistoryCharts(chartsMountEl, rg, { t }) || null;
+        }
 
         syncDescInputOriginalValue();
         syncCurrentSetControls();
