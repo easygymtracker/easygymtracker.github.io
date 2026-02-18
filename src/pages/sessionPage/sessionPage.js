@@ -66,6 +66,68 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         }
     }
 
+    // Inline editing for current series description (notes)
+    function syncDescInputOriginalValue() {
+        const inp = currentSectionEl?.querySelector('input[data-action="edit-series-desc"]');
+        if (!inp) return;
+        inp.dataset.original = inp.value ?? "";
+    }
+
+    currentSectionEl?.addEventListener("focusin", (e) => {
+        const inp = e.target.closest('input[data-action="edit-series-desc"]');
+        if (!inp) return;
+
+        // On first focus, remember original for Escape
+        if (inp.dataset.original == null) inp.dataset.original = inp.value ?? "";
+
+        // Visual focus style (optional)
+        inp.style.borderColor = "var(--border)";
+        inp.style.color = "var(--text)";
+    });
+
+    currentSectionEl?.addEventListener("focusout", (e) => {
+        const inp = e.target.closest('input[data-action="edit-series-desc"]');
+        if (!inp) return;
+
+        // Restore muted style
+        inp.style.borderColor = "transparent";
+        inp.style.color = "var(--muted)";
+
+        // Commit on blur (immediate)
+        persistCurrentSeriesDescription(inp.value);
+        // Reset "original" baseline to the committed value
+        inp.dataset.original = inp.value ?? "";
+    });
+
+    currentSectionEl?.addEventListener("input", (e) => {
+        const inp = e.target.closest('input[data-action="edit-series-desc"]');
+        if (!inp) return;
+
+        // Debounced persistence while typing
+        persistCurrentSeriesDescriptionDebounced(inp.value);
+    });
+
+    currentSectionEl?.addEventListener("keydown", (e) => {
+        const inp = e.target.closest('input[data-action="edit-series-desc"]');
+        if (!inp) return;
+
+        if (e.key === "Enter") {
+            e.preventDefault();
+            persistCurrentSeriesDescription(inp.value);
+            inp.dataset.original = inp.value ?? "";
+            inp.blur();
+            return;
+        }
+
+        if (e.key === "Escape") {
+            e.preventDefault();
+            const original = inp.dataset.original ?? "";
+            inp.value = original;
+            persistCurrentSeriesDescription(original);
+            inp.blur();
+        }
+    });
+
     async function ensureNotificationPermission() {
         if (!("Notification" in window)) return false;
         if (Notification.permission === "granted") return true;
@@ -120,6 +182,40 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
     }
     window.addEventListener("beforeunload", onBeforeUnload);
 
+    function debounce(fn, wait = 400) {
+        let tId = null;
+        return (...args) => {
+            if (tId) clearTimeout(tId);
+            tId = setTimeout(() => fn(...args), wait);
+        };
+    }
+
+    function getCurrentRoutine() {
+        return currentRoutineId ? routineStore.getById(currentRoutineId) : null;
+    }
+
+    function getCurrentSeries(routine) {
+        return routine?.series?.[currentSeriesIndex] ?? null;
+    }
+
+    function persistCurrentSeriesDescription(nextDescRaw) {
+        const routine = getCurrentRoutine();
+        if (!routine) return;
+
+        const s = getCurrentSeries(routine);
+        if (!s) return;
+
+        const next = (nextDescRaw ?? "").trim();
+        const prev = (s.description ?? "").trim();
+
+        if (next === prev) return;
+
+        s.description = next;
+        routineStore.update(routine);
+    }
+
+    const persistCurrentSeriesDescriptionDebounced =
+        debounce(persistCurrentSeriesDescription, 500);
 
     function notifySessionState() {
         if (!hasInitiated) return;
@@ -709,8 +805,33 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         }
 
         const name = resolveExerciseName(s);
-        const seriesDesc = s?.description ? String(s.description) : "";
+        const seriesDesc = s?.description != null ? String(s.description) : "";
         const descSuffix = seriesDesc ? ` — <span class="muted">${escapeHtml(seriesDesc)}</span>` : "";
+        const descEditorHtml = `
+          <span class="muted" style="display:inline-flex; align-items:center; gap:8px;">
+            <span aria-hidden="true" style="opacity:.7;">—</span>
+            <input
+              type="text"
+              class="currentSeriesDescInput"
+              data-action="edit-series-desc"
+              value="${escapeHtml(seriesDesc)}"
+              placeholder="${escapeHtml(t("session.seriesDesc.placeholder") || "Add notes…")}"
+              aria-label="${escapeHtml(t("session.seriesDesc.aria") || "Exercise notes")}"
+              spellcheck="true"
+              style="
+                border:1px solid transparent;
+                background:transparent;
+                color:var(--muted);
+                padding:2px 6px;
+                border-radius:8px;
+                min-width: 160px;
+                max-width: 520px;
+                width: min(520px, 60vw);
+                outline:none;
+              "
+            />
+          </span>
+        `;
 
         const groups = Array.isArray(s?.repGroups) ? s.repGroups : [];
         const rg = groups[currentRepGroupIndex] || null;
@@ -934,8 +1055,9 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
             <div class="currentExerciseHeader">
                 <div class="currentExerciseTitleWrap">
                 <div class="currentExerciseLabel">${escapeHtml(t("session.currentExercise") || "Current exercise")}</div>
-                <div class="currentExerciseName">
-                    ${escapeHtml(name)}${descSuffix}
+                <div class="currentExerciseName" style="display:flex; flex-wrap:wrap; gap:8px; align-items:baseline;">
+                    <span>${escapeHtml(name)}</span>
+                    ${descEditorHtml}
                 </div>
                 </div>
 
@@ -954,6 +1076,7 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
             </div>
         `;
 
+        syncDescInputOriginalValue();
         syncCurrentSetControls();
     }
 
@@ -1293,7 +1416,6 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         const routine = currentRoutineId ? routineStore.getById(currentRoutineId) : null;
         if (!routine) return;
 
-        const series = Array.isArray(routine.series) ? routine.series : [];
         ensureSessionSeriesOrder(routine);
 
         const n = sessionSeriesOrder.length;
