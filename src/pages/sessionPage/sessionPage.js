@@ -1333,7 +1333,7 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
             reps: performed.reps,
             weight: performed.weight,
             restSecondsAfterOverride: performed.restSecondsAfter ?? null,
-            saveHistory: performed.changed,
+            saveHistory: true,
             updateRepGroupFields: performed.changed === true,
         });
     });
