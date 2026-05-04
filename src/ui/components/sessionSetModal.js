@@ -30,6 +30,8 @@ export function openSessionSetModal({
   mode = "edit",
 }) {
   return new Promise((resolve) => {
+    let currentLaterality = laterality ?? "bilateral";
+
     const overlay = document.createElement("div");
     overlay.className = "modalOverlay";
 
@@ -39,9 +41,19 @@ export function openSessionSetModal({
     const initialRepsTuple = normalizeTuple(initialReps);
     const initialWeightTuple = normalizeTuple(initialWeight);
 
-    const repsValue = laterality === "unilateral"
-      ? ""
-      : (typeof initialReps === "number" ? initialReps : (initialRepsTuple.left ?? ""));
+    const bilateralRepsValue =
+      currentLaterality === "unilateral"
+        ? (initialRepsTuple.left ?? "")
+        : (typeof initialReps === "number" ? initialReps : (initialRepsTuple.left ?? ""));
+
+    const bilateralWeightValue =
+      currentLaterality === "unilateral"
+        ? (initialWeightTuple.left ?? "")
+        : (typeof initialWeight === "number" ? initialWeight : (initialWeightTuple.left ?? ""));
+
+    const lateralityLabel = escapeHtml(t("repGroup.lateralityLabel") || "Laterality");
+    const bilateralLabel = escapeHtml(t("repGroup.laterality.bilateral") || "Bilateral");
+    const unilateralLabel = escapeHtml(t("repGroup.laterality.unilateral") || "Unilateral");
 
     modal.innerHTML = `
       <h3>
@@ -63,8 +75,32 @@ export function openSessionSetModal({
         ${escapeHtml(exerciseName)} · ${escapeHtml(t("session.set"))} ${setIndex}
       </p>
 
-      ${laterality === "unilateral"
-        ? `
+      <div style="margin: 12px 0 8px;">
+        <span class="muted" style="font-size:.85em; display:block; margin-bottom:6px;">${lateralityLabel}</span>
+        <div class="lateralityToggle" role="group" aria-label="${lateralityLabel}">
+          <button type="button" class="lateralityBtn${currentLaterality === "bilateral" ? " lateralityBtn--active" : ""}" data-laterality="bilateral">
+            ${bilateralLabel}
+          </button>
+          <button type="button" class="lateralityBtn${currentLaterality === "unilateral" ? " lateralityBtn--active" : ""}" data-laterality="unilateral">
+            ${unilateralLabel}
+          </button>
+        </div>
+      </div>
+
+      <div data-section="bilateral-reps" ${currentLaterality === "unilateral" ? 'style="display:none"' : ""}>
+        <label>
+          ${escapeHtml(t("session.reps"))}
+          <input
+            type="number"
+            min="1"
+            step="1"
+            value="${bilateralRepsValue}"
+            data-field="reps"
+          />
+        </label>
+      </div>
+
+      <div data-section="unilateral-reps" ${currentLaterality === "bilateral" ? 'style="display:none"' : ""}>
         <div class="row">
           <label>
             ${escapeHtml(t("session.enterRepsLeft") || `${t("session.reps")} (L)`)}
@@ -87,22 +123,22 @@ export function openSessionSetModal({
             />
           </label>
         </div>
-      `
-        : `
+      </div>
+
+      <div data-section="bilateral-weight" ${currentLaterality === "unilateral" ? 'style="display:none"' : ""}>
         <label>
-          ${escapeHtml(t("session.reps"))}
+          ${escapeHtml(t("session.weight"))}
           <input
             type="number"
-            min="1"
-            step="1"
-            value="${repsValue ?? ""}"
-            data-field="reps"
+            min="0"
+            step="any"
+            value="${bilateralWeightValue}"
+            data-field="weight"
           />
         </label>
-      `}
+      </div>
 
-      ${laterality === "unilateral"
-        ? `
+      <div data-section="unilateral-weight" ${currentLaterality === "bilateral" ? 'style="display:none"' : ""}>
         <div class="row">
           <label>
             ${escapeHtml(t("session.enterWeightLeft"))}
@@ -125,19 +161,7 @@ export function openSessionSetModal({
             />
           </label>
         </div>
-      `
-        : `
-        <label>
-          ${escapeHtml(t("session.weight"))}
-          <input
-            type="number"
-            min="0"
-            step="any"
-            value="${typeof initialWeight === "number" ? initialWeight : (initialWeightTuple.left ?? "")}"
-            data-field="weight"
-          />
-        </label>
-      `}
+      </div>
 
       <label>
         ${escapeHtml(t("session.rest"))} (${escapeHtml(t("session.seconds") || "seconds")})
@@ -202,6 +226,54 @@ export function openSessionSetModal({
     const weightLeftInput = modal.querySelector('[data-field="weight-left"]');
     const weightRightInput = modal.querySelector('[data-field="weight-right"]');
 
+    const bilateralRepsSec = modal.querySelector('[data-section="bilateral-reps"]');
+    const unilateralRepsSec = modal.querySelector('[data-section="unilateral-reps"]');
+    const bilateralWeightSec = modal.querySelector('[data-section="bilateral-weight"]');
+    const unilateralWeightSec = modal.querySelector('[data-section="unilateral-weight"]');
+
+    function switchLaterality(next) {
+      if (next === currentLaterality) return;
+
+      // Copy values across so the user doesn't lose what they typed
+      if (next === "unilateral") {
+        // bilateral → unilateral: spread bilateral value to both sides
+        const rv = repsInput.value;
+        if (rv !== "") {
+          repsLeftInput.value = rv;
+          repsRightInput.value = rv;
+        }
+        const wv = weightInput.value;
+        if (wv !== "") {
+          weightLeftInput.value = wv;
+          weightRightInput.value = wv;
+        }
+      } else {
+        // unilateral → bilateral: use left value
+        if (repsLeftInput.value !== "") repsInput.value = repsLeftInput.value;
+        if (weightLeftInput.value !== "") weightInput.value = weightLeftInput.value;
+      }
+
+      currentLaterality = next;
+
+      bilateralRepsSec.style.display = next === "bilateral" ? "" : "none";
+      unilateralRepsSec.style.display = next === "unilateral" ? "" : "none";
+      bilateralWeightSec.style.display = next === "bilateral" ? "" : "none";
+      unilateralWeightSec.style.display = next === "unilateral" ? "" : "none";
+
+      modal.querySelectorAll(".lateralityBtn").forEach((btn) => {
+        btn.classList.toggle("lateralityBtn--active", btn.dataset.laterality === next);
+      });
+
+      clearError();
+      validateAll(false);
+      syncConfirmState();
+    }
+
+    modal.addEventListener("click", (e) => {
+      const btn = e.target.closest(".lateralityBtn[data-laterality]");
+      if (btn) switchLaterality(btn.dataset.laterality);
+    });
+
     function showError(msg) {
       errorEl.textContent = msg;
       errorEl.style.display = "";
@@ -255,7 +327,7 @@ export function openSessionSetModal({
     }
 
     function validateReps(live = false) {
-      if (laterality === "unilateral") return validateRepsUnilateral(live);
+      if (currentLaterality === "unilateral") return validateRepsUnilateral(live);
       return validateRepsBilateral(live);
     }
 
@@ -303,7 +375,7 @@ export function openSessionSetModal({
 
       let ok = validateReps(live);
 
-      if (laterality === "unilateral") {
+      if (currentLaterality === "unilateral") {
         ok =
           validateWeightInput(weightLeftInput, live) &&
           validateWeightInput(weightRightInput, live) &&
@@ -322,40 +394,13 @@ export function openSessionSetModal({
       confirmBtn.disabled = !validateAll(false);
     }
 
-    repsInput?.addEventListener("input", () => {
-      validateAll(true);
-      syncConfirmState();
-    });
-
-    repsLeftInput?.addEventListener("input", () => {
-      validateAll(true);
-      syncConfirmState();
-    });
-
-    repsRightInput?.addEventListener("input", () => {
-      validateAll(true);
-      syncConfirmState();
-    });
-
-    weightInput?.addEventListener("input", () => {
-      validateAll(true);
-      syncConfirmState();
-    });
-
-    weightLeftInput?.addEventListener("input", () => {
-      validateAll(true);
-      syncConfirmState();
-    });
-
-    weightRightInput?.addEventListener("input", () => {
-      validateAll(true);
-      syncConfirmState();
-    });
-
-    restInput?.addEventListener("input", () => {
-      validateAll(true);
-      syncConfirmState();
-    });
+    repsInput?.addEventListener("input", () => { validateAll(true); syncConfirmState(); });
+    repsLeftInput?.addEventListener("input", () => { validateAll(true); syncConfirmState(); });
+    repsRightInput?.addEventListener("input", () => { validateAll(true); syncConfirmState(); });
+    weightInput?.addEventListener("input", () => { validateAll(true); syncConfirmState(); });
+    weightLeftInput?.addEventListener("input", () => { validateAll(true); syncConfirmState(); });
+    weightRightInput?.addEventListener("input", () => { validateAll(true); syncConfirmState(); });
+    restInput?.addEventListener("input", () => { validateAll(true); syncConfirmState(); });
 
     function close(result) {
       document.removeEventListener("keydown", onKeyDown);
@@ -369,7 +414,7 @@ export function openSessionSetModal({
       if (!validateAll(false)) return;
 
       let reps;
-      if (laterality === "unilateral") {
+      if (currentLaterality === "unilateral") {
         reps = {
           left: repsLeftInput.value === "" ? null : Number(repsLeftInput.value),
           right: repsRightInput.value === "" ? null : Number(repsRightInput.value),
@@ -379,7 +424,7 @@ export function openSessionSetModal({
       }
 
       let weight;
-      if (laterality === "unilateral") {
+      if (currentLaterality === "unilateral") {
         weight = {
           left: weightLeftInput.value === "" ? null : Number(weightLeftInput.value),
           right: weightRightInput.value === "" ? null : Number(weightRightInput.value),
@@ -391,25 +436,29 @@ export function openSessionSetModal({
       const restSecondsAfter =
         restInput.value === "" ? 0 : Number(restInput.value);
 
-      const repsChanged =
-        laterality === "unilateral"
-          ? !sameValue(normalizeTuple(reps), normalizeTuple(initialReps))
-          : reps !== (typeof initialReps === "number" ? initialReps : (normalizeTuple(initialReps).left ?? null));
+      const lateralityChanged = currentLaterality !== (laterality ?? "bilateral");
 
-      const weightChanged =
-        laterality === "unilateral"
+      const repsChanged = lateralityChanged || (
+        currentLaterality === "unilateral"
+          ? !sameValue(normalizeTuple(reps), normalizeTuple(initialReps))
+          : reps !== (typeof initialReps === "number" ? initialReps : (normalizeTuple(initialReps).left ?? null))
+      );
+
+      const weightChanged = lateralityChanged || (
+        currentLaterality === "unilateral"
           ? !sameValue(normalizeTuple(weight), normalizeTuple(initialWeight))
           : !sameValue(
             weight,
             typeof initialWeight === "number" ? initialWeight : (normalizeTuple(initialWeight).left ?? null)
-          );
+          )
+      );
 
       const changed =
         repsChanged ||
         weightChanged ||
         restSecondsAfter !== (initialRestSeconds ?? 0);
 
-      close({ reps, weight, restSecondsAfter, changed });
+      close({ reps, weight, restSecondsAfter, laterality: currentLaterality, changed });
     };
 
     syncConfirmState();

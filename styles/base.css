@@ -610,6 +610,37 @@ body .isReordering {
     border-color: var(--danger, #ef4444);
 }
 
+.lateralityToggle {
+    display: flex;
+    gap: 6px;
+}
+
+.lateralityBtn {
+    flex: 1;
+    padding: 7px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    font: inherit;
+    font-size: .88em;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.lateralityBtn:hover {
+    border-color: var(--accent);
+    color: var(--text);
+}
+
+.lateralityBtn--active {
+    background: rgba(96, 165, 250, 0.15);
+    border-color: var(--accent);
+    color: var(--text);
+    font-weight: 600;
+}
+
+
 .addSetBtn:hover {
     opacity: 1;
     border-color: var(--accent);

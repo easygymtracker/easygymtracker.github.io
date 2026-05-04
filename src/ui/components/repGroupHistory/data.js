@@ -35,6 +35,16 @@ function parseIsoMs(dateTime) {
     return Number.isFinite(ms) ? ms : null;
 }
 
+/** From a sorted array of {t, y} points, keep only the last point per calendar day. */
+function dedupeByDay(points) {
+    const byDay = new Map();
+    for (const p of points) {
+        const day = new Date(p.t).toDateString();
+        byDay.set(day, p); // later entries overwrite earlier ones
+    }
+    return Array.from(byDay.values());
+}
+
 export function getPoints(repGroup, field) {
     const history = Array.isArray(repGroup?.history) ? repGroup.history : [];
     const points = [];
@@ -46,7 +56,8 @@ export function getPoints(repGroup, field) {
     }
 
     points.sort((a, b) => a.t - b.t);
-    return points.length > MAX_POINTS ? points.slice(points.length - MAX_POINTS) : points;
+    const deduped = dedupeByDay(points);
+    return deduped.length > MAX_POINTS ? deduped.slice(deduped.length - MAX_POINTS) : deduped;
 }
 
 export function getPointsBySide(repGroup, field) {
@@ -69,9 +80,12 @@ export function getPointsBySide(repGroup, field) {
     left.sort((a, b) => a.t - b.t);
     right.sort((a, b) => a.t - b.t);
 
+    const dedupedLeft = dedupeByDay(left);
+    const dedupedRight = dedupeByDay(right);
+
     return {
-        left: left.length > MAX_POINTS ? left.slice(left.length - MAX_POINTS) : left,
-        right: right.length > MAX_POINTS ? right.slice(right.length - MAX_POINTS) : right,
+        left: dedupedLeft.length > MAX_POINTS ? dedupedLeft.slice(dedupedLeft.length - MAX_POINTS) : dedupedLeft,
+        right: dedupedRight.length > MAX_POINTS ? dedupedRight.slice(dedupedRight.length - MAX_POINTS) : dedupedRight,
     };
 }
 

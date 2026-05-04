@@ -91,13 +91,16 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
 
     // Inline editing for current series description (notes)
     function syncDescInputOriginalValue() {
-        const inp = currentSectionEl?.querySelector('input[data-action="edit-series-desc"]');
+        const inp = currentSectionEl?.querySelector('[data-action="edit-series-desc"]');
         if (!inp) return;
         inp.dataset.original = inp.value ?? "";
+        // Initial auto-resize for pre-filled content
+        inp.style.height = "auto";
+        inp.style.height = inp.scrollHeight + "px";
     }
 
     currentSectionEl?.addEventListener("focusin", (e) => {
-        const inp = e.target.closest('input[data-action="edit-series-desc"]');
+        const inp = e.target.closest('[data-action="edit-series-desc"]');
         if (!inp) return;
 
         // On first focus, remember original for Escape
@@ -109,7 +112,7 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
     });
 
     currentSectionEl?.addEventListener("focusout", (e) => {
-        const inp = e.target.closest('input[data-action="edit-series-desc"]');
+        const inp = e.target.closest('[data-action="edit-series-desc"]');
         if (!inp) return;
 
         // Restore muted style
@@ -123,29 +126,29 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
     });
 
     currentSectionEl?.addEventListener("input", (e) => {
-        const inp = e.target.closest('input[data-action="edit-series-desc"]');
+        const inp = e.target.closest('[data-action="edit-series-desc"]');
         if (!inp) return;
+
+        // Auto-resize textarea
+        inp.style.height = "auto";
+        inp.style.height = inp.scrollHeight + "px";
 
         // Debounced persistence while typing
         persistCurrentSeriesDescriptionDebounced(inp.value);
     });
 
     currentSectionEl?.addEventListener("keydown", (e) => {
-        const inp = e.target.closest('input[data-action="edit-series-desc"]');
+        const inp = e.target.closest('[data-action="edit-series-desc"]');
         if (!inp) return;
 
-        if (e.key === "Enter") {
-            e.preventDefault();
-            persistCurrentSeriesDescription(inp.value);
-            inp.dataset.original = inp.value ?? "";
-            inp.blur();
-            return;
-        }
+        // Enter inserts a newline naturally in textarea; no special handling needed
 
         if (e.key === "Escape") {
             e.preventDefault();
             const original = inp.dataset.original ?? "";
             inp.value = original;
+            inp.style.height = "auto";
+            inp.style.height = inp.scrollHeight + "px";
             persistCurrentSeriesDescription(original);
             inp.blur();
         }
@@ -740,14 +743,13 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         const descEditorHtml = `
           <span class="muted" style="display:inline-flex; align-items:center; gap:8px;">
             <span aria-hidden="true" style="opacity:.7;">—</span>
-            <input
-              type="text"
+            <textarea
               class="currentSeriesDescInput"
               data-action="edit-series-desc"
-              value="${escapeHtml(seriesDesc)}"
               placeholder="${escapeHtml(t("session.seriesDesc.placeholder") || "Add notes…")}"
               aria-label="${escapeHtml(t("session.seriesDesc.aria") || "Exercise notes")}"
               spellcheck="true"
+              rows="1"
               style="
                 border:1px solid transparent;
                 background:transparent;
@@ -758,8 +760,12 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
                 max-width: 520px;
                 width: min(520px, 60vw);
                 outline:none;
-              "
-            />
+                resize:none;
+                overflow:hidden;
+                line-height:1.4;
+                font:inherit;
+                display:block;
+              ">${escapeHtml(seriesDesc)}</textarea>
           </span>
         `;
 
@@ -1210,7 +1216,7 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
 
             const newRepGroup = new RepGroup({
                 exerciseId: s.exerciseId,
-                laterality: ref?.laterality ?? Laterality.BILATERAL,
+                laterality: performed.laterality ?? ref?.laterality ?? Laterality.BILATERAL,
                 targetReps: performed.reps,
                 targetWeight: performed.weight,
                 restSecondsAfter: performed.restSecondsAfter ?? 0,
@@ -1252,6 +1258,11 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         });
 
         if (!performed) return;
+
+        // Update laterality on the repGroup if the user changed it
+        if (performed.laterality && performed.laterality !== rg.laterality) {
+            rg.laterality = performed.laterality;
+        }
 
         commitCurrentSet({
             reps: performed.reps,
