@@ -1,6 +1,25 @@
 GymApp Routine Export Format (v1)
 ================================
 
+Cloudflare Web Analytics Setup
+------------------------------
+
+Traffic tracking is integrated through a lightweight Cloudflare Web Analytics loader in `index.html`.
+
+To enable it:
+
+1. Get your token from Cloudflare Web Analytics.
+2. Open `index.html` and set:
+
+```html
+<meta name="cf-analytics-token" content="YOUR_CLOUDFLARE_TOKEN" />
+```
+
+Notes:
+
+- If the token is empty, analytics stays disabled.
+- The loader skips localhost/127.0.0.1/::1 automatically, so local testing does not pollute production stats.
+
 This document describes the fixed, portable export format used by
 Dimple Gym Routine Tracker to download and later import routines across devices.
 
