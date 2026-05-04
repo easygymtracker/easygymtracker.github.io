@@ -80,7 +80,7 @@
       var p = params.get("p");
       if (!p) return;
 
-      var routeHeads = { features: true, privacy: true, about: true, routines: true, routine: true, session: true };
+      var routeHeads = { features: true, privacy: true, about: true, routines: true, routine: true, session: true, profile: true };
       var parts = window.location.pathname.split("/").filter(Boolean);
       var base = "";
       if (parts.length && !routeHeads[parts[0]]) {
@@ -113,6 +113,9 @@
         <p data-i18n="app.subtitle">Minimal routine list. Create and manage training plans locally.</p>
       </div>
       <div class="toolbar" id="appToolbar">
+        <button class="btn" data-nav="/profile">
+          Profile
+        </button>
         <button class="btn primary" data-nav="/routine/new" data-i18n="routines.new">
           + New routine
         </button>
@@ -599,6 +602,63 @@
           <p class="note" id="sessionNotFound" style="display:none;" data-i18n="session.routineNotFound">
             Routine not found.
           </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="card route" data-route="profile" id="route-profile" style="display:none;">
+      <div class="pageHeader">
+        <h2>Profile tracking</h2>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="btn" id="btnExportProfile" type="button">Export</button>
+          <button class="btn" id="btnImportProfile" type="button">Import</button>
+          <input type="file" id="profileImportFile" accept=".json,.gymprofile.json" style="display:none;">
+          <button class="btn danger" id="btnClearProfileEntries" type="button" style="display:none;">
+            Clear history
+          </button>
+          <button class="btn" data-nav="/routines">Back</button>
+        </div>
+      </div>
+
+      <div class="routineDetail" style="display:grid; gap:16px;">
+        <p class="muted" style="margin:0;">
+          Track body weight, body fat percentage, and muscle mass. Charts below show the maximum value recorded for each day.
+        </p>
+
+        <form id="profileForm" class="form" style="padding-top:0;">
+          <div class="field">
+            <label for="profileRecordedAt">Recorded at</label>
+            <input id="profileRecordedAt" type="datetime-local" required />
+          </div>
+
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:12px;">
+            <div class="field">
+              <label for="profileWeightKg">Weight (kg)</label>
+              <input id="profileWeightKg" type="number" min="0" step="0.1" placeholder="e.g., 82.4" />
+            </div>
+
+            <div class="field">
+              <label for="profileBodyFatPct">Body fat (%)</label>
+              <input id="profileBodyFatPct" type="number" min="0" max="100" step="0.1" placeholder="e.g., 14.8" />
+            </div>
+
+            <div class="field">
+              <label for="profileMuscleKg">Muscle (kg)</label>
+              <input id="profileMuscleKg" type="number" min="0" step="0.1" placeholder="e.g., 36.2" />
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="btn primary" type="submit">Save measurement</button>
+          </div>
+        </form>
+
+        <div id="profileCharts" style="display:grid; gap:12px; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));"></div>
+
+        <div>
+          <h3 style="margin:0 0 10px 0; font-size:14px; color: var(--accent2);">Saved entries</h3>
+          <div id="profileEntryList" style="display:grid; gap:10px;"></div>
+          <p class="note" id="profileEmpty" style="display:none;">No measurements yet. Add your first entry above.</p>
         </div>
       </div>
     </section>

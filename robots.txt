@@ -8,6 +8,7 @@ Allow: /about
 Disallow: /routines
 Disallow: /routine/
 Disallow: /session/
+Disallow: /profile
 
 # Avoid duplicate locale-query URLs.
 Disallow: /*?lang=

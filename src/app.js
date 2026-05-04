@@ -3,6 +3,7 @@
 import { startRouter, navigate } from "./router.js";
 import { createRoutineStore } from "./store/routineStore.js";
 import { createExerciseStore } from "./store/exerciseStore.js";
+import { createProfileStore } from "./store/profileStore.js";
 import { registerServiceWorker } from "./app/serviceWorkerBootstrap.js";
 import { setupRoutineImport } from "./app/routineImportBootstrap.js";
 
@@ -10,6 +11,7 @@ import { mountSessionPage } from "./pages/sessionPage/sessionPage.js";
 import { mountRoutinesPage } from "./pages/routinesPage/routinesPage.js";
 import { mountRoutineNewPage } from "./pages/routinesPage/routineNewPage.js";
 import { mountRoutineDetailPage } from "./pages/routinesPage/routineDetailPage.js";
+import { mountProfilePage } from "./pages/profilePage/profilePage.js";
 
 import { setLocale, getLocale, getLocaleFromUrl, translateDocument, t } from "./internationalization/i18n.js";
 
@@ -20,6 +22,7 @@ registerServiceWorker();
 // -----------------------------------------------------------------------------
 const routineStore = createRoutineStore();
 const exerciseStore = createExerciseStore();
+const profileStore = createProfileStore();
 
 // -----------------------------------------------------------------------------
 // Top toolbar actions (global)
@@ -54,6 +57,7 @@ const pages = {
     "routine-new": mountRoutineNewPage({ routineStore }),
     routine: mountRoutineDetailPage({ routineStore, exerciseStore }),
     session: mountSessionPage({ routineStore, exerciseStore }),
+    profile: mountProfilePage({ profileStore }),
 };
 
 const PUBLIC_ROUTES = new Set(["home", "features", "privacy", "about"]);
@@ -179,6 +183,7 @@ const ROUTE_SEO = {
     "routine-new": { robots: "noindex,nofollow" },
     routine: { robots: "noindex,nofollow" },
     session: { robots: "noindex,nofollow" },
+    profile: { robots: "noindex,nofollow" },
 };
 
 // -----------------------------------------------------------------------------

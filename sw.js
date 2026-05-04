@@ -26,7 +26,6 @@ const NOTIFICATION_TAG = "workout-session";
 const NOTIFICATION_ICON = "/icons/icon-192.png";
 const NOTIFICATION_BADGE = "/icons/icon-192.png";
 
-self.addEventListener("install", () => {
 self.addEventListener("install", (event) => {
     console.log("[SW] installed");
     self.skipWaiting();
