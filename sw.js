@@ -1,5 +1,24 @@
 // sw.js
 
+// ── Cache strategy ───────────────────────────────────────────────────────────
+// Bump CACHE_VERSION whenever assets change (or use a build hash).
+const CACHE_VERSION = "v1";
+const CACHE_NAME = `gym-tracker-${CACHE_VERSION}`;
+
+// App-shell files to precache on install.
+const PRECACHE_URLS = [
+    "/",
+    "/styles/base.css",
+    "/styles/components/session.css",
+    "/src/app.js",
+    "/src/router.js",
+    "/src/internationalization/i18n.js",
+    "/src/internationalization/dicts.js",
+    "/manifest.json",
+    "/icons/icon-192.png",
+    "/icons/icon-512.png",
+];
+
 let sessionStartTs = null;
 let lastHeartbeatTs = null;
 
@@ -8,13 +27,72 @@ const NOTIFICATION_ICON = "/icons/icon-192.png";
 const NOTIFICATION_BADGE = "/icons/icon-192.png";
 
 self.addEventListener("install", () => {
+self.addEventListener("install", (event) => {
     console.log("[SW] installed");
     self.skipWaiting();
+    // Precache app shell so the first offline visit still works.
+    event.waitUntil(
+        caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE_URLS))
+    );
 });
 
 self.addEventListener("activate", (event) => {
     console.log("[SW] activated");
-    event.waitUntil(self.clients.claim());
+    // Delete stale caches from previous versions.
+    event.waitUntil(
+        caches.keys().then((keys) =>
+            Promise.all(
+                keys
+                    .filter((k) => k.startsWith("gym-tracker-") && k !== CACHE_NAME)
+                    .map((k) => caches.delete(k))
+            )
+        ).then(() => self.clients.claim())
+    );
+});
+
+// ── Fetch handler ────────────────────────────────────────────────────────────
+// Navigation requests: network-first so users always get fresh HTML; fall back
+// to cached "/" for offline SPA support.
+// Static assets (JS, CSS, images, fonts): cache-first for fast repeat loads.
+self.addEventListener("fetch", (event) => {
+    const { request } = event;
+
+    // Only handle same-origin GET requests.
+    if (request.method !== "GET") return;
+    if (!request.url.startsWith(self.location.origin)) return;
+
+    const url = new URL(request.url);
+    const isNavigation = request.mode === "navigate";
+    const isStaticAsset = /\.(js|css|png|jpg|jpeg|svg|webp|woff2?|ico|json)(\?|$)/.test(url.pathname);
+
+    if (isNavigation) {
+        // Network-first: serve fresh HTML; on failure serve cached home shell.
+        event.respondWith(
+            fetch(request)
+                .then((response) => {
+                    // Cache successful navigation responses.
+                    if (response.ok) {
+                        const clone = response.clone();
+                        caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+                    }
+                    return response;
+                })
+                .catch(() => caches.match("/").then((r) => r || Response.error()))
+        );
+    } else if (isStaticAsset) {
+        // Cache-first: serve from cache instantly; update cache in background.
+        event.respondWith(
+            caches.open(CACHE_NAME).then(async (cache) => {
+                const cached = await cache.match(request);
+                const networkFetch = fetch(request).then((response) => {
+                    if (response.ok) cache.put(request, response.clone());
+                    return response;
+                }).catch(() => undefined);
+                // Return cached immediately if available, otherwise wait for network.
+                return cached ?? networkFetch;
+            })
+        );
+    }
 });
 
 self.addEventListener("message", (event) => {

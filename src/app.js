@@ -57,31 +57,58 @@ const pages = {
 };
 
 const PUBLIC_ROUTES = new Set(["home", "features", "privacy", "about"]);
+const SITE_URL = "https://easygymtracker.github.io";
+
+function breadcrumbStructuredData(items) {
+    return {
+        "@type": "BreadcrumbList",
+        itemListElement: items.map((item, index) => ({
+            "@type": "ListItem",
+            position: index + 1,
+            name: item.name,
+            item: item.url,
+        })),
+    };
+}
 
 const ROUTE_SEO = {
     home: {
         robots: "index,follow",
         title: "Easy Gym Routine Tracker | Private workout planner and session tracker",
         description: "Plan routines, track workout sessions, and keep your gym data private on your own device with Easy Gym Routine Tracker.",
-        canonical: "https://easygymtracker.github.io/",
+        canonical: `${SITE_URL}/`,
         structuredData: {
             "@context": "https://schema.org",
-            "@type": "SoftwareApplication",
-            name: "Easy Gym Routine Tracker",
-            applicationCategory: "HealthApplication",
-            operatingSystem: "Web",
-            url: "https://easygymtracker.github.io/",
-            description: "A local-first web app for planning gym routines, logging sessions, and tracking progress privately on your own device.",
-            offers: {
-                "@type": "Offer",
-                price: "0",
-                priceCurrency: "USD"
-            },
-            featureList: [
-                "Local-first routine storage",
-                "Workout session tracking",
-                "Unilateral and bilateral set support",
-                "Progress history charts"
+            "@graph": [
+                {
+                    "@type": "SoftwareApplication",
+                    name: "Easy Gym Routine Tracker",
+                    applicationCategory: "HealthApplication",
+                    operatingSystem: "Web",
+                    url: `${SITE_URL}/`,
+                    description: "A local-first web app for planning gym routines, logging sessions, and tracking progress privately on your own device.",
+                    offers: {
+                        "@type": "Offer",
+                        price: "0",
+                        priceCurrency: "USD"
+                    },
+                    featureList: [
+                        "Local-first routine storage",
+                        "Workout session tracking",
+                        "Unilateral and bilateral set support",
+                        "Progress history charts"
+                    ]
+                },
+                {
+                    "@type": "Organization",
+                    name: "Easy Gym Routine Tracker",
+                    url: `${SITE_URL}/`
+                },
+                {
+                    "@type": "WebSite",
+                    name: "Easy Gym Routine Tracker",
+                    url: `${SITE_URL}/`
+                }
             ]
         },
     },
@@ -89,39 +116,63 @@ const ROUTE_SEO = {
         robots: "index,follow",
         title: "Features | Easy Gym Routine Tracker",
         description: "See the core features of Easy Gym Routine Tracker: local-first routine building, session mode, unilateral support, exports, and progress history.",
-        canonical: "https://easygymtracker.github.io/features",
+        canonical: `${SITE_URL}/features`,
         structuredData: {
             "@context": "https://schema.org",
-            "@type": "WebPage",
-            name: "Features | Easy Gym Routine Tracker",
-            url: "https://easygymtracker.github.io/features",
-            description: "Feature overview for Easy Gym Routine Tracker."
+            "@graph": [
+                {
+                    "@type": "WebPage",
+                    name: "Features | Easy Gym Routine Tracker",
+                    url: `${SITE_URL}/features`,
+                    description: "Feature overview for Easy Gym Routine Tracker."
+                },
+                breadcrumbStructuredData([
+                    { name: "Home", url: `${SITE_URL}/` },
+                    { name: "Features", url: `${SITE_URL}/features` },
+                ]),
+            ]
         },
     },
     privacy: {
         robots: "index,follow",
         title: "Privacy | Easy Gym Routine Tracker",
         description: "Understand the privacy model of Easy Gym Routine Tracker and how workout data is stored locally on your device.",
-        canonical: "https://easygymtracker.github.io/privacy",
+        canonical: `${SITE_URL}/privacy`,
         structuredData: {
             "@context": "https://schema.org",
-            "@type": "PrivacyPolicy",
-            name: "Privacy | Easy Gym Routine Tracker",
-            url: "https://easygymtracker.github.io/privacy",
-            description: "Privacy information for Easy Gym Routine Tracker."
+            "@graph": [
+                {
+                    "@type": "PrivacyPolicy",
+                    name: "Privacy | Easy Gym Routine Tracker",
+                    url: `${SITE_URL}/privacy`,
+                    description: "Privacy information for Easy Gym Routine Tracker."
+                },
+                breadcrumbStructuredData([
+                    { name: "Home", url: `${SITE_URL}/` },
+                    { name: "Privacy", url: `${SITE_URL}/privacy` },
+                ]),
+            ]
         },
     },
     about: {
         robots: "index,follow",
         title: "How It Works | Easy Gym Routine Tracker",
         description: "Learn how Easy Gym Routine Tracker works: build routines, run sessions, log sets, and track progress — all stored locally on your device.",
-        canonical: "https://easygymtracker.github.io/about",
+        canonical: `${SITE_URL}/about`,
         structuredData: {
             "@context": "https://schema.org",
-            "@type": "WebPage",
-            name: "How It Works | Easy Gym Routine Tracker",
-            url: "https://easygymtracker.github.io/about",
-            description: "Step-by-step overview of how Easy Gym Routine Tracker works."
+            "@graph": [
+                {
+                    "@type": "WebPage",
+                    name: "How It Works | Easy Gym Routine Tracker",
+                    url: `${SITE_URL}/about`,
+                    description: "Step-by-step overview of how Easy Gym Routine Tracker works."
+                },
+                breadcrumbStructuredData([
+                    { name: "Home", url: `${SITE_URL}/` },
+                    { name: "How it works", url: `${SITE_URL}/about` },
+                ]),
+            ]
         },
     },
     routines: { robots: "noindex,nofollow" },

@@ -152,15 +152,34 @@ export const onNavigate = (() => {
 export function startRouter({ defaultPath = "/routines", onRoute }) {
     normalizeLegacyHashUrl();
 
-    // global nav buttons/links
+    // global nav: intercept [data-nav] elements AND same-origin <a href> links
     document.addEventListener("click", (e) => {
+        // data-nav wins (supports buttons and explicit nav links)
         const nav = e.target.closest("[data-nav]");
-        if (!nav) return;
+        if (nav) {
+            e.preventDefault();
+            const target = nav.getAttribute("data-nav");
+            if (target) navigate(target);
+            return;
+        }
 
+        // plain <a href> — intercept same-origin links for SPA navigation
+        const anchor = e.target.closest("a[href]");
+        if (!anchor) return;
+        const href = anchor.getAttribute("href");
+        if (!href) return;
+        // skip external, mailto, tel, hash-only, and target="_blank" links
+        if (
+            href.startsWith("http://") ||
+            href.startsWith("https://") ||
+            href.startsWith("mailto:") ||
+            href.startsWith("tel:") ||
+            href.startsWith("#") ||
+            anchor.target === "_blank" ||
+            anchor.hasAttribute("download")
+        ) return;
         e.preventDefault();
-        const target = nav.getAttribute("data-nav");
-        if (!target) return;
-        navigate(target);
+        navigate(href);
     });
 
     function render() {

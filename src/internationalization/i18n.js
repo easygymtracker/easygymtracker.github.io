@@ -73,7 +73,16 @@ export function translateDocument(root = document) {
         const key = el.getAttribute("data-i18n");
         const attr = el.getAttribute("data-i18n-attr");
         if (!attr) return;
-        el.setAttribute(attr, t(key));
+
+        // Supports single attr (e.g. "placeholder") and multi-attr
+        // declarations (e.g. "title,aria-label").
+        attr
+            .split(",")
+            .map((name) => name.trim())
+            .filter(Boolean)
+            .forEach((name) => {
+                el.setAttribute(name, t(key));
+            });
     });
 
     root.querySelectorAll("[data-i18n-aria-label]").forEach(el => {

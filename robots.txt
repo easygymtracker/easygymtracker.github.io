@@ -1,5 +1,8 @@
 User-agent: *
 Allow: /
+Allow: /features
+Allow: /privacy
+Allow: /about
 
 # App/private screens should not be indexed.
 Disallow: /routines

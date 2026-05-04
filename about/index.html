@@ -5,102 +5,58 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="robots" content="index,follow" />
-  <meta name="description" content="Plan routines, track workout sessions, and keep your gym data private on your own device with Easy Gym Routine Tracker." />
-  <link rel="canonical" href="https://easygymtracker.github.io/" />
+  <meta name="description" content="Learn how Easy Gym Routine Tracker works: build routines, run sessions, log sets, and track progress — all stored locally on your device." />
+  <link rel="canonical" href="https://easygymtracker.github.io/about" />
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="Easy Gym Routine Tracker | Private workout planner and session tracker" />
-  <meta property="og:description" content="Plan routines, track workout sessions, and keep your gym data private on your own device with Easy Gym Routine Tracker." />
-  <meta property="og:url" content="https://easygymtracker.github.io/" />
+  <meta property="og:title" content="How It Works | Easy Gym Routine Tracker" />
+  <meta property="og:description" content="Learn how Easy Gym Routine Tracker works: build routines, run sessions, log sets, and track progress — all stored locally on your device." />
+  <meta property="og:url" content="https://easygymtracker.github.io/about" />
   <meta property="og:image" content="https://easygymtracker.github.io/icons/icon-512.png" />
   <meta property="og:site_name" content="Easy Gym Routine Tracker" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Easy Gym Routine Tracker | Private workout planner and session tracker" />
-  <meta name="twitter:description" content="Plan routines, track workout sessions, and keep your gym data private on your own device with Easy Gym Routine Tracker." />
+  <meta name="twitter:title" content="How It Works | Easy Gym Routine Tracker" />
+  <meta name="twitter:description" content="Learn how Easy Gym Routine Tracker works: build routines, run sessions, log sets, and track progress — all stored locally on your device." />
   <meta name="twitter:image" content="https://easygymtracker.github.io/icons/icon-512.png" />
   <script type="application/ld+json" data-structured="route">
     {
       "@context": "https://schema.org",
       "@graph": [
         {
-          "@type": "SoftwareApplication",
-          "name": "Easy Gym Routine Tracker",
-          "applicationCategory": "HealthApplication",
-          "operatingSystem": "Web",
-          "url": "https://easygymtracker.github.io/",
-          "description": "A local-first web app for planning gym routines, logging sessions, and tracking progress privately on your own device.",
-          "offers": {
-            "@type": "Offer",
-            "price": "0",
-            "priceCurrency": "USD"
-          },
-          "featureList": [
-            "Local-first routine storage",
-            "Workout session tracking",
-            "Unilateral and bilateral set support",
-            "Progress history charts"
+          "@type": "WebPage",
+          "name": "How It Works | Easy Gym Routine Tracker",
+          "url": "https://easygymtracker.github.io/about",
+          "description": "Step-by-step overview of how Easy Gym Routine Tracker works."
+        },
+        {
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://easygymtracker.github.io/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "How it works",
+              "item": "https://easygymtracker.github.io/about"
+            }
           ]
-        },
-        {
-          "@type": "Organization",
-          "name": "Easy Gym Routine Tracker",
-          "url": "https://easygymtracker.github.io/"
-        },
-        {
-          "@type": "WebSite",
-          "name": "Easy Gym Routine Tracker",
-          "url": "https://easygymtracker.github.io/"
         }
       ]
     }
   </script>
 
-  <script>
-    (function restoreRouteOnLoad() {
-      // 1. Normalise old hash-based routes (e.g. /#/routines, /#/routine/abc).
-      //    Runs synchronously so the URL is already clean before ES modules boot.
-      var rawHash = window.location.hash || "";
-      if (rawHash.startsWith("#/")) {
-        var hashParts = rawHash.slice(1).split("?");
-        var hashPath  = hashParts[0] || "/";
-        var hashQs    = hashParts[1] || "";
-        var merged = new URLSearchParams(window.location.search);
-        if (hashQs) {
-          new URLSearchParams(hashQs).forEach(function(v, k) { merged.set(k, v); });
-        }
-        var cleanUrl = hashPath + (merged.toString() ? "?" + merged.toString() : "");
-        window.history.replaceState(null, "", cleanUrl);
-        // After replaceState the hash is gone; fall through — the ?p= check
-        // below will be a no-op, which is fine.
-      }
-
-      // 2. Restore deep-link path from GitHub Pages 404 redirect (?p= param).
-      var params = new URLSearchParams(window.location.search);
-      var p = params.get("p");
-      if (!p) return;
-
-      var routeHeads = { features: true, privacy: true, about: true, routines: true, routine: true, session: true };
-      var parts = window.location.pathname.split("/").filter(Boolean);
-      var base = "";
-      if (parts.length && !routeHeads[parts[0]]) {
-        base = "/" + parts[0];
-      }
-
-      var q = params.get("q");
-      var path = p.startsWith("/") ? p : "/" + p;
-      var next = (base + path) + (q ? ("?" + q) : "") + (window.location.hash || "");
-      window.history.replaceState(null, "", next);
-    })();
-  </script>
-
-  <title data-i18n="app.title">Easy Gym Routine Tracker</title>
-  <link rel="manifest" href="./manifest.json" />
-  <link rel="stylesheet" href="./styles/base.css" />
-  <link rel="stylesheet" href="./styles/components/session.css" />
+  <title>How It Works | Easy Gym Routine Tracker</title>
+  <link rel="manifest" href="../manifest.json" />
+  <link rel="stylesheet" href="../styles/base.css" />
+  <link rel="stylesheet" href="../styles/components/session.css" />
     <!-- Preload critical JS modules to reduce the ES-module waterfall -->
-    <link rel="modulepreload" href="./src/app.js" />
-    <link rel="modulepreload" href="./src/router.js" />
-    <link rel="modulepreload" href="./src/internationalization/i18n.js" />
-    <link rel="modulepreload" href="./src/internationalization/dicts.js" />
+    <link rel="modulepreload" href="../src/app.js" />
+    <link rel="modulepreload" href="../src/router.js" />
+    <link rel="modulepreload" href="../src/internationalization/i18n.js" />
+    <link rel="modulepreload" href="../src/internationalization/dicts.js" />
 </head>
 
 <body>
@@ -127,7 +83,7 @@
     <main id="mainContent">
 
     <!-- Routes -->
-    <section class="route landingRoute" data-route="home" id="route-home">
+    <section class="route landingRoute" data-route="home" id="route-home" style="display:none;">
       <div class="landingHero card">
         <p class="landingEyebrow" data-i18n="home.eyebrow">Private workout planning</p>
         <h2 data-i18n="home.title">Track your gym routines without giving your data away.</h2>
@@ -251,7 +207,7 @@
       </div>
     </section>
 
-    <section class="route landingRoute" data-route="about" id="route-about" style="display:none;">
+    <section class="route landingRoute" data-route="about" id="route-about">
       <div class="landingHero card">
         <p class="landingEyebrow" data-i18n="about.eyebrow">How it works</p>
         <h2 data-i18n="about.title">A workout tracker built for the gym floor, not a dashboard.</h2>
@@ -285,7 +241,7 @@
       </div>
     </section>
 
-    <section class="card route" data-route="routines" id="route-routines">
+    <section class="card route" data-route="routines" id="route-routines" style="display:none;">
       <div class="listHeader">
         <h2 data-i18n="routines.title">Your routines</h2>
         <div class="count" id="routineCount">0</div>
@@ -605,7 +561,7 @@
 
   </div>
 
-  <script type="module" src="./src/app.js"></script>
+  <script type="module" src="../src/app.js"></script>
 </body>
 
 </html>
