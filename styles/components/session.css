@@ -421,3 +421,173 @@
     opacity: 0.45;
     cursor: not-allowed;
 }
+
+/* =========================
+   Session set modal overrides
+   ========================= */
+
+.modalCard .currentSetDoneIconBtn {
+    width: auto;
+    min-width: fit-content;
+    padding: 8px 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* =========================
+   Laterality toggle
+   ========================= */
+
+.lateralityToggle {
+    display: flex;
+    gap: 6px;
+}
+
+.lateralityBtn {
+    flex: 1;
+    padding: 7px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    font: inherit;
+    font-size: .88em;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.lateralityBtn:hover {
+    border-color: var(--accent);
+    color: var(--text);
+}
+
+.lateralityBtn--active {
+    background: rgba(96, 165, 250, 0.15);
+    border-color: var(--accent);
+    color: var(--text);
+    font-weight: 600;
+}
+
+/* =========================
+   Add-set button
+   ========================= */
+
+.addSetBtn:hover {
+    opacity: 1;
+    border-color: var(--accent);
+}
+
+/* =========================
+   Workout summary modal
+   ========================= */
+
+.workoutSummaryModal {
+    width: min(92vw, 420px);
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.summaryHeader {
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+.summaryIcon {
+    font-size: 2.4rem;
+    line-height: 1;
+    margin-bottom: 6px;
+}
+
+.summaryHeader h3 {
+    margin: 6px 0 4px;
+    font-size: 1.2rem;
+}
+
+.summaryMotivational {
+    font-size: .9rem;
+    margin: 0;
+}
+
+.summaryKpis {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.summaryKpi {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+}
+
+.summaryKpiValue {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.summaryKpiLabel {
+    font-size: .75rem;
+    text-align: center;
+}
+
+.summaryComparison {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(96, 165, 250, 0.08);
+    border: 1px solid rgba(96, 165, 250, 0.25);
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin-bottom: 16px;
+    font-size: .9rem;
+}
+
+.summaryComparisonIcon {
+    font-size: 1.6rem;
+    flex-shrink: 0;
+}
+
+.summaryBreakdownTitle {
+    font-size: .8rem;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    margin: 0 0 8px;
+}
+
+.summaryTable {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .85rem;
+}
+
+.summaryTable th {
+    text-align: left;
+    color: var(--muted);
+    font-weight: 500;
+    padding: 4px 6px;
+    border-bottom: 1px solid var(--border);
+}
+
+.summaryTable td {
+    padding: 5px 6px;
+    border-bottom: 1px solid rgba(255, 255, 255, .04);
+}
+
+.summaryTable tr:last-child td {
+    border-bottom: none;
+}
+
+.summaryCloseBtn {
+    width: 100%;
+    padding: 10px;
+    font-size: 1rem;
+}

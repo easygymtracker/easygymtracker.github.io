@@ -6,6 +6,7 @@ import { createExerciseStore } from "./store/exerciseStore.js";
 import { createProfileStore } from "./store/profileStore.js";
 import { registerServiceWorker } from "./app/serviceWorkerBootstrap.js";
 import { setupRoutineImport } from "./app/routineImportBootstrap.js";
+import { createStyleRouter } from "./app/styleRouter.js";
 
 import { mountSessionPage } from "./pages/sessionPage/sessionPage.js";
 import { mountRoutinesPage } from "./pages/routinesPage/routinesPage.js";
@@ -64,6 +65,16 @@ const pages = {
 
 const PUBLIC_ROUTES = new Set(["home", "features", "privacy", "about"]);
 const SITE_URL = "https://easygymtracker.github.io";
+const styleRouter = createStyleRouter({
+    routeToStyles: {
+        home: ["../styles/components/landing.css"],
+        session: ["../styles/components/session.css"],
+        routines: ["../styles/components/routines.css"],
+        "routine-new": ["../styles/components/routines.css"],
+        routine: ["../styles/components/routines.css"],
+    },
+    resolveFrom: import.meta.url,
+});
 
 function breadcrumbStructuredData(items) {
     return {
@@ -196,6 +207,8 @@ function showRoute(name) {
     document.querySelectorAll(".route").forEach((el) => {
         el.style.display = (el.dataset.route === name) ? "" : "none";
     });
+
+    styleRouter.apply(name);
 
     if (appToolbar) {
         appToolbar.style.display = (name === "routines") ? "flex" : "none";

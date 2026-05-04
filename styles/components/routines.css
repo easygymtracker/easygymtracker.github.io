@@ -1,0 +1,276 @@
+/* /styles/components/routines.css — routines, routine, routine-new routes */
+
+/* =========================
+   Routine list container
+   ========================= */
+
+.routineList {
+    padding: 10px 8px 10px;
+}
+
+/* =========================
+   Routine list row
+   Row = [ Play square ] [ Body (meta + actions) ]
+   ========================= */
+
+.routineRow {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 12px;
+    align-items: center;
+    padding: 14px 12px;
+    border-radius: 12px;
+    position: relative;
+}
+
+.routineRow:hover {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.routineRow[draggable="true"] {
+    -webkit-user-drag: element;
+}
+
+/* Reserve space for floating icon (top-right) when present */
+.withFloatingIcon {
+    padding-right: 54px;
+    padding-top: 14px;
+}
+
+/* Body: mobile stacked, desktop meta + actions */
+.routineRowBody {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    min-width: 0;
+}
+
+.routineMeta {
+    min-width: 0;
+}
+
+.routineMeta h3 {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.25;
+}
+
+.routineMeta p {
+    margin: 6px 0 0;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.35;
+}
+
+.rowActions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+/* =========================
+   Start session button
+   ========================= */
+
+.startSessionBtn {
+    width: 54px;
+    height: 54px;
+    border-radius: 14px;
+    border: 1px solid rgba(34, 197, 94, 0.35);
+    background: rgba(34, 197, 94, 0.14);
+    color: var(--text);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.06s ease, background 0.2s ease, border-color 0.2s ease;
+    user-select: none;
+    touch-action: manipulation;
+    flex: 0 0 auto;
+}
+
+.startSessionBtn:hover {
+    background: rgba(34, 197, 94, 0.20);
+    border-color: rgba(34, 197, 94, 0.45);
+}
+
+.startSessionBtn:active {
+    transform: translateY(1px);
+}
+
+.startSessionBtn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+/* Floating routine row icon (download) */
+.routineRowDownloadBtn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 2;
+}
+
+/* =========================
+   Icon button + chip
+   ========================= */
+
+.iconBtn {
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text);
+    border-radius: 999px;
+    cursor: pointer;
+    transition: transform 0.06s ease, background 0.2s ease, border-color 0.2s ease;
+    user-select: none;
+    touch-action: manipulation;
+}
+
+.iconBtn:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(96, 165, 250, 0.35);
+}
+
+.iconBtn:active {
+    transform: translateY(1px);
+}
+
+.iconBtn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.iconBtn .icon {
+    font-size: 18px;
+    line-height: 1;
+}
+
+/* Small pill */
+.chip {
+    font-size: 12px;
+    color: var(--accent2);
+    border: 1px solid rgba(96, 165, 250, 0.35);
+    background: rgba(96, 165, 250, 0.10);
+    padding: 8px 12px;
+    border-radius: 999px;
+    white-space: nowrap;
+}
+
+/* =========================
+   Routine detail header
+   ========================= */
+
+/* Routine detail header body */
+.pageHeader .routineHeader {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 12px;
+}
+
+.routineHeaderBody {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-grow: 1;
+}
+
+/* =========================
+   Routine detail body
+   ========================= */
+
+.routineDetail {
+    padding: 14px 16px;
+}
+
+/* =========================
+   Drag reorder animations
+   ========================= */
+
+@keyframes movedFlash {
+    0% {
+        transform: translateY(0);
+        box-shadow: none;
+    }
+
+    25% {
+        transform: translateY(-6px);
+        box-shadow: 0 10px 24px rgba(96, 165, 250, 0.18);
+    }
+
+    100% {
+        transform: translateY(0);
+        box-shadow: none;
+    }
+}
+
+@keyframes otherFlash {
+    0% {
+        transform: translateY(0);
+    }
+
+    25% {
+        transform: translateY(6px);
+    }
+
+    100% {
+        transform: translateY(0);
+    }
+}
+
+.routineRow.moved {
+    outline: 1px solid rgba(96, 165, 250, 0.45);
+    background: rgba(96, 165, 250, 0.08);
+    animation: movedFlash 260ms ease-out;
+}
+
+.routineRow.movedOther {
+    outline: 1px solid rgba(96, 165, 250, 0.22);
+    background: rgba(96, 165, 250, 0.04);
+    animation: otherFlash 260ms ease-out;
+}
+
+/* Only during active long-press drag */
+body .isReordering {
+    touch-action: none;
+}
+
+/* =========================
+   Desktop overrides
+   ========================= */
+
+@media (min-width: 720px) {
+    /* Routine row body becomes 2 columns on desktop */
+    .routineRowBody {
+        grid-template-columns: 1fr auto;
+        align-items: center;
+    }
+
+    .chip {
+        padding: 6px 10px;
+    }
+
+    .startSessionBtn {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+    }
+
+    .iconBtn {
+        width: 36px;
+        height: 36px;
+    }
+
+    .iconBtn .icon {
+        font-size: 16px;
+    }
+}
