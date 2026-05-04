@@ -12,6 +12,7 @@ import { mountRoutinesPage } from "./pages/routinesPage/routinesPage.js";
 import { mountRoutineNewPage } from "./pages/routinesPage/routineNewPage.js";
 import { mountRoutineDetailPage } from "./pages/routinesPage/routineDetailPage.js";
 import { mountProfilePage } from "./pages/profilePage/profilePage.js";
+import { mountProfileHistoryPage } from "./pages/profilePage/profileHistoryPage.js";
 
 import { setLocale, getLocale, getLocaleFromUrl, translateDocument, t } from "./internationalization/i18n.js";
 
@@ -58,6 +59,7 @@ const pages = {
     routine: mountRoutineDetailPage({ routineStore, exerciseStore }),
     session: mountSessionPage({ routineStore, exerciseStore }),
     profile: mountProfilePage({ profileStore }),
+    "profile-history": mountProfileHistoryPage({ profileStore }),
 };
 
 const PUBLIC_ROUTES = new Set(["home", "features", "privacy", "about"]);
@@ -184,6 +186,7 @@ const ROUTE_SEO = {
     routine: { robots: "noindex,nofollow" },
     session: { robots: "noindex,nofollow" },
     profile: { robots: "noindex,nofollow" },
+    "profile-history": { robots: "noindex,nofollow" },
 };
 
 // -----------------------------------------------------------------------------

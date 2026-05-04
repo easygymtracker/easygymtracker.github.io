@@ -42,9 +42,27 @@ export function createProfileStore() {
         writeEntries(readEntries().filter((entry) => entry.id !== id));
     }
 
+    function updateEntry(id, patch) {
+        const entries = readEntries();
+        const index = entries.findIndex((entry) => entry.id === id);
+        if (index === -1) return null;
+
+        const current = entries[index];
+        const next = {
+            ...current,
+            ...patch,
+            id: current.id,
+            createdAt: current.createdAt,
+        };
+
+        entries[index] = next;
+        writeEntries(entries);
+        return next;
+    }
+
     function clearAll() {
         writeEntries([]);
     }
 
-    return { listEntries, addEntry, removeEntry, clearAll };
+    return { listEntries, addEntry, removeEntry, updateEntry, clearAll };
 }
