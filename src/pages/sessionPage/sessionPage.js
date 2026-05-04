@@ -9,6 +9,7 @@ import { openSessionSetModal } from "/src/ui/components/sessionSetModal.js";
 import { RepGroup, Laterality } from "/src/models/repGroup.js";
 import { setLeaveGuard, clearLeaveGuard } from "/src/router.js";
 import { mountRepGroupHistoryCharts } from "/src/ui/components/repGroupHistoryChart.js";
+import { openWorkoutSummaryModal } from "/src/ui/components/workoutSummaryModal.js";
 import {
     formatSideValue as formatSideValueValue,
     isSameWeight as isSameWeightValue,
@@ -491,7 +492,12 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         });
     }
 
-    function endWorkoutSession() {
+    async function endWorkoutSession() {
+        const endEpochMs = Date.now();
+        const durationMs = startEpochMs != null ? endEpochMs - startEpochMs : elapsedMs;
+        const sessionStartIso = startEpochMs != null ? new Date(startEpochMs).toISOString() : null;
+        const summaryRoutine = currentRoutineId ? routineStore.getById(currentRoutineId) : null;
+
         cleanupCharts?.();
         cleanupCharts = null;
 
@@ -507,6 +513,14 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         clearSessionNotification();
         hasInitiated = false;
         renderCurrent();
+
+        if (summaryRoutine && sessionStartIso) {
+            await openWorkoutSummaryModal({
+                routine: summaryRoutine,
+                sessionStartIso,
+                durationMs,
+            });
+        }
     }
 
     function hasCompletedAnyRep(seriesIdx) {
