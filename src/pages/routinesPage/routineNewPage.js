@@ -19,7 +19,7 @@ export function mountRoutineNewPage({ routineStore }) {
         }
 
         const routine = routineStore.create({ name, description });
-        navigate(`#/routine/${routine.id}`);
+        navigate(`/routine/${routine.id}`);
     });
 
     function render() {

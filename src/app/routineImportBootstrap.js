@@ -38,7 +38,7 @@ export function setupRoutineImport({ triggerEl, routineStore, exerciseStore, nav
                 exerciseStore,
             });
 
-            navigate(`#/routine/${routine.id}`);
+            navigate(`/routine/${routine.id}`);
         } catch (err) {
             alert(err?.message || "Failed to import routine");
         }

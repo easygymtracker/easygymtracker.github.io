@@ -173,7 +173,7 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
     });
 
     function isOnSessionRoute() {
-        return (location.hash || "").startsWith("#/session/");
+        return (location.pathname || "").startsWith("/session/");
     }
 
     function shouldBlockLeaving() {
@@ -188,9 +188,9 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         return confirm(msg);
     }
 
-    setLeaveGuard(({ fromHash, toHash }) => {
-        const fromIsSession = (fromHash || "").startsWith("#/session/");
-        const toIsSession = (toHash || "").startsWith("#/session/");
+    setLeaveGuard(({ fromPath, toPath }) => {
+        const fromIsSession = (fromPath || "").startsWith("/session/");
+        const toIsSession = (toPath || "").startsWith("/session/");
 
         if (!fromIsSession) return true;
         if (toIsSession) return true;

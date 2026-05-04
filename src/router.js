@@ -1,8 +1,21 @@
-// router.js - tiny hash router + simple event emitter
+// router.js - tiny history router + simple event emitter
 
-function parseHash() {
-    const raw = location.hash || "#/routines";
-    const path = raw.replace(/^#/, "");
+function normalizePath(path) {
+    if (!path) return "/routines";
+    let p = String(path).trim();
+    if (!p.startsWith("/")) p = `/${p}`;
+    if (p.length > 1 && p.endsWith("/")) p = p.slice(0, -1);
+    if (p === "/index.html") p = "/";
+    return p;
+}
+
+function currentPathWithSearch() {
+    const path = normalizePath(location.pathname);
+    return `${path}${location.search || ""}`;
+}
+
+function parseCurrentRoute() {
+    const path = normalizePath(location.pathname);
     const parts = path.split("/").filter(Boolean);
 
     if (parts.length === 0) return { name: "routines", params: {} };
@@ -24,6 +37,26 @@ function parseHash() {
     return { name: "routines", params: {} };
 }
 
+function normalizeLegacyHashUrl() {
+    // Backward-compat for old links like /#/routine/abc?lang=es
+    const rawHash = String(location.hash || "");
+    if (!rawHash.startsWith("#/")) return;
+
+    const raw = rawHash.slice(1); // "/routine/abc?lang=es"
+    const [pathPart, queryPart] = raw.split("?");
+    const nextPath = normalizePath(pathPart || "/routines");
+
+    const mergedQuery = new URLSearchParams(location.search || "");
+    if (queryPart) {
+        const hashQuery = new URLSearchParams(queryPart);
+        for (const [k, v] of hashQuery.entries()) mergedQuery.set(k, v);
+    }
+
+    const query = mergedQuery.toString();
+    const nextUrl = `${nextPath}${query ? `?${query}` : ""}`;
+    history.replaceState(null, "", nextUrl);
+  }
+
 let leaveGuard = null;
 
 export function setLeaveGuard(fn) {
@@ -34,66 +67,85 @@ export function clearLeaveGuard() {
     leaveGuard = null;
 }
 
-function canLeave({ fromHash, toHash, reason }) {
+function canLeave({ fromPath, toPath, reason }) {
     if (!leaveGuard) return true;
     try {
-        return leaveGuard({ fromHash, toHash, reason }) !== false;
+        return leaveGuard({ fromPath, toPath, reason }) !== false;
     } catch {
         // Fail open to avoid trapping the user due to guard errors
         return true;
     }
 }
 
-export function navigate(hash) {
-    const fromHash = location.hash || "#/routines";
-    const toHash = hash;
+export function navigate(path) {
+    const targetPath = normalizePath(path);
+    const fromPath = currentPathWithSearch();
+    const toPath = targetPath;
 
-    if (toHash === fromHash) return;
+    if (toPath === fromPath) return;
 
-    if (!canLeave({ fromHash, toHash, reason: "navigate" })) return;
+    if (!canLeave({ fromPath, toPath, reason: "navigate" })) return;
 
-    location.hash = hash;
+    history.pushState(null, "", toPath);
+    onNavigate.emit();
 }
 
 // Small event emitter so other parts can request a re-render
 export const onNavigate = (() => {
     const listeners = new Set();
     return {
-        subscribe(fn) { listeners.add(fn); return () => listeners.delete(fn); },
-        emit() { listeners.forEach((fn) => fn()); },
+        subscribe(fn) {
+            listeners.add(fn);
+            return () => listeners.delete(fn);
+        },
+        emit() {
+            listeners.forEach((fn) => fn());
+        },
     };
 })();
 
-export function startRouter({ defaultHash = "#/routines", onRoute }) {
-    // global nav buttons
+export function startRouter({ defaultPath = "/routines", onRoute }) {
+    normalizeLegacyHashUrl();
+
+    // global nav buttons/links
     document.addEventListener("click", (e) => {
         const nav = e.target.closest("[data-nav]");
         if (!nav) return;
-        navigate(nav.getAttribute("data-nav"));
+
+        e.preventDefault();
+        const target = nav.getAttribute("data-nav");
+        if (!target) return;
+        navigate(target);
     });
 
     function render() {
-        const route = parseHash();
+        const route = parseCurrentRoute();
         onRoute(route);
     }
 
-    if (!location.hash) location.hash = defaultHash;
-    let lastHash = location.hash;
+    if (normalizePath(location.pathname) === "/") {
+        history.replaceState(null, "", normalizePath(defaultPath));
+    }
 
-    window.addEventListener("hashchange", () => {
-        const fromHash = lastHash;
-        const toHash = location.hash;
+    let lastPath = currentPathWithSearch();
 
-        if (toHash !== fromHash && !canLeave({ fromHash, toHash, reason: "hashchange" })) {
-            history.replaceState(null, "", fromHash);
+    window.addEventListener("popstate", () => {
+        const fromPath = lastPath;
+        const toPath = currentPathWithSearch();
+
+        if (toPath !== fromPath && !canLeave({ fromPath, toPath, reason: "popstate" })) {
+            history.pushState(null, "", fromPath);
             return;
         }
 
-        lastHash = toHash;
+        lastPath = toPath;
         onNavigate.emit();
     });
 
-    onNavigate.subscribe(render);
+    onNavigate.subscribe(() => {
+        lastPath = currentPathWithSearch();
+        render();
+    });
 
     render();
 }

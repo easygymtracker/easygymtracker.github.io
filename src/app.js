@@ -30,7 +30,7 @@ btnClearAll.addEventListener("click", () => {
     const ok = confirm(t("confirm.clearAll"));
     if (!ok) return;
     routineStore.clearAll();
-    navigate("#/routines");
+    navigate("/routines");
 });
 
 const btnUploadRoutine = document.getElementById("btnUploadRoutine");
@@ -68,7 +68,7 @@ function syncLocaleFromUrl() {
 }
 
 startRouter({
-    defaultHash: "#/routines",
+    defaultPath: "/routines",
     onRoute({ name, params }) {
         syncLocaleFromUrl();
 

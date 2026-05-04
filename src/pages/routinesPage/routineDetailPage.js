@@ -157,7 +157,7 @@ export function mountRoutineDetailPage({ routineStore, exerciseStore }) {
         }
 
         routineStore.remove(currentId);
-        navigate("#/routines");
+        navigate("/routines");
     });
 
     btnAddSeries.addEventListener("click", () => {
@@ -200,7 +200,7 @@ export function mountRoutineDetailPage({ routineStore, exerciseStore }) {
             return;
         }
 
-        navigate(`#/session/${currentId}`);
+        navigate(`/session/${currentId}`);
     });
 
     function render(params) {
@@ -208,7 +208,7 @@ export function mountRoutineDetailPage({ routineStore, exerciseStore }) {
 
         const routine = currentId ? routineStore.getById(currentId) : null;
         if (!routine) {
-            navigate("#/routines");
+            navigate("/routines");
             return;
         }
 

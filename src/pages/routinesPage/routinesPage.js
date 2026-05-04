@@ -22,7 +22,7 @@ export function mountRoutinesPage({ routineStore, exerciseStore }) {
         const action = btn ? btn.getAttribute("data-action") : "open";
 
         if (action === "open") {
-            navigate(`#/routine/${id}`);
+            navigate(`/routine/${id}`);
             return;
         }
 
@@ -53,7 +53,7 @@ export function mountRoutinesPage({ routineStore, exerciseStore }) {
         if (action === "start-session") {
             e.preventDefault();
             e.stopPropagation();
-            navigate(`#/session/${id}`);
+            navigate(`/session/${id}`);
             return;
         }
     });
