@@ -195,7 +195,7 @@ function showRoute(name) {
     });
 
     if (appToolbar) {
-        appToolbar.style.display = PUBLIC_ROUTES.has(name) ? "none" : "flex";
+        appToolbar.style.display = (name === "routines") ? "flex" : "none";
     }
 }
 

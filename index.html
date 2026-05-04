@@ -113,13 +113,14 @@
         <p data-i18n="app.subtitle">Minimal routine list. Create and manage training plans locally.</p>
       </div>
       <div class="toolbar" id="appToolbar">
-        <button class="btn" data-nav="/profile">
+        <button class="btn" data-nav="/profile" data-i18n="profile.nav">
           Profile
         </button>
         <button class="btn primary" data-nav="/routine/new" data-i18n="routines.new">
           + New routine
         </button>
         <button class="btn primary" id="btnUploadRoutine" tabindex="0" data-i18n="routines.upload"
+          data-i18n-title="routines.uploadHelp" data-i18n-aria-label="routines.uploadHelp"
           title="Upload a routine file to import it" aria-label="Upload a routine file to import it">
           Upload routine
         </button>
@@ -140,7 +141,7 @@
           Build routines, run workout sessions, and keep everything stored on your own device. No account, no cloud lock-in, no noisy dashboard.
         </p>
 
-        <nav class="landingActions" aria-label="Home links">
+        <nav class="landingActions" aria-label="Home links" data-i18n-aria-label="a11y.nav.homeLinks">
           <a href="/routines" class="btn primary" data-nav="/routines" data-i18n="home.cta.openApp">Open the app</a>
           <a href="/routine/new" class="btn" data-nav="/routine/new" data-i18n="home.cta.firstRoutine">Create a first routine</a>
           <a href="/features" class="btn" data-nav="/features" data-i18n="home.cta.features">Features</a>
@@ -148,7 +149,7 @@
           <a href="/privacy" class="btn" data-nav="/privacy" data-i18n="home.cta.privacy">Privacy</a>
         </nav>
 
-        <div class="landingStats" aria-label="Product highlights">
+        <div class="landingStats" aria-label="Product highlights" data-i18n-aria-label="a11y.home.productHighlights">
           <div class="landingStat card">
             <strong data-i18n="home.stat.offlineValue">100% local</strong>
             <span data-i18n="home.stat.offlineLabel">Your routines stay on this device.</span>
@@ -187,7 +188,7 @@
         <p class="landingLead" data-i18n="features.lead">
           Easy Gym Routine Tracker focuses on the core job: creating routines quickly, running sessions smoothly, and reviewing progress without sending your data to a remote backend.
         </p>
-        <nav class="landingActions" aria-label="Features links">
+        <nav class="landingActions" aria-label="Features links" data-i18n-aria-label="a11y.nav.featuresLinks">
           <a href="/" class="btn primary" data-nav="/" data-i18n="features.cta.home">Home</a>
           <a href="/routines" class="btn" data-nav="/routines" data-i18n="features.cta.openApp">Open the app</a>
           <a href="/privacy" class="btn" data-nav="/privacy" data-i18n="features.cta.privacy">Privacy</a>
@@ -213,11 +214,15 @@
         </article>
         <article class="card landingFeature">
           <h3 data-i18n="features.portableExports.title">Portable exports</h3>
-          <p data-i18n="features.portableExports.body">Download routines in a stable JSON format and import them later without depending on a cloud account.</p>
+          <p data-i18n="features.portableExports.body">Download routines or body measurements in a stable JSON format and import them on any device — no cloud account needed.</p>
         </article>
         <article class="card landingFeature">
           <h3 data-i18n="features.localFirst.title">Local-first</h3>
-          <p data-i18n="features.localFirst.body">Your routine and session data stays on the device through local storage instead of being pushed to a central server.</p>
+          <p data-i18n="features.localFirst.body">All data — routines, sessions, and body measurements — stays only on your device through browser storage. Nothing is ever sent to a server.</p>
+        </article>
+        <article class="card landingFeature">
+          <h3 data-i18n="features.profileTracking.title">Profile tracking</h3>
+          <p data-i18n="features.profileTracking.body">Log weight, body fat, and muscle mass over time. Charts show daily peaks for each metric. All measurements remain private on your device.</p>
         </article>
       </div>
     </section>
@@ -229,7 +234,7 @@
         <p class="landingLead" data-i18n="privacy.lead">
           This app is designed around local usage. Routines, sets, and session history are stored in the browser on the device you use, so you can manage training data without creating an account.
         </p>
-        <nav class="landingActions" aria-label="Privacy links">
+        <nav class="landingActions" aria-label="Privacy links" data-i18n-aria-label="a11y.nav.privacyLinks">
           <a href="/" class="btn primary" data-nav="/" data-i18n="privacy.cta.home">Home</a>
           <a href="/features" class="btn" data-nav="/features" data-i18n="privacy.cta.features">Features</a>
           <a href="/routines" class="btn" data-nav="/routines" data-i18n="privacy.cta.openApp">Open the app</a>
@@ -239,7 +244,7 @@
       <div class="landingGrid">
         <article class="card landingFeature">
           <h3 data-i18n="privacy.whatStored.title">What is stored</h3>
-          <p data-i18n="privacy.whatStored.body">Routine definitions, set targets, exercise descriptions, and session history are saved in browser storage on your device.</p>
+          <p data-i18n="privacy.whatStored.body">Routine definitions, set targets, exercise descriptions, session history, and body measurements (weight, body fat, and muscle) are all saved in browser storage on your device. Nothing is ever sent to a server.</p>
         </article>
         <article class="card landingFeature">
           <h3 data-i18n="privacy.notRequired.title">What is not required</h3>
@@ -250,8 +255,12 @@
           <p data-i18n="privacy.notifications.body">If you allow notifications, they are used for session-related reminders and workout flow while the app is running on your device.</p>
         </article>
         <article class="card landingFeature">
-          <h3 data-i18n="privacy.exports.title">Exports</h3>
-          <p data-i18n="privacy.exports.body">When you export a routine, the resulting JSON file contains the routine structure and history data you chose to keep locally.</p>
+          <h3 data-i18n="privacy.exports.title">Data portability</h3>
+          <p data-i18n="privacy.exports.body">Export routines or body measurements to a portable JSON file at any time. Import files are processed locally — no data is uploaded to any server.</p>
+        </article>
+        <article class="card landingFeature">
+          <h3 data-i18n="privacy.localOnly.title">Your data stays private</h3>
+          <p data-i18n="privacy.localOnly.body">The app has no backend, no sync service, and no user accounts. Every byte of your workout and body data remains only in your own browser storage.</p>
         </article>
       </div>
     </section>
@@ -263,7 +272,7 @@
         <p class="landingLead" data-i18n="about.lead">
           Easy Gym Routine Tracker keeps everything simple. Build a routine once, then run through it session by session without touching complex settings.
         </p>
-        <nav class="landingActions" aria-label="About links">
+        <nav class="landingActions" aria-label="About links" data-i18n-aria-label="a11y.nav.aboutLinks">
           <a href="/" class="btn primary" data-nav="/" data-i18n="about.cta.home">Home</a>
           <a href="/routines" class="btn" data-nav="/routines" data-i18n="about.cta.openApp">Try it</a>
           <a href="/features" class="btn" data-nav="/features" data-i18n="about.cta.features">See features</a>
@@ -608,57 +617,57 @@
 
     <section class="card route" data-route="profile" id="route-profile" style="display:none;">
       <div class="pageHeader">
-        <h2>Profile tracking</h2>
+        <h2 data-i18n="profile.title">Profile tracking</h2>
         <div style="display:flex; gap:10px; flex-wrap:wrap;">
-          <button class="btn" id="btnExportProfile" type="button">Export</button>
-          <button class="btn" id="btnImportProfile" type="button">Import</button>
+          <button class="btn" id="btnExportProfile" type="button" data-i18n="common.export">Export</button>
+          <button class="btn" id="btnImportProfile" type="button" data-i18n="common.import">Import</button>
           <input type="file" id="profileImportFile" accept=".json,.gymprofile.json" style="display:none;">
-          <button class="btn danger" id="btnClearProfileEntries" type="button" style="display:none;">
+          <button class="btn danger" id="btnClearProfileEntries" type="button" style="display:none;" data-i18n="profile.clearHistory">
             Clear history
           </button>
-          <button class="btn" data-nav="/routines">Back</button>
+          <button class="btn" data-nav="/routines" data-i18n="common.back">Back</button>
         </div>
       </div>
 
       <div class="routineDetail" style="display:grid; gap:16px;">
-        <p class="muted" style="margin:0;">
+        <p class="muted" style="margin:0;" data-i18n="profile.intro">
           Track body weight, body fat percentage, and muscle mass. Charts below show the maximum value recorded for each day.
         </p>
 
         <form id="profileForm" class="form" style="padding-top:0;">
           <div class="field">
-            <label for="profileRecordedAt">Recorded at</label>
+            <label for="profileRecordedAt" data-i18n="profile.recordedAt">Recorded at</label>
             <input id="profileRecordedAt" type="datetime-local" required />
           </div>
 
           <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:12px;">
             <div class="field">
-              <label for="profileWeightKg">Weight (kg)</label>
-              <input id="profileWeightKg" type="number" min="0" step="0.1" placeholder="e.g., 82.4" />
+              <label for="profileWeightKg" data-i18n="profile.weightKg">Weight (kg)</label>
+              <input id="profileWeightKg" type="number" min="0" step="0.1" placeholder="e.g., 82.4" data-i18n="profile.weightPlaceholder" data-i18n-attr="placeholder" />
             </div>
 
             <div class="field">
-              <label for="profileBodyFatPct">Body fat (%)</label>
-              <input id="profileBodyFatPct" type="number" min="0" max="100" step="0.1" placeholder="e.g., 14.8" />
+              <label for="profileBodyFatPct" data-i18n="profile.bodyFatPct">Body fat (%)</label>
+              <input id="profileBodyFatPct" type="number" min="0" max="100" step="0.1" placeholder="e.g., 14.8" data-i18n="profile.bodyFatPlaceholder" data-i18n-attr="placeholder" />
             </div>
 
             <div class="field">
-              <label for="profileMuscleKg">Muscle (kg)</label>
-              <input id="profileMuscleKg" type="number" min="0" step="0.1" placeholder="e.g., 36.2" />
+              <label for="profileMuscleKg" data-i18n="profile.muscleKg">Muscle (kg)</label>
+              <input id="profileMuscleKg" type="number" min="0" step="0.1" placeholder="e.g., 36.2" data-i18n="profile.musclePlaceholder" data-i18n-attr="placeholder" />
             </div>
           </div>
 
           <div class="actions">
-            <button class="btn primary" type="submit">Save measurement</button>
+            <button class="btn primary" type="submit" data-i18n="profile.saveMeasurement">Save measurement</button>
           </div>
         </form>
 
         <div id="profileCharts" style="display:grid; gap:12px; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));"></div>
 
         <div>
-          <h3 style="margin:0 0 10px 0; font-size:14px; color: var(--accent2);">Saved entries</h3>
+          <h3 style="margin:0 0 10px 0; font-size:14px; color: var(--accent2);" data-i18n="profile.savedEntries">Saved entries</h3>
           <div id="profileEntryList" style="display:grid; gap:10px;"></div>
-          <p class="note" id="profileEmpty" style="display:none;">No measurements yet. Add your first entry above.</p>
+          <p class="note" id="profileEmpty" style="display:none;" data-i18n="profile.empty">No measurements yet. Add your first entry above.</p>
         </div>
       </div>
     </section>
