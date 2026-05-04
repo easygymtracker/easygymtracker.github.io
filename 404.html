@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Redirecting...</title>
+  <script>
+    (function redirectToSpaEntry() {
+      var routeHeads = { features: true, privacy: true, about: true, routines: true, routine: true, session: true };
+      var parts = window.location.pathname.split("/").filter(Boolean);
+
+      var base = "";
+      if (parts.length && !routeHeads[parts[0]]) {
+        base = "/" + parts[0];
+      }
+
+      var path = window.location.pathname;
+      if (base && path.startsWith(base)) {
+        path = path.slice(base.length) || "/";
+      }
+
+      var query = window.location.search ? window.location.search.slice(1) : "";
+      var target = (base || "") + "/?p=" + encodeURIComponent(path);
+      if (query) target += "&q=" + encodeURIComponent(query);
+      if (window.location.hash) target += window.location.hash;
+
+      window.location.replace(target);
+    })();
+  </script>
+</head>
+<body></body>
+</html>

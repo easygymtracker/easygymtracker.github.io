@@ -1,13 +1,13 @@
-# robots.txt for 
-
 User-agent: *
 Allow: /
 
+# App/private screens should not be indexed.
+Disallow: /routines
+Disallow: /routine/
+Disallow: /session/
+
+# Avoid duplicate locale-query URLs.
 Disallow: /*?lang=
 Disallow: /*&lang=
-Disallow: /src/
-Disallow: /vendor/
-Disallow: /assets/
-Disallow: /lang/
 
-Sitemap: 
+Sitemap: https://easygymtracker.github.io/sitemap.xml

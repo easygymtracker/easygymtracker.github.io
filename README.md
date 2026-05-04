@@ -11,6 +11,72 @@ The format is designed to be:
 - Human-readable (plain JSON)
 
 
+Structured JSON for SEO (JSON-LD)
+---------------------------------
+
+The website also uses structured JSON in the form of JSON-LD for search engines.
+
+This is different from the routine export format above:
+
+- The export format is app data meant for import/export between devices.
+- JSON-LD is metadata meant for crawlers like Google, Bing, and social platforms.
+
+JSON-LD is usually embedded in HTML inside a script tag like this:
+
+```html
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Easy Gym Routine Tracker",
+  "applicationCategory": "HealthApplication",
+  "operatingSystem": "Web",
+  "url": "https://easygymtracker.github.io/",
+  "description": "A local-first web app for planning gym routines, logging sessions, and tracking progress privately on your own device.",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "featureList": [
+    "Local-first routine storage",
+    "Workout session tracking",
+    "Unilateral and bilateral set support",
+    "Progress history charts"
+  ]
+}
+</script>
+```
+
+What the fields mean:
+
+- `@context`
+  Tells crawlers which vocabulary is being used. Here it is Schema.org.
+
+- `@type`
+  Describes what this page or entity is. For the homepage we use `SoftwareApplication`.
+
+- `name`, `description`, `url`
+  Core identity fields for the product/page.
+
+- `applicationCategory`, `operatingSystem`
+  Extra classification that helps search engines understand the app.
+
+- `offers`
+  Pricing metadata. In this case the app is represented as free.
+
+- `featureList`
+  A concise list of product capabilities.
+
+In this project, the public routes update JSON-LD dynamically so that:
+
+- `/` exposes a `SoftwareApplication`
+- `/features` exposes a `WebPage`
+- `/privacy` exposes a `PrivacyPolicy`
+
+That structured data is added at runtime in the SPA bootstrap and is intended to match the visible page content.
+
+
 Overview
 --------
 

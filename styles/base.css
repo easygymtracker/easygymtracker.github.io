@@ -73,6 +73,100 @@ header {
     justify-content: flex-end;
 }
 
+.landingRoute {
+    display: grid;
+    gap: 16px;
+}
+
+.landingHero {
+    padding: 24px 20px;
+}
+
+.landingEyebrow {
+    color: var(--accent2);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+}
+
+.landingHero h2 {
+    margin: 0;
+    font-size: clamp(30px, 7vw, 42px);
+    line-height: 1.05;
+    max-width: 12ch;
+}
+
+.landingLead {
+    margin: 14px 0 0;
+    color: var(--muted);
+    font-size: 16px;
+    line-height: 1.55;
+    max-width: 56ch;
+}
+
+.landingActions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.landingStats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.landingStat {
+    padding: 14px;
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.landingStat strong {
+    display: block;
+    font-size: 14px;
+    color: var(--text);
+}
+
+.landingStat span {
+    display: block;
+    margin-top: 6px;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.landingGrid {
+    display: grid;
+    gap: 12px;
+}
+
+.landingFeature {
+    padding: 18px;
+}
+
+.landingFeature h3 {
+    margin: 0 0 8px;
+    color: var(--accent2);
+    font-size: 16px;
+}
+
+.landingFeature p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+@media (max-width: 640px) {
+    .landingStats {
+        grid-template-columns: 1fr;
+    }
+}
+
 /* Buttons */
 .btn {
     border: 1px solid var(--border);

@@ -1,5 +1,7 @@
 // router.js - tiny history router + simple event emitter
 
+const ROUTE_HEADS = new Set(["features", "privacy", "about", "routines", "routine", "session"]);
+
 function normalizePath(path) {
     if (!path) return "/routines";
     let p = String(path).trim();
@@ -9,16 +11,59 @@ function normalizePath(path) {
     return p;
 }
 
-function currentPathWithSearch() {
-    const path = normalizePath(location.pathname);
-    return `${path}${location.search || ""}`;
+function detectBasePath(pathname = location.pathname) {
+    const parts = normalizePath(pathname).split("/").filter(Boolean);
+    if (!parts.length) return "";
+
+    const first = parts[0];
+    if (ROUTE_HEADS.has(first)) return "";
+
+    // GitHub Pages project sites usually mount app under /<repo-name>/
+    if (location.hostname.endsWith("github.io")) return `/${first}`;
+
+    return "";
+}
+
+function stripBasePath(pathname, basePath) {
+    const normalized = normalizePath(pathname);
+    if (!basePath) return normalized;
+
+    if (normalized === basePath) return "/";
+    if (normalized.startsWith(`${basePath}/`)) {
+        return normalized.slice(basePath.length) || "/";
+    }
+
+    return normalized;
+}
+
+const BASE_PATH = detectBasePath();
+
+function toBrowserUrl(appPath) {
+    const path = normalizePath(appPath);
+    if (!BASE_PATH) return path;
+    if (path === "/") return `${BASE_PATH}/`;
+    return `${BASE_PATH}${path}`;
+}
+
+function currentAppPath() {
+    return stripBasePath(location.pathname, BASE_PATH);
+}
+
+function currentAppPathWithSearch() {
+    return `${currentAppPath()}${location.search || ""}`;
 }
 
 function parseCurrentRoute() {
-    const path = normalizePath(location.pathname);
+    const path = currentAppPath();
     const parts = path.split("/").filter(Boolean);
 
-    if (parts.length === 0) return { name: "routines", params: {} };
+    if (parts.length === 0) return { name: "home", params: {} };
+
+    if (parts[0] === "features") return { name: "features", params: {} };
+
+    if (parts[0] === "privacy") return { name: "privacy", params: {} };
+
+    if (parts[0] === "about") return { name: "about", params: {} };
 
     if (parts[0] === "routines") return { name: "routines", params: {} };
 
@@ -34,7 +79,7 @@ function parseCurrentRoute() {
         return { name: "session", params: { routineId: parts[1] } };
     }
 
-    return { name: "routines", params: {} };
+    return { name: "home", params: {} };
 }
 
 function normalizeLegacyHashUrl() {
@@ -44,7 +89,8 @@ function normalizeLegacyHashUrl() {
 
     const raw = rawHash.slice(1); // "/routine/abc?lang=es"
     const [pathPart, queryPart] = raw.split("?");
-    const nextPath = normalizePath(pathPart || "/routines");
+    const appPath = normalizePath(pathPart || "/routines");
+    const nextPath = toBrowserUrl(appPath);
 
     const mergedQuery = new URLSearchParams(location.search || "");
     if (queryPart) {
@@ -55,7 +101,7 @@ function normalizeLegacyHashUrl() {
     const query = mergedQuery.toString();
     const nextUrl = `${nextPath}${query ? `?${query}` : ""}`;
     history.replaceState(null, "", nextUrl);
-  }
+}
 
 let leaveGuard = null;
 
@@ -79,14 +125,13 @@ function canLeave({ fromPath, toPath, reason }) {
 
 export function navigate(path) {
     const targetPath = normalizePath(path);
-    const fromPath = currentPathWithSearch();
+    const fromPath = currentAppPathWithSearch();
     const toPath = targetPath;
 
     if (toPath === fromPath) return;
-
     if (!canLeave({ fromPath, toPath, reason: "navigate" })) return;
 
-    history.pushState(null, "", toPath);
+    history.pushState(null, "", toBrowserUrl(targetPath));
     onNavigate.emit();
 }
 
@@ -123,18 +168,18 @@ export function startRouter({ defaultPath = "/routines", onRoute }) {
         onRoute(route);
     }
 
-    if (normalizePath(location.pathname) === "/") {
-        history.replaceState(null, "", normalizePath(defaultPath));
+    if (currentAppPath() === "/") {
+        history.replaceState(null, "", toBrowserUrl(defaultPath));
     }
 
-    let lastPath = currentPathWithSearch();
+    let lastPath = currentAppPathWithSearch();
 
     window.addEventListener("popstate", () => {
         const fromPath = lastPath;
-        const toPath = currentPathWithSearch();
+        const toPath = currentAppPathWithSearch();
 
         if (toPath !== fromPath && !canLeave({ fromPath, toPath, reason: "popstate" })) {
-            history.pushState(null, "", fromPath);
+            history.pushState(null, "", toBrowserUrl(fromPath));
             return;
         }
 
@@ -143,7 +188,7 @@ export function startRouter({ defaultPath = "/routines", onRoute }) {
     });
 
     onNavigate.subscribe(() => {
-        lastPath = currentPathWithSearch();
+        lastPath = currentAppPathWithSearch();
         render();
     });
 
