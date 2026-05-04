@@ -1,6 +1,14 @@
 // src/ui/components/repGroupHistoryCharts.js
 import { escapeHtml } from "/src/ui/dom.js";
 
+const DEFAULT_WINDOW_POINTS = 10;
+const DRAG_THRESHOLD_PX = 8;
+const DOUBLE_TAP_MS = 320;
+
+function clamp(value, min, max) {
+    return Math.min(max, Math.max(min, value));
+}
+
 /**
  * Convert RepGroup history value (null | number | {left,right}) into a scalar number:
  * - number => number
@@ -89,6 +97,88 @@ function fmtDate(ms) {
     return `${dd}/${mm}`;
 }
 
+function buildTimeline(seriesList) {
+    const timeline = new Set();
+
+    for (const points of seriesList) {
+        for (const point of points || []) {
+            if (point?.t != null) timeline.add(point.t);
+        }
+    }
+
+    return Array.from(timeline).sort((a, b) => a - b);
+}
+
+function getRepGroupTimeline(repGroup) {
+    const hist = Array.isArray(repGroup?.history) ? repGroup.history : [];
+    const timeline = [];
+
+    for (const entry of hist) {
+        const t = parseIsoMs(entry?.dateTime);
+        if (t != null) timeline.push(t);
+    }
+
+    timeline.sort((a, b) => a - b);
+    return timeline.filter((t, index) => index === 0 || timeline[index - 1] !== t);
+}
+
+function getDefaultViewportState(timeline) {
+    const total = timeline.length;
+    const windowSize = total ? Math.min(DEFAULT_WINDOW_POINTS, total) : 1;
+
+    return {
+        windowSize,
+        startIndex: Math.max(0, total - windowSize),
+        focusT: null,
+    };
+}
+
+function getViewport(timeline, viewState) {
+    if (!timeline.length) {
+        return {
+            startIndex: 0,
+            endIndex: 0,
+            windowSize: 1,
+            minT: 0,
+            maxT: 1,
+            visibleTimeline: [],
+        };
+    }
+
+    const windowSize = clamp(viewState?.windowSize ?? timeline.length, 1, timeline.length);
+    const maxStart = Math.max(0, timeline.length - windowSize);
+    const startIndex = clamp(viewState?.startIndex ?? maxStart, 0, maxStart);
+    const endIndex = Math.min(timeline.length - 1, startIndex + windowSize - 1);
+
+    return {
+        startIndex,
+        endIndex,
+        windowSize,
+        minT: timeline[startIndex],
+        maxT: timeline[endIndex],
+        visibleTimeline: timeline.slice(startIndex, endIndex + 1),
+    };
+}
+
+function filterPointsInRange(points, minT, maxT) {
+    return (points || []).filter((point) => point.t >= minT && point.t <= maxT);
+}
+
+function getNearestPoint(points, targetT) {
+    let nearest = null;
+    let nearestDistance = Number.POSITIVE_INFINITY;
+
+    for (const point of points || []) {
+        const distance = Math.abs(point.t - targetT);
+        if (distance < nearestDistance) {
+            nearest = point;
+            nearestDistance = distance;
+        }
+    }
+
+    return nearest;
+}
+
 function computeDomain(seriesList) {
     // seriesList: Array<Array<{t,y}>>
     const all = seriesList.flat();
@@ -139,6 +229,28 @@ function drawAxes(ctx, cssW, cssH, { title, suffix, padL, padR, padT, padB, bord
     return { plotW, plotH };
 }
 
+function drawGrid(ctx, { padL, padT, plotW, plotH, border }) {
+    ctx.save();
+    ctx.strokeStyle = border;
+    ctx.lineWidth = 1;
+    ctx.globalAlpha = 0.45;
+
+    for (let i = 1; i <= 2; i += 1) {
+        const y = padT + (plotH * i) / 3;
+        ctx.beginPath();
+        ctx.moveTo(padL, y);
+        ctx.lineTo(padL + plotW, y);
+        ctx.stroke();
+    }
+
+    const midX = padL + plotW / 2;
+    ctx.beginPath();
+    ctx.moveTo(midX, padT);
+    ctx.lineTo(midX, padT + plotH);
+    ctx.stroke();
+    ctx.restore();
+}
+
 function drawLabels(ctx, cssW, { minY, maxY, minT, maxT, suffix, padL, padT, plotH, muted }) {
     // y labels
     ctx.fillStyle = muted;
@@ -169,6 +281,22 @@ function drawSeries(ctx, points, { xFor, yFor, strokeStyle, lineWidth = 2 }) {
         else ctx.lineTo(x, y);
     });
     ctx.stroke();
+}
+
+function drawPointMarkers(ctx, points, { xFor, yFor, fillStyle }) {
+    if (!points.length) return;
+
+    ctx.save();
+    ctx.fillStyle = fillStyle;
+    ctx.globalAlpha = 0.9;
+
+    for (const point of points) {
+        ctx.beginPath();
+        ctx.arc(xFor(point.t), yFor(point.y), 2.4, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    ctx.restore();
 }
 
 function fillUnderSeries(ctx, points, { xFor, yFor, padT, plotH, fillStyle }) {
@@ -208,6 +336,68 @@ function drawLastMarker(ctx, points, { xFor, yFor, dotStyle, textStyle, suffix, 
     ctx.fillText(`${round1(last.y)}${suffix}`, Math.min(cssW - 54, lx + 6), ly - labelOffsetY);
 }
 
+function drawFocusOverlay(ctx, focusEntries, {
+    focusT,
+    xFor,
+    yFor,
+    padT,
+    plotH,
+    cssW,
+    padR,
+    suffix,
+    text,
+    muted,
+    border,
+}) {
+    if (!focusEntries.length) return;
+
+    const round1 = (value) => String(Math.round(value * 10) / 10);
+    const anchorX = xFor(focusT);
+
+    ctx.save();
+    ctx.strokeStyle = border;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath();
+    ctx.moveTo(anchorX, padT);
+    ctx.lineTo(anchorX, padT + plotH);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    for (const entry of focusEntries) {
+        ctx.beginPath();
+        ctx.fillStyle = entry.color;
+        ctx.arc(xFor(entry.point.t), yFor(entry.point.y), 4, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    const lines = [fmtDate(focusEntries[0].point.t)];
+    for (const entry of focusEntries) {
+        const prefix = entry.label ? `${entry.label}: ` : "";
+        lines.push(`${prefix}${round1(entry.point.y)}${suffix}`);
+    }
+
+    ctx.font = "11px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+    const boxWidth = Math.max(...lines.map((line) => ctx.measureText(line).width)) + 18;
+    const boxHeight = 8 + (lines.length * 16);
+    const boxX = clamp(anchorX + 10, 8, cssW - padR - boxWidth);
+    const boxY = padT + 6;
+
+    ctx.fillStyle = "rgba(15, 23, 42, 0.92)";
+    ctx.strokeStyle = border;
+    ctx.beginPath();
+    ctx.roundRect(boxX, boxY, boxWidth, boxHeight, 10);
+    ctx.fill();
+    ctx.stroke();
+
+    lines.forEach((line, index) => {
+        ctx.fillStyle = index === 0 ? text : muted;
+        ctx.textBaseline = "top";
+        ctx.fillText(line, boxX + 9, boxY + 6 + (index * 16));
+    });
+
+    ctx.restore();
+}
+
 function drawLineChart(canvas, points, { title = "", suffix = "" } = {}) {
     // Backward-compatible single-series chart
     return drawMultiLineChart(canvas, { main: points }, { title, suffix });
@@ -217,7 +407,7 @@ function drawLineChart(canvas, points, { title = "", suffix = "" } = {}) {
  * Multi-series chart.
  * seriesMap: { [key]: Array<{t,y}> }
  */
-function drawMultiLineChart(canvas, seriesMap, { title = "", suffix = "" } = {}) {
+function drawMultiLineChart(canvas, seriesMap, { title = "", suffix = "", interaction = null } = {}) {
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
@@ -254,34 +444,41 @@ function drawMultiLineChart(canvas, seriesMap, { title = "", suffix = "" } = {})
     const seriesList = Object.values(seriesMap).filter(Boolean);
     const anyPoints = seriesList.some(s => s.length > 0);
 
-    // title
-    ctx.font = "12px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
-    ctx.fillStyle = muted;
-    ctx.textBaseline = "top";
-    ctx.fillText(title, 8, 6);
-
     if (!anyPoints) {
+        ctx.font = "12px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
         ctx.fillStyle = muted;
+        ctx.textBaseline = "top";
+        ctx.fillText(title, 8, 6);
         ctx.textBaseline = "middle";
         ctx.fillText("No history yet", 8, cssH / 2);
-        return;
+        return null;
     }
 
     const { plotW, plotH } = drawAxes(ctx, cssW, cssH, { title, suffix, padL, padR, padT, padB, border, muted });
 
-    const { minT, maxT, minY, maxY } = computeDomain(seriesList);
+    const timeline = buildTimeline(seriesList);
+    const viewport = interaction ? getViewport(interaction.timeline || timeline, interaction.viewState) : getViewport(timeline, { windowSize: timeline.length, startIndex: 0 });
+    const visibleSeriesMap = Object.fromEntries(
+        Object.entries(seriesMap).map(([key, points]) => [key, filterPointsInRange(points || [], viewport.minT, viewport.maxT)])
+    );
+    const visibleSeriesList = Object.values(visibleSeriesMap);
+    const domainSource = visibleSeriesList.some((points) => points.length > 0) ? visibleSeriesList : seriesList;
+    const { minY, maxY } = computeDomain(domainSource);
+    const minT = viewport.minT;
+    const maxT = viewport.maxT;
 
     const xFor = (t) => padL + ((t - minT) / ((maxT - minT) || 1)) * plotW;
     const yFor = (y) => padT + (1 - (y - minY) / ((maxY - minY) || 1)) * plotH;
 
     // labels
     drawLabels(ctx, cssW, { minY, maxY, minT, maxT, suffix, padL, padT, plotH, muted });
+    drawGrid(ctx, { padL, padT, plotW, plotH, border });
 
     // draw + fill
     // Fill only the first series to avoid clutter
-    const keys = Object.keys(seriesMap);
+    const keys = Object.keys(visibleSeriesMap);
     const firstKey = keys[0];
-    const firstSeries = seriesMap[firstKey] || [];
+    const firstSeries = visibleSeriesMap[firstKey] || [];
 
     fillUnderSeries(ctx, firstSeries, { xFor, yFor, padT, plotH, fillStyle: fill });
 
@@ -289,12 +486,55 @@ function drawMultiLineChart(canvas, seriesMap, { title = "", suffix = "" } = {})
     const key0 = keys[0];
     const key1 = keys[1];
 
-    if (key0) drawSeries(ctx, seriesMap[key0] || [], { xFor, yFor, strokeStyle: lineA, lineWidth: 2 });
-    if (key1) drawSeries(ctx, seriesMap[key1] || [], { xFor, yFor, strokeStyle: lineB, lineWidth: 2 });
+    if (key0) {
+        drawSeries(ctx, visibleSeriesMap[key0] || [], { xFor, yFor, strokeStyle: lineA, lineWidth: 2 });
+        drawPointMarkers(ctx, visibleSeriesMap[key0] || [], { xFor, yFor, fillStyle: lineA });
+    }
+    if (key1) {
+        drawSeries(ctx, visibleSeriesMap[key1] || [], { xFor, yFor, strokeStyle: lineB, lineWidth: 2 });
+        drawPointMarkers(ctx, visibleSeriesMap[key1] || [], { xFor, yFor, fillStyle: lineB });
+    }
+
+    const focusT = interaction?.viewState?.focusT;
+    const focusEntries = focusT == null
+        ? []
+        : keys
+            .map((key, index) => {
+                const point = getNearestPoint(visibleSeriesMap[key] || [], focusT);
+                if (!point) return null;
+                return {
+                    point,
+                    label: interaction?.seriesLabels?.[key] || (keys.length > 1 ? key : ""),
+                    color: index === 0 ? lineA : lineB,
+                };
+            })
+            .filter(Boolean);
 
     // Last markers/labels
-    if (key0) drawLastMarker(ctx, seriesMap[key0] || [], { xFor, yFor, dotStyle: lineA, textStyle: muted, suffix, cssW, labelOffsetY: 4 });
-    if (key1) drawLastMarker(ctx, seriesMap[key1] || [], { xFor, yFor, dotStyle: lineB, textStyle: muted, suffix, cssW, labelOffsetY: 16 });
+    if (focusEntries.length) {
+        drawFocusOverlay(ctx, focusEntries, {
+            focusT: focusEntries[0].point.t,
+            xFor,
+            yFor,
+            padT,
+            plotH,
+            cssW,
+            padR,
+            suffix,
+            text,
+            muted,
+            border,
+        });
+    } else {
+        if (key0) drawLastMarker(ctx, visibleSeriesMap[key0] || [], { xFor, yFor, dotStyle: lineA, textStyle: muted, suffix, cssW, labelOffsetY: 4 });
+        if (key1) drawLastMarker(ctx, visibleSeriesMap[key1] || [], { xFor, yFor, dotStyle: lineB, textStyle: muted, suffix, cssW, labelOffsetY: 16 });
+    }
+
+    return {
+        padL,
+        plotW,
+        visibleTimeline: viewport.visibleTimeline,
+    };
 }
 
 function skeletonHtml({ weightTitle, repsTitle, isUnilateral, leftLabel, rightLabel }) {
@@ -318,13 +558,13 @@ function skeletonHtml({ weightTitle, repsTitle, isUnilateral, leftLabel, rightLa
       <div style="border:1px solid var(--border); border-radius:12px; padding:10px;">
         ${legend}
         <canvas data-chart="weight" aria-label="${escapeHtml(weightTitle)}"
-          style="width:100%; height:120px; display:block;"></canvas>
+                    style="width:100%; height:120px; display:block; touch-action:pan-y; cursor:grab;"></canvas>
       </div>
 
       <div style="border:1px solid var(--border); border-radius:12px; padding:10px;">
         ${legend}
         <canvas data-chart="reps" aria-label="${escapeHtml(repsTitle)}"
-          style="width:100%; height:120px; display:block;"></canvas>
+                    style="width:100%; height:120px; display:block; touch-action:pan-y; cursor:grab;"></canvas>
       </div>
     </div>
   `;
@@ -358,24 +598,153 @@ export function mountRepGroupHistoryCharts(containerEl, repGroup, { t } = {}) {
 
     const weightCanvas = containerEl.querySelector('canvas[data-chart="weight"]');
     const repsCanvas = containerEl.querySelector('canvas[data-chart="reps"]');
+    const sharedTimeline = getRepGroupTimeline(repGroup);
+    const chartState = {
+        ...getDefaultViewportState(sharedTimeline),
+        activePointerId: null,
+        activeCanvas: null,
+        isDragging: false,
+        dragStartX: 0,
+        dragStartY: 0,
+        dragStartIndex: 0,
+        lastTapAt: 0,
+    };
+    const canvasLayouts = new WeakMap();
+
+    const pickTimestamp = (canvas, clientX) => {
+        const layout = canvasLayouts.get(canvas);
+        if (!layout?.visibleTimeline?.length) return null;
+
+        const rect = canvas.getBoundingClientRect();
+        const relativeX = clamp(clientX - rect.left, 0, rect.width || 1);
+        const normalized = clamp((relativeX - layout.padL) / Math.max(1, layout.plotW), 0, 1);
+        const maxIndex = layout.visibleTimeline.length - 1;
+        const index = Math.round(normalized * maxIndex);
+        return layout.visibleTimeline[index] ?? null;
+    };
+
+    const resetViewport = () => {
+        Object.assign(chartState, getDefaultViewportState(sharedTimeline), {
+            activePointerId: null,
+            activeCanvas: null,
+            isDragging: false,
+            dragStartX: 0,
+            dragStartY: 0,
+            dragStartIndex: 0,
+        });
+    };
 
     const render = () => {
         if (isUnilateral) {
             const w = getPointsBySide(repGroup, "weight");
             const r = getPointsBySide(repGroup, "reps");
 
-            drawMultiLineChart(weightCanvas, { left: w.left, right: w.right }, { title: weightTitle });
-            drawMultiLineChart(repsCanvas, { left: r.left, right: r.right }, { title: repsTitle });
+            canvasLayouts.set(weightCanvas, drawMultiLineChart(weightCanvas, { left: w.left, right: w.right }, {
+                title: weightTitle,
+                interaction: { timeline: sharedTimeline, viewState: chartState, seriesLabels: { left: leftLabel, right: rightLabel } },
+            }));
+            canvasLayouts.set(repsCanvas, drawMultiLineChart(repsCanvas, { left: r.left, right: r.right }, {
+                title: repsTitle,
+                interaction: { timeline: sharedTimeline, viewState: chartState, seriesLabels: { left: leftLabel, right: rightLabel } },
+            }));
         } else {
-            drawLineChart(weightCanvas, getPoints(repGroup, "weight"), { title: weightTitle });
-            drawLineChart(repsCanvas, getPoints(repGroup, "reps"), { title: repsTitle });
+            canvasLayouts.set(weightCanvas, drawMultiLineChart(weightCanvas, { main: getPoints(repGroup, "weight") }, {
+                title: weightTitle,
+                interaction: { timeline: sharedTimeline, viewState: chartState, seriesLabels: { main: "" } },
+            }));
+            canvasLayouts.set(repsCanvas, drawMultiLineChart(repsCanvas, { main: getPoints(repGroup, "reps") }, {
+                title: repsTitle,
+                interaction: { timeline: sharedTimeline, viewState: chartState, seriesLabels: { main: "" } },
+            }));
         }
+    };
+
+    const handlePointerDown = (event) => {
+        const canvas = event.currentTarget;
+        canvas.setPointerCapture?.(event.pointerId);
+        chartState.activePointerId = event.pointerId;
+        chartState.activeCanvas = canvas;
+        chartState.isDragging = false;
+        chartState.dragStartX = event.clientX;
+        chartState.dragStartY = event.clientY;
+        chartState.dragStartIndex = chartState.startIndex;
+    };
+
+    const handlePointerMove = (event) => {
+        if (chartState.activePointerId !== event.pointerId || !chartState.activeCanvas) return;
+
+        const canvas = chartState.activeCanvas;
+        const layout = canvasLayouts.get(canvas);
+        if (!layout?.visibleTimeline?.length) return;
+
+        const dx = event.clientX - chartState.dragStartX;
+        const dy = event.clientY - chartState.dragStartY;
+
+        if (!chartState.isDragging) {
+            if (Math.abs(dx) < DRAG_THRESHOLD_PX || Math.abs(dx) <= Math.abs(dy)) return;
+            chartState.isDragging = true;
+        }
+
+        event.preventDefault();
+        const pixelsPerStep = layout.visibleTimeline.length > 1
+            ? layout.plotW / Math.max(1, chartState.windowSize - 1)
+            : layout.plotW;
+        const nextStart = chartState.dragStartIndex - Math.round(dx / Math.max(18, pixelsPerStep));
+        const maxStart = Math.max(0, sharedTimeline.length - chartState.windowSize);
+        const clampedStart = clamp(nextStart, 0, maxStart);
+
+        if (clampedStart !== chartState.startIndex) {
+            chartState.startIndex = clampedStart;
+            chartState.focusT = null;
+            render();
+        }
+    };
+
+    const handlePointerEnd = (event) => {
+        if (chartState.activePointerId !== event.pointerId) return;
+
+        const canvas = event.currentTarget;
+        canvas.releasePointerCapture?.(event.pointerId);
+
+        if (!chartState.isDragging) {
+            const now = Date.now();
+            if (now - chartState.lastTapAt <= DOUBLE_TAP_MS) {
+                resetViewport();
+            } else {
+                chartState.focusT = pickTimestamp(canvas, event.clientX);
+                chartState.lastTapAt = now;
+            }
+            render();
+        }
+
+        chartState.activePointerId = null;
+        chartState.activeCanvas = null;
+        chartState.isDragging = false;
     };
 
     render();
 
+    weightCanvas?.addEventListener("pointerdown", handlePointerDown);
+    repsCanvas?.addEventListener("pointerdown", handlePointerDown);
+    weightCanvas?.addEventListener("pointermove", handlePointerMove);
+    repsCanvas?.addEventListener("pointermove", handlePointerMove);
+    weightCanvas?.addEventListener("pointerup", handlePointerEnd);
+    repsCanvas?.addEventListener("pointerup", handlePointerEnd);
+    weightCanvas?.addEventListener("pointercancel", handlePointerEnd);
+    repsCanvas?.addEventListener("pointercancel", handlePointerEnd);
+
     const ro = new ResizeObserver(render);
     ro.observe(containerEl);
 
-    return () => ro.disconnect();
+    return () => {
+        ro.disconnect();
+        weightCanvas?.removeEventListener("pointerdown", handlePointerDown);
+        repsCanvas?.removeEventListener("pointerdown", handlePointerDown);
+        weightCanvas?.removeEventListener("pointermove", handlePointerMove);
+        repsCanvas?.removeEventListener("pointermove", handlePointerMove);
+        weightCanvas?.removeEventListener("pointerup", handlePointerEnd);
+        repsCanvas?.removeEventListener("pointerup", handlePointerEnd);
+        weightCanvas?.removeEventListener("pointercancel", handlePointerEnd);
+        repsCanvas?.removeEventListener("pointercancel", handlePointerEnd);
+    };
 }
