@@ -9,6 +9,26 @@ import { openSessionSetModal } from "/src/ui/components/sessionSetModal.js";
 import { RepGroup, Laterality } from "/src/models/repGroup.js";
 import { setLeaveGuard, clearLeaveGuard } from "/src/router.js";
 import { mountRepGroupHistoryCharts } from "/src/ui/components/repGroupHistoryChart.js";
+import {
+    formatSideValue as formatSideValueValue,
+    isSameWeight as isSameWeightValue,
+    normalizeReps as normalizeRepsValue,
+    normalizeWeight as normalizeWeightValue,
+    resolveExerciseName as resolveExerciseNameValue,
+    resolveRepValue as resolveRepValueValue,
+} from "./sessionValueUtils.js";
+import {
+    advanceToNext as advanceToNextProgress,
+    ensureSessionSeriesOrder as ensureSessionSeriesOrderProgress,
+    hasCompletedAnyRep as hasCompletedAnyRepProgress,
+    isRepDone as isRepDoneProgress,
+    markRepDone as markRepDoneProgress,
+    pickTopMostIncomplete as pickTopMostIncompleteProgress,
+    recomputeCompletedSeries as recomputeCompletedSeriesProgress,
+    shiftCompletedAfterInsert as shiftCompletedAfterInsertProgress,
+    statusForRep as statusForRepProgress,
+    statusForSeries as statusForSeriesProgress,
+} from "./sessionProgress.js";
 
 export function mountSessionPage({ routineStore, exerciseStore }) {
     const titleEl = document.getElementById("sessionTitle");
@@ -487,7 +507,7 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
     }
 
     function hasCompletedAnyRep(seriesIdx) {
-        return completedRepGroups.get(seriesIdx)?.size > 0;
+        return hasCompletedAnyRepProgress(completedRepGroups, seriesIdx);
     }
 
     function stopRestTick() {
@@ -498,27 +518,15 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
     }
 
     function normalizeWeight(w) {
-        if (w === null) return null;
-        if (typeof w === "number") return w;
-        return { left: w?.left ?? null, right: w?.right ?? null };
+        return normalizeWeightValue(w);
     }
 
     function normalizeReps(r) {
-        if (r === null) return null;
-        if (typeof r === "number") return r;
-        return { left: r?.left ?? null, right: r?.right ?? null };
+        return normalizeRepsValue(r);
     }
 
     function isSameWeight(a, b) {
-        const wa = normalizeWeight(a);
-        const wb = normalizeWeight(b);
-
-        if (wa === null && wb === null) return true;
-        if (typeof wa === "number" && typeof wb === "number") return wa === wb;
-        if (typeof wa === "object" && typeof wb === "object") {
-            return wa.left === wb.left && wa.right === wb.right;
-        }
-        return false;
+        return isSameWeightValue(a, b);
     }
 
     function updateCurrentSetTimerUI() {
@@ -646,150 +654,66 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
     });
 
     function isRepDone(seriesIdx, repIdx) {
-        return completedRepGroups.get(seriesIdx)?.has(repIdx) === true;
+        return isRepDoneProgress(completedRepGroups, seriesIdx, repIdx);
     }
 
     function markRepDone(seriesIdx, repIdx) {
-        if (!completedRepGroups.has(seriesIdx)) completedRepGroups.set(seriesIdx, new Set());
-        completedRepGroups.get(seriesIdx).add(repIdx);
+        markRepDoneProgress(completedRepGroups, seriesIdx, repIdx);
     }
 
     function shiftCompletedAfterInsert(seriesIdx, insertIdx) {
-        const done = completedRepGroups.get(seriesIdx);
-        if (!done || done.size === 0) return;
-
-        const shifted = new Set();
-        for (const idx of done) {
-            shifted.add(idx >= insertIdx ? idx + 1 : idx);
-        }
-        completedRepGroups.set(seriesIdx, shifted);
+        shiftCompletedAfterInsertProgress(completedRepGroups, seriesIdx, insertIdx);
     }
 
     function statusForRep(seriesIdx, repIdx) {
-        if (isRepDone(seriesIdx, repIdx)) return "done";
-        if (seriesIdx === currentSeriesIndex && repIdx === currentRepGroupIndex) return "active";
-        return "todo";
+        return statusForRepProgress({ completedRepGroups, currentSeriesIndex, currentRepGroupIndex }, seriesIdx, repIdx);
     }
 
     function statusForSeries(seriesIdx, routine) {
-        const groups = routine?.series?.[seriesIdx]?.repGroups ?? [];
-        if (!groups.length) return seriesIdx === currentSeriesIndex ? "active" : "todo";
-
-        const allDone = groups.every((_, i) => isRepDone(seriesIdx, i));
-        if (allDone) return "done";
-        if (seriesIdx === currentSeriesIndex) return "active";
-        return "todo";
+        return statusForSeriesProgress({ completedRepGroups, currentSeriesIndex, currentRepGroupIndex }, seriesIdx, routine);
     }
 
     function recomputeCompletedSeries(routine) {
-        const series = routine?.series ?? [];
-        const nextCompleted = new Set();
-
-        for (let s = 0; s < series.length; s += 1) {
-            const groups = Array.isArray(series[s]?.repGroups) ? series[s].repGroups : [];
-            if (!groups.length) continue;
-
-            const allDone = groups.every((_, i) => isRepDone(s, i));
-            if (allDone) nextCompleted.add(s);
-        }
-
-        completedSeries = nextCompleted;
+        completedSeries = recomputeCompletedSeriesProgress(routine, completedRepGroups);
     }
 
     function ensureSessionSeriesOrder(routine) {
-        const series = Array.isArray(routine?.series) ? routine.series : [];
-        if (!sessionSeriesOrder || sessionSeriesOrder.length !== series.length) {
-            sessionSeriesOrder = series.map((_, i) => i);
-        }
+        sessionSeriesOrder = ensureSessionSeriesOrderProgress(routine, sessionSeriesOrder);
         return sessionSeriesOrder;
     }
 
-    function getFirstIncompleteRepIndex(seriesIdx, routine) {
-        const groups = Array.isArray(routine?.series?.[seriesIdx]?.repGroups)
-            ? routine.series[seriesIdx].repGroups
-            : [];
-        if (!groups.length) return null;
-
-        for (let i = 0; i < groups.length; i += 1) {
-            if (!isRepDone(seriesIdx, i)) return i;
-        }
-        return null;
-    }
-
-    function getNextIncompleteRepAfter(seriesIdx, startAfterRepIdx, routine) {
-        const groups = Array.isArray(routine?.series?.[seriesIdx]?.repGroups)
-            ? routine.series[seriesIdx].repGroups
-            : [];
-        if (!groups.length) return null;
-
-        for (let i = (startAfterRepIdx ?? -1) + 1; i < groups.length; i += 1) {
-            if (!isRepDone(seriesIdx, i)) return i;
-        }
-        return null;
-    }
-
     function pickTopMostIncomplete(routine) {
-        const order = ensureSessionSeriesOrder(routine);
-        for (const seriesIdx of order) {
-            const repIdx = getFirstIncompleteRepIndex(seriesIdx, routine);
-            if (repIdx != null) {
-                return { seriesIdx, repIdx };
-            }
-        }
-        return null;
+        const pick = pickTopMostIncompleteProgress(routine, sessionSeriesOrder, completedRepGroups);
+        sessionSeriesOrder = pick.sessionSeriesOrder ?? sessionSeriesOrder;
+        return pick.seriesIdx == null ? null : { seriesIdx: pick.seriesIdx, repIdx: pick.repIdx };
     }
 
     function advanceToNext(routine) {
         if (!routine) return;
 
-        const nextInSame = getNextIncompleteRepAfter(currentSeriesIndex, currentRepGroupIndex, routine);
-        if (nextInSame != null) {
-            currentRepGroupIndex = nextInSame;
-            return;
-        }
-        const firstInSame = getFirstIncompleteRepIndex(currentSeriesIndex, routine);
-        if (firstInSame != null) {
-            currentRepGroupIndex = firstInSame;
-            return;
-        }
-        const pick = pickTopMostIncomplete(routine);
-        if (pick) {
-            currentSeriesIndex = pick.seriesIdx;
-            currentRepGroupIndex = pick.repIdx;
-        }
+        const next = advanceToNextProgress(routine, {
+            completedRepGroups,
+            currentSeriesIndex,
+            currentRepGroupIndex,
+            sessionSeriesOrder,
+        });
+        if (!next) return;
+
+        currentSeriesIndex = next.currentSeriesIndex;
+        currentRepGroupIndex = next.currentRepGroupIndex;
+        sessionSeriesOrder = next.sessionSeriesOrder ?? sessionSeriesOrder;
     }
 
     function resolveExerciseName(seriesItem) {
-        const id = seriesItem?.exerciseId;
-        if (!id) return t("session.exercise.unknown");
-
-        const ex =
-            exerciseStore?.getById?.(id) ||
-            exerciseStore?.list?.()?.find?.((e) => e.id === id) ||
-            null;
-
-        return ex?.name || ex?.description || id;
+        return resolveExerciseNameValue(seriesItem, exerciseStore, t("session.exercise.unknown"));
     }
 
     function formatSideValue(v) {
-        if (v == null) return "—";
-        if (typeof v === "number") return String(v);
-        if (typeof v === "object") {
-            const left = v.left ?? "—";
-            const right = v.right ?? "—";
-            return `${left}/${right}`;
-        }
-        return String(v);
+        return formatSideValueValue(v);
     }
 
     function resolveRepValue(repGroup, field) {
-        const hist = Array.isArray(repGroup?.history) ? repGroup.history : [];
-        const last = hist.length ? hist[hist.length - 1] : null;
-
-        if (field === "targetWeight") return last?.weight ?? repGroup?.targetWeight ?? null;
-        if (field === "targetReps") return last?.reps ?? repGroup?.targetReps ?? null;
-
-        return null;
+        return resolveRepValueValue(repGroup, field);
     }
 
     function renderCurrentExercise(routine) {

@@ -3,7 +3,8 @@
 import { startRouter, navigate, onNavigate } from "./router.js";
 import { createRoutineStore } from "./store/routineStore.js";
 import { createExerciseStore } from "./store/exerciseStore.js";
-import { importRoutineFromExport } from "./import/routineImport.js";
+import { registerServiceWorker } from "./app/serviceWorkerBootstrap.js";
+import { setupRoutineImport } from "./app/routineImportBootstrap.js";
 
 import { mountSessionPage } from "./pages/sessionPage/sessionPage.js";
 import { mountRoutinesPage } from "./pages/routinesPage/routinesPage.js";
@@ -12,40 +13,7 @@ import { mountRoutineDetailPage } from "./pages/routinesPage/routineDetailPage.j
 
 import { setLocale, getLocale, getLocaleFromUrl, translateDocument, t } from "./internationalization/i18n.js";
 
-// -----------------------------------------------------------------------------
-// Service Worker registration + diagnostics
-// -----------------------------------------------------------------------------
-if ("serviceWorker" in navigator) {
-    console.log("[SW] serviceWorker supported");
-
-    window.addEventListener("load", async () => {
-        try {
-            const reg = await navigator.serviceWorker.register("/sw.js");
-            console.log("[SW] registered:", reg.scope);
-
-            // When the SW is ready (installed + activated)
-            navigator.serviceWorker.ready.then(() => {
-                console.log("[SW] ready");
-            });
-
-            // Log initial controller state
-            if (navigator.serviceWorker.controller) {
-                console.log("[SW] controller present on first load");
-            } else {
-                console.log("[SW] controller is NULL on first load");
-            }
-
-            // Listen for controller takeover
-            navigator.serviceWorker.addEventListener("controllerchange", () => {
-                console.log("[SW] controller changed — page now controlled");
-            });
-        } catch (err) {
-            console.error("[SW] registration failed:", err);
-        }
-    });
-} else {
-    console.warn("[SW] serviceWorker NOT supported");
-}
+registerServiceWorker();
 
 // -----------------------------------------------------------------------------
 // Stores
@@ -66,43 +34,11 @@ btnClearAll.addEventListener("click", () => {
 });
 
 const btnUploadRoutine = document.getElementById("btnUploadRoutine");
-
-const uploadInput = document.createElement("input");
-uploadInput.type = "file";
-uploadInput.accept = ".json,.gymroutine.json";
-uploadInput.style.display = "none";
-document.body.appendChild(uploadInput);
-
-btnUploadRoutine?.addEventListener("click", () => {
-    uploadInput.value = "";
-    uploadInput.click();
-});
-
-btnUploadRoutine?.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        uploadInput.value = "";
-        uploadInput.click();
-    }
-});
-
-uploadInput.addEventListener("change", async () => {
-    const file = uploadInput.files?.[0];
-    if (!file) return;
-
-    try {
-        const text = await file.text();
-
-        const routine = importRoutineFromExport({
-            rawText: text,
-            routineStore,
-            exerciseStore,
-        });
-
-        navigate(`#/routine/${routine.id}`);
-    } catch (err) {
-        alert(err?.message || "Failed to import routine");
-    }
+setupRoutineImport({
+    triggerEl: btnUploadRoutine,
+    routineStore,
+    exerciseStore,
+    navigate,
 });
 
 // -----------------------------------------------------------------------------
