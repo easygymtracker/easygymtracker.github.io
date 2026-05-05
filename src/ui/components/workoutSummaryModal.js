@@ -14,6 +14,14 @@ function toScalarReps(reps) {
     return l + r;
 }
 
+function toScalarWeight(weight) {
+    if (weight == null) return null;
+    if (typeof weight === "number") return weight;
+    const l = typeof weight.left === "number" ? weight.left : 0;
+    const r = typeof weight.right === "number" ? weight.right : 0;
+    return l + r;
+}
+
 function toVolumeFromEntry(entry) {
     const { reps, weight } = entry;
     if (reps == null || weight == null) return 0;
@@ -62,6 +70,55 @@ function pickComparison(totalKg) {
 }
 
 // ─── stats computation ────────────────────────────────────────────────────────
+
+export function computeSessionPRs(routine, sessionStartIso) {
+    const previousByExercise = new Map();
+    const currentByExercise = new Map();
+
+    for (const series of routine?.series ?? []) {
+        const exName = series?.exerciseName
+            ?? series?.exercise?.name
+            ?? t("session.exercise.unknown")
+            ?? "Exercise";
+
+        for (const rg of series?.repGroups ?? []) {
+            for (const entry of rg?.history ?? []) {
+                if (!entry?.dateTime) continue;
+
+                const reps = toScalarReps(entry.reps) ?? 0;
+                const weight = toScalarWeight(entry.weight) ?? 0;
+                const volume = toVolumeFromEntry(entry) ?? 0;
+
+                const target = entry.dateTime < sessionStartIso
+                    ? previousByExercise
+                    : currentByExercise;
+
+                const prev = target.get(exName) ?? { maxReps: 0, maxWeight: 0, maxVolume: 0 };
+                prev.maxReps = Math.max(prev.maxReps, reps);
+                prev.maxWeight = Math.max(prev.maxWeight, weight);
+                prev.maxVolume = Math.max(prev.maxVolume, volume);
+                target.set(exName, prev);
+            }
+        }
+    }
+
+    const byExercise = [];
+    for (const [exercise, current] of currentByExercise.entries()) {
+        const prev = previousByExercise.get(exercise) ?? { maxReps: 0, maxWeight: 0, maxVolume: 0 };
+        const weightPr = current.maxWeight > prev.maxWeight && current.maxWeight > 0;
+        const repsPr = current.maxReps > prev.maxReps && current.maxReps > 0;
+        const volumePr = current.maxVolume > prev.maxVolume && current.maxVolume > 0;
+
+        if (weightPr || repsPr || volumePr) {
+            byExercise.push({ exercise, weightPr, repsPr, volumePr });
+        }
+    }
+
+    return {
+        totalPrs: byExercise.reduce((acc, item) => acc + Number(item.weightPr) + Number(item.repsPr) + Number(item.volumePr), 0),
+        byExercise,
+    };
+}
 
 export function computeSessionStats(routine, sessionStartIso) {
     let totalVolume = 0;

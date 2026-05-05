@@ -9,7 +9,7 @@ import { openSessionSetModal } from "/src/ui/components/sessionSetModal.js";
 import { RepGroup, Laterality } from "/src/models/repGroup.js";
 import { setLeaveGuard, clearLeaveGuard } from "/src/router.js";
 import { mountRepGroupHistoryCharts } from "/src/ui/components/repGroupHistoryChart.js";
-import { openWorkoutSummaryModal } from "/src/ui/components/workoutSummaryModal.js";
+import { openWorkoutSummaryModal, computeSessionStats, computeSessionPRs } from "/src/ui/components/workoutSummaryModal.js";
 import {
     formatSideValue as formatSideValueValue,
     isSameWeight as isSameWeightValue,
@@ -31,7 +31,7 @@ import {
     statusForSeries as statusForSeriesProgress,
 } from "./sessionProgress.js";
 
-export function mountSessionPage({ routineStore, exerciseStore }) {
+export function mountSessionPage({ routineStore, exerciseStore, profileStore, workoutSessionStore }) {
     const titleEl = document.getElementById("sessionTitle");
     const metaEl = document.getElementById("sessionRoutineMeta");
 
@@ -481,6 +481,24 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         notifySessionState();
     }
 
+    function buildSessionNotesSnapshot(routine) {
+        const parts = [];
+        for (const [idx, series] of (routine?.series ?? []).entries()) {
+            const text = String(series?.description ?? "").trim();
+            if (!text) continue;
+            const exName = resolveExerciseName(series);
+            parts.push(`${idx + 1}. ${exName}: ${text}`);
+        }
+        return parts.join("\n");
+    }
+
+    function latestBodyweightKg() {
+        if (!profileStore?.listEntries) return null;
+        const latest = profileStore.listEntries()[0] ?? null;
+        const value = Number(latest?.weightKg);
+        return Number.isFinite(value) && value > 0 ? value : null;
+    }
+
     function isWorkoutComplete(routine) {
         const series = Array.isArray(routine?.series) ? routine.series : [];
         if (!series.length) return true;
@@ -497,6 +515,7 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         const durationMs = startEpochMs != null ? endEpochMs - startEpochMs : elapsedMs;
         const sessionStartIso = startEpochMs != null ? new Date(startEpochMs).toISOString() : null;
         const summaryRoutine = currentRoutineId ? routineStore.getById(currentRoutineId) : null;
+        const endedAtIso = new Date(endEpochMs).toISOString();
 
         cleanupCharts?.();
         cleanupCharts = null;
@@ -515,6 +534,31 @@ export function mountSessionPage({ routineStore, exerciseStore }) {
         renderCurrent();
 
         if (summaryRoutine && sessionStartIso) {
+            const stats = computeSessionStats(summaryRoutine, sessionStartIso);
+            const prDetection = computeSessionPRs(summaryRoutine, sessionStartIso);
+
+            if (workoutSessionStore?.addSession) {
+                workoutSessionStore.addSession({
+                    routineId: summaryRoutine.id,
+                    routineName: summaryRoutine.name || "",
+                    date: endedAtIso,
+                    startedAt: sessionStartIso,
+                    endedAt: endedAtIso,
+                    durationMs,
+                    sessionNotes: buildSessionNotesSnapshot(summaryRoutine),
+                    rpe: null,
+                    bodyweightKg: latestBodyweightKg(),
+                    totals: {
+                        sets: stats.totalSets,
+                        reps: stats.totalReps,
+                        volume: stats.totalVolume,
+                        exercises: stats.exercises.length,
+                    },
+                    exerciseBreakdown: stats.exercises,
+                    prDetection,
+                });
+            }
+
             await openWorkoutSummaryModal({
                 routine: summaryRoutine,
                 sessionStartIso,

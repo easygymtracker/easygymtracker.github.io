@@ -4,6 +4,7 @@ import { startRouter, navigate } from "./router.js";
 import { createRoutineStore } from "./store/routineStore.js";
 import { createExerciseStore } from "./store/exerciseStore.js";
 import { createProfileStore } from "./store/profileStore.js";
+import { createWorkoutSessionStore } from "./store/workoutSessionStore.js";
 import { registerServiceWorker } from "./app/serviceWorkerBootstrap.js";
 import { setupRoutineImport } from "./app/routineImportBootstrap.js";
 import { createStyleRouter } from "./app/styleRouter.js";
@@ -25,6 +26,7 @@ registerServiceWorker();
 const routineStore = createRoutineStore();
 const exerciseStore = createExerciseStore();
 const profileStore = createProfileStore();
+const workoutSessionStore = createWorkoutSessionStore();
 
 // -----------------------------------------------------------------------------
 // Top toolbar actions (global)
@@ -58,7 +60,7 @@ const pages = {
     routines: mountRoutinesPage({ routineStore, exerciseStore }),
     "routine-new": mountRoutineNewPage({ routineStore }),
     routine: mountRoutineDetailPage({ routineStore, exerciseStore }),
-    session: mountSessionPage({ routineStore, exerciseStore }),
+    session: mountSessionPage({ routineStore, exerciseStore, profileStore, workoutSessionStore }),
     profile: mountProfilePage({ profileStore }),
     "profile-history": mountProfileHistoryPage({ profileStore }),
 };

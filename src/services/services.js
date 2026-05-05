@@ -8,6 +8,7 @@ import { Exercise } from "../models/exercise.js";
 import { Routine } from "../models/routine.js";
 import { SetSeries } from "../models/setSeries.js";
 import { RepGroup } from "../models/repGroup.js";
+import { WorkoutSession } from "../models/workoutSession.js";
 
 const adapter = new LocalStorageAdapter("gymapp_v1");
 
@@ -18,6 +19,7 @@ const serializer = new JsonSerializer({
         Routine: (obj) => Routine.fromJSON(obj),
         SetSeries: (obj) => SetSeries.fromJSON(obj),
         RepGroup: (obj) => RepGroup.fromJSON(obj),
+        WorkoutSession: (obj) => WorkoutSession.fromJSON(obj),
     },
     // migrate: (payload, fromV, toV) => payload, // add when needed
 });
