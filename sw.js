@@ -2,7 +2,7 @@
 
 // Cache strategy
 // Bump CACHE_VERSION whenever assets change.
-const CACHE_VERSION = "v3";
+const CACHE_VERSION = "v4";
 const CACHE_NAME = `gym-tracker-${CACHE_VERSION}`;
 
 // App-shell files to precache on install.
@@ -27,17 +27,25 @@ let sessionStartTs = null;
 let lastHeartbeatTs = null;
 
 const NOTIFICATION_TAG = "workout-session";
-const NOTIFICATION_ICON = "/assets/favicon.png";
-const NOTIFICATION_BADGE = "/assets/favicon.png";
+const NOTIFICATION_ICON = "/assets/favicon_bg.png";
+const NOTIFICATION_BADGE = "/assets/favicon_bg.png";
 const NOTIFICATION_IMAGE = "/assets/favicon_bg.png";
 const NOTIFICATION_COLOR = "#1e1e1e";
+
+const IS_LOCALHOST =
+    self.location.hostname === "localhost" ||
+    self.location.hostname === "127.0.0.1" ||
+    self.location.hostname === "::1";
 
 self.addEventListener("install", (event) => {
     console.log("[SW] installed");
     self.skipWaiting();
-    event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE_URLS))
-    );
+    // Skip precaching on localhost to avoid stale bundles.
+    if (!IS_LOCALHOST) {
+        event.waitUntil(
+            caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE_URLS))
+        );
+    }
 });
 
 self.addEventListener("activate", (event) => {
@@ -55,7 +63,10 @@ self.addEventListener("activate", (event) => {
 
 // Navigation requests: network-first.
 // Static assets: cache-first.
+// Skip all caching on localhost to avoid stale bundles.
 self.addEventListener("fetch", (event) => {
+    if (IS_LOCALHOST) return;
+
     const { request } = event;
 
     if (request.method !== "GET") return;

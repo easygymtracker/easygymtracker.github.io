@@ -9,25 +9,18 @@ export function registerServiceWorker() {
         location.hostname === "127.0.0.1" ||
         location.hostname === "::1";
 
-    // Local static serving (python/http.server) frequently keeps stale SW caches.
-    // Disable SW locally to avoid loading outdated JS/CSS bundles.
-    if (isLocalHost) {
+    // On localhost clear stale caches but still register the SW so
+    // notifications work during development.
+    if (isLocalHost && "caches" in window) {
         window.addEventListener("load", async () => {
             try {
-                const regs = await navigator.serviceWorker.getRegistrations();
-                await Promise.all(regs.map((reg) => reg.unregister()));
-
-                if ("caches" in window) {
-                    const keys = await caches.keys();
-                    await Promise.all(keys.map((key) => caches.delete(key)));
-                }
-
-                console.log("[SW] disabled on localhost and caches cleared");
+                const keys = await caches.keys();
+                await Promise.all(keys.map((key) => caches.delete(key)));
+                console.log("[SW] localhost: caches cleared");
             } catch (err) {
-                console.warn("[SW] local cleanup failed:", err);
+                console.warn("[SW] localhost cache cleanup failed:", err);
             }
         });
-        return;
     }
 
     console.log("[SW] serviceWorker supported");

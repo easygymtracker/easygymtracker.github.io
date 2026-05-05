@@ -225,7 +225,7 @@ export function openWorkoutSummaryModal({ routine, sessionStartIso, durationMs, 
                 <td>${escapeHtml(ex.name)}</td>
                 <td>${ex.sets}</td>
                 <td>${ex.reps}</td>
-                <td>${ex.volume > 0 ? (Math.round(ex.volume) + " kg") : "—"}</td>
+                <td>${ex.volume > 0 ? (Math.round(ex.volume) + " kg") : "ï¿½"}</td>
             </tr>
         `).join("");
 
