@@ -1,94 +1,76 @@
 // app/styleRouter.js
-
-function toArray(value) {
-    return Array.isArray(value) ? value : [];
-}
+//
+// Lazy style loader: only fetches a route's CSS when the route is first
+// visited instead of prewarming every stylesheet at boot.  Previously loaded
+// sheets are cached in-memory and toggled via `media` on subsequent visits.
 
 export function createStyleRouter({ routeToStyles = {}, resolveFrom = import.meta.url } = {}) {
-    const managedLinks = new Map();
-    const managedPreloads = new Set();
+    // href → <link> element (only created once per unique href)
+    const linkByHref = new Map();
 
-    function resolveStyleHref(stylePath) {
-        return new URL(stylePath, resolveFrom).href;
-    }
+    // Pre-index: resolve every relative path once at init.
+    // routeHrefs: Map<routeName, Set<absoluteHref>>
+    // allHrefs:   Set<absoluteHref>
+    const routeHrefs = new Map();
+    const allHrefs = new Set();
 
-    function stylesForRoute(routeName) {
-        return toArray(routeToStyles[routeName]);
-    }
-
-    function allStyleHrefs() {
-        return Array.from(
-            new Set(
-                Object.values(routeToStyles)
-                    .flatMap((value) => toArray(value))
-                    .map(resolveStyleHref)
-            )
-        );
-    }
-
-    function findManagedLink(href) {
-        for (const linkEl of document.head.querySelectorAll('link[data-style-router="true"][rel="stylesheet"]')) {
-            if (linkEl.href === href) return linkEl;
+    for (const [route, paths] of Object.entries(routeToStyles)) {
+        const resolved = new Set();
+        for (const p of Array.isArray(paths) ? paths : []) {
+            const href = new URL(p, resolveFrom).href;
+            resolved.add(href);
+            allHrefs.add(href);
         }
-        return null;
+        routeHrefs.set(route, resolved);
     }
 
-    function ensureManagedLink(href) {
-        if (managedLinks.has(href)) return managedLinks.get(href);
-
-        const existing = findManagedLink(href);
-        if (existing) {
-            managedLinks.set(href, existing);
-            return existing;
-        }
-
-        const linkEl = document.createElement("link");
-        linkEl.rel = "stylesheet";
-        linkEl.href = href;
-        linkEl.media = "not all";
-        linkEl.setAttribute("data-style-router", "true");
-        document.head.appendChild(linkEl);
-        managedLinks.set(href, linkEl);
-        return linkEl;
-    }
-
-    function ensurePreload(href) {
-        if (managedPreloads.has(href)) return;
-        for (const preloadEl of document.head.querySelectorAll('link[data-style-router-preload="true"][rel="preload"][as="style"]')) {
-            if (preloadEl.href === href) {
-                managedPreloads.add(href);
-                return;
-            }
-        }
-
-        const preloadEl = document.createElement("link");
-        preloadEl.rel = "preload";
-        preloadEl.as = "style";
-        preloadEl.href = href;
-        preloadEl.setAttribute("data-style-router-preload", "true");
-        document.head.appendChild(preloadEl);
-        managedPreloads.add(href);
-    }
-
-    function prewarmRouteStyles() {
-        for (const href of allStyleHrefs()) {
-            ensurePreload(href);
-            ensureManagedLink(href);
+    // Adopt <link> elements already in the HTML so we never create duplicates.
+    for (const el of document.head.querySelectorAll('link[data-style-router="true"][rel="stylesheet"]')) {
+        if (allHrefs.has(el.href)) {
+            linkByHref.set(el.href, el);
         }
     }
 
-    prewarmRouteStyles();
+    // Remove preload hints from the HTML — they were only useful before we
+    // switched to lazy loading.  Keeping them causes wasted bandwidth for
+    // routes the user may never visit.
+    for (const el of document.head.querySelectorAll('link[data-style-router-preload="true"]')) {
+        el.remove();
+    }
+
+    function ensureLink(href) {
+        let el = linkByHref.get(href);
+        if (el) return el;
+
+        el = document.createElement("link");
+        el.rel = "stylesheet";
+        el.href = href;
+        el.media = "not all";            // hidden until activated
+        el.setAttribute("data-style-router", "true");
+        document.head.appendChild(el);
+        linkByHref.set(href, el);
+        return el;
+    }
 
     function apply(routeName) {
-        if (document?.body) {
+        if (document.body) {
             document.body.setAttribute("data-route", routeName || "unknown");
         }
 
-        const nextHrefs = new Set(stylesForRoute(routeName).map(resolveStyleHref));
+        const needed = routeHrefs.get(routeName);
 
-        for (const href of allStyleHrefs()) {
-            const linkEl = ensureManagedLink(href);
-            linkEl.media = nextHrefs.has(href) ? "all" : "not all";
+        // Activate sheets for the current route (lazy-create on first visit).
+        if (needed) {
+            for (const href of needed) {
+                ensureLink(href).media = "all";
+            }
+        }
+
+        // Deactivate sheets that belong to other routes.
+        for (const [href, el] of linkByHref) {
+            if (!needed || !needed.has(href)) {
+                el.media = "not all";
+            }
         }
     }
 

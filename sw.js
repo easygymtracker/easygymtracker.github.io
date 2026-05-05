@@ -2,7 +2,7 @@
 
 // Cache strategy
 // Bump CACHE_VERSION whenever assets change.
-const CACHE_VERSION = "v4";
+const CACHE_VERSION = "v5";
 const CACHE_NAME = `gym-tracker-${CACHE_VERSION}`;
 
 // App-shell files to precache on install.
@@ -13,6 +13,7 @@ const PRECACHE_URLS = [
     "/styles/components/routines.css",
     "/styles/components/landing.css",
     "/src/app.js",
+    "/src/app/styleRouter.js",
     "/src/router.js",
     "/src/internationalization/i18n.js",
     "/src/internationalization/dicts.js",
