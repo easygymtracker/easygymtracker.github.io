@@ -69,15 +69,16 @@ const pages = {
 
 const PUBLIC_ROUTES = new Set(["home", "features", "privacy", "about"]);
 const SITE_URL = "https://easygymtracker.github.io";
+const STYLE_VERSION = "20260505b";
 const styleRouter = createStyleRouter({
     routeToStyles: {
-        home: ["../styles/components/landing.css"],
-        session: ["../styles/components/session.css"],
-        routines: ["../styles/components/routines.css", "../styles/components/workoutCalendar.css"],
-        "routine-new": ["../styles/components/routines.css"],
-        routine: ["../styles/components/routines.css"],
-        profile: ["../styles/components/workoutCalendar.css"],
-        "exercise-history": ["../styles/components/exerciseHistory.css"],
+        home: [`../styles/components/landing.css?v=${STYLE_VERSION}`],
+        session: [`../styles/components/session.css?v=${STYLE_VERSION}`],
+        routines: [`../styles/components/routines.css?v=${STYLE_VERSION}`, `../styles/components/workoutCalendar.css?v=${STYLE_VERSION}`],
+        "routine-new": [`../styles/components/routines.css?v=${STYLE_VERSION}`],
+        routine: [`../styles/components/routines.css?v=${STYLE_VERSION}`],
+        profile: [`../styles/components/workoutCalendar.css?v=${STYLE_VERSION}`],
+        "exercise-history": [`../styles/components/exerciseHistory.css?v=${STYLE_VERSION}`],
     },
     resolveFrom: import.meta.url,
 });

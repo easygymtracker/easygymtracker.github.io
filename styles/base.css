@@ -355,6 +355,32 @@ textarea {
     overflow: auto;
 }
 
+/* Keep route content spacing uniform across Features, Privacy, Profile and Profile History. */
+#route-profile .routineDetail,
+#route-profile-history .routineDetail {
+    padding: 16px;
+}
+
+#route-profile .historyCard,
+#route-profile-history .historyCard {
+    padding: 16px;
+}
+
+#route-features .landingHero,
+#route-privacy .landingHero {
+    padding: 16px;
+}
+
+#route-features .landingFeature,
+#route-privacy .landingFeature {
+    padding: 16px;
+}
+
+#route-features .landingGrid,
+#route-privacy .landingGrid {
+    gap: 16px;
+}
+
 .calendarSectionWrap {
     padding: 12px;
     border-bottom: 1px solid var(--border);
