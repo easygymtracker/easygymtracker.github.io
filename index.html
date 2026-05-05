@@ -5,17 +5,20 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="robots" content="index,follow" />
-  <meta name="description" content="Plan routines, track workout sessions, and keep your gym data private on your own device with Easy Gym Routine Tracker." />
+  <meta name="description"
+    content="Plan routines, track workout sessions, and keep your gym data private on your own device with Easy Gym Routine Tracker." />
   <link rel="canonical" href="https://easygymtracker.github.io/" />
   <meta property="og:type" content="website" />
   <meta property="og:title" content="Easy Gym Routine Tracker | Private workout planner and session tracker" />
-  <meta property="og:description" content="Plan routines, track workout sessions, and keep your gym data private on your own device with Easy Gym Routine Tracker." />
+  <meta property="og:description"
+    content="Plan routines, track workout sessions, and keep your gym data private on your own device with Easy Gym Routine Tracker." />
   <meta property="og:url" content="https://easygymtracker.github.io/" />
   <meta property="og:image" content="https://easygymtracker.github.io/icons/icon-512.png" />
   <meta property="og:site_name" content="Easy Gym Routine Tracker" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Easy Gym Routine Tracker | Private workout planner and session tracker" />
-  <meta name="twitter:description" content="Plan routines, track workout sessions, and keep your gym data private on your own device with Easy Gym Routine Tracker." />
+  <meta name="twitter:description"
+    content="Plan routines, track workout sessions, and keep your gym data private on your own device with Easy Gym Routine Tracker." />
   <meta name="twitter:image" content="https://easygymtracker.github.io/icons/icon-512.png" />
   <script type="application/ld+json" data-structured="route">
     {
@@ -54,7 +57,9 @@
     }
   </script>
 
-  <!-- Cloudflare Web Analytics --><script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "99f154e545af43458a6b6fa0cd3bbcb9"}'></script><!-- End Cloudflare Web Analytics -->
+  <!-- Cloudflare Web Analytics -->
+  <script defer src='https://static.cloudflareinsights.com/beacon.min.js'
+    data-cf-beacon='{"token": "99f154e545af43458a6b6fa0cd3bbcb9"}'></script><!-- End Cloudflare Web Analytics -->
 
   <script>
     (function restoreRouteOnLoad() {
@@ -63,11 +68,11 @@
       var rawHash = window.location.hash || "";
       if (rawHash.startsWith("#/")) {
         var hashParts = rawHash.slice(1).split("?");
-        var hashPath  = hashParts[0] || "/";
-        var hashQs    = hashParts[1] || "";
+        var hashPath = hashParts[0] || "/";
+        var hashQs = hashParts[1] || "";
         var merged = new URLSearchParams(window.location.search);
         if (hashQs) {
-          new URLSearchParams(hashQs).forEach(function(v, k) { merged.set(k, v); });
+          new URLSearchParams(hashQs).forEach(function (v, k) { merged.set(k, v); });
         }
         var cleanUrl = hashPath + (merged.toString() ? "?" + merged.toString() : "");
         window.history.replaceState(null, "", cleanUrl);
@@ -95,7 +100,7 @@
   </script>
 
   <title data-i18n="app.title">Easy Gym Routine Tracker</title>
-<link rel="manifest" href="./manifest.json" />
+  <link rel="manifest" href="./manifest.json" />
   <link rel="icon" type="image/png" href="/assets/favicon.png" />
   <link rel="apple-touch-icon" href="/assets/favicon.png" />
   <link rel="stylesheet" href="./styles/base.css" />
@@ -103,11 +108,11 @@
   <link rel="stylesheet" href="./styles/components/workoutCalendar.css" data-style-router="true" />
   <link rel="preload" as="style" href="./styles/components/landing.css" data-style-router-preload="true" />
   <link rel="preload" as="style" href="./styles/components/session.css" data-style-router-preload="true" />
-    <!-- Preload critical JS modules to reduce the ES-module waterfall -->
-    <link rel="modulepreload" href="./src/app.js" />
-    <link rel="modulepreload" href="./src/router.js" />
-    <link rel="modulepreload" href="./src/internationalization/i18n.js" />
-    <link rel="modulepreload" href="./src/internationalization/dicts.js" />
+  <!-- Preload critical JS modules to reduce the ES-module waterfall -->
+  <link rel="modulepreload" href="./src/app.js" />
+  <link rel="modulepreload" href="./src/router.js" />
+  <link rel="modulepreload" href="./src/internationalization/i18n.js" />
+  <link rel="modulepreload" href="./src/internationalization/dicts.js" />
 </head>
 
 <body>
@@ -137,619 +142,657 @@
 
     <main id="mainContent">
 
-    <!-- Routes -->
-    <section class="route landingRoute" data-route="home" id="route-home">
-      <div class="landingHero card">
-        <p class="landingEyebrow" data-i18n="home.eyebrow">Private workout planning</p>
-        <h2 data-i18n="home.title">Track your gym routines without giving your data away.</h2>
-        <p class="landingLead" data-i18n="home.lead">
-          Build routines, run workout sessions, and keep everything stored on your own device. No account, no cloud lock-in, no noisy dashboard.
-        </p>
+      <!-- Routes -->
+      <section class="route landingRoute" data-route="home" id="route-home">
+        <div class="landingHero card">
+          <p class="landingEyebrow" data-i18n="home.eyebrow">Private workout planning</p>
+          <h2 data-i18n="home.title">Track your gym routines without giving your data away.</h2>
+          <p class="landingLead" data-i18n="home.lead">
+            Build routines, run workout sessions, and keep everything stored on your own device. No account, no cloud
+            lock-in, no noisy dashboard.
+          </p>
 
-        <nav class="landingActions" aria-label="Home links" data-i18n-aria-label="a11y.nav.homeLinks">
-          <a href="/routines" class="btn primary" data-nav="/routines" data-i18n="home.cta.openApp">Open the app</a>
-          <a href="/routine/new" class="btn" data-nav="/routine/new" data-i18n="home.cta.firstRoutine">Create a first routine</a>
-          <a href="/features" class="btn" data-nav="/features" data-i18n="home.cta.features">Features</a>
-          <a href="/about" class="btn" data-nav="/about" data-i18n="home.cta.about">How it works</a>
-          <a href="/privacy" class="btn" data-nav="/privacy" data-i18n="home.cta.privacy">Privacy</a>
-        </nav>
+          <nav class="landingActions" aria-label="Home links" data-i18n-aria-label="a11y.nav.homeLinks">
+            <a href="/routines" class="btn primary" data-nav="/routines" data-i18n="home.cta.openApp">Open the app</a>
+            <a href="/routine/new" class="btn" data-nav="/routine/new" data-i18n="home.cta.firstRoutine">Create a first
+              routine</a>
+            <a href="/features" class="btn" data-nav="/features" data-i18n="home.cta.features">Features</a>
+            <a href="/about" class="btn" data-nav="/about" data-i18n="home.cta.about">How it works</a>
+            <a href="/privacy" class="btn" data-nav="/privacy" data-i18n="home.cta.privacy">Privacy</a>
+          </nav>
 
-        <div class="landingStats" aria-label="Product highlights" data-i18n-aria-label="a11y.home.productHighlights">
-          <div class="landingStat card">
-            <strong data-i18n="home.stat.offlineValue">100% local</strong>
-            <span data-i18n="home.stat.offlineLabel">Your routines stay on this device.</span>
-          </div>
-          <div class="landingStat card">
-            <strong data-i18n="home.stat.fastValue">Touch-first</strong>
-            <span data-i18n="home.stat.fastLabel">Built for fast in-gym logging.</span>
-          </div>
-          <div class="landingStat card">
-            <strong data-i18n="home.stat.flexValue">Bilateral + unilateral</strong>
-            <span data-i18n="home.stat.flexLabel">Supports left/right work and history.</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="landingGrid">
-        <article class="card landingFeature">
-          <h3 data-i18n="home.feature.privacyTitle">Private by default</h3>
-          <p data-i18n="home.feature.privacyBody">Routines are stored locally, so you can use the tracker without creating an account or syncing to a third-party service.</p>
-        </article>
-        <article class="card landingFeature">
-          <h3 data-i18n="home.feature.sessionTitle">Session-ready</h3>
-          <p data-i18n="home.feature.sessionBody">Run actual workout sessions with timers, set completion flows, rest tracking, and post-workout summaries.</p>
-        </article>
-        <article class="card landingFeature">
-          <h3 data-i18n="home.feature.progressTitle">Progress visibility</h3>
-          <p data-i18n="home.feature.progressBody">Review rep and weight history over time, including unilateral work, with lightweight charts designed for mobile use.</p>
-        </article>
-      </div>
-    </section>
-
-    <section class="route landingRoute routeHidden" data-route="features" id="route-features">
-      <div class="landingHero card">
-        <p class="landingEyebrow" data-i18n="features.eyebrow">Features</p>
-        <h2 data-i18n="features.title">Fast workout tracking without the usual clutter.</h2>
-        <p class="landingLead" data-i18n="features.lead">
-          Easy Gym Routine Tracker focuses on the core job: creating routines quickly, running sessions smoothly, and reviewing progress without sending your data to a remote backend.
-        </p>
-        <nav class="landingActions" aria-label="Features links" data-i18n-aria-label="a11y.nav.featuresLinks">
-          <a href="/" class="btn primary" data-nav="/" data-i18n="features.cta.home">Home</a>
-          <a href="/routines" class="btn" data-nav="/routines" data-i18n="features.cta.openApp">Open the app</a>
-          <a href="/privacy" class="btn" data-nav="/privacy" data-i18n="features.cta.privacy">Privacy</a>
-        </nav>
-      </div>
-
-      <div class="landingGrid">
-        <article class="card landingFeature">
-          <h3 data-i18n="features.routineBuilder.title">Routine builder</h3>
-          <p data-i18n="features.routineBuilder.body">Create exercises, add set structures, edit descriptions, and configure rest flows without dealing with a complex setup wizard.</p>
-        </article>
-        <article class="card landingFeature">
-          <h3 data-i18n="features.sessionMode.title">Session mode</h3>
-          <p data-i18n="features.sessionMode.body">Track live workouts with start/pause controls, set completion modals, rest timers, and workout-end summaries.</p>
-        </article>
-        <article class="card landingFeature">
-          <h3 data-i18n="features.unilateral.title">Unilateral support</h3>
-          <p data-i18n="features.unilateral.body">Handle left/right reps and left/right weight when an exercise needs side-specific tracking.</p>
-        </article>
-        <article class="card landingFeature">
-          <h3 data-i18n="features.historyCharts.title">History charts</h3>
-          <p data-i18n="features.historyCharts.body">Inspect rep and weight trends with touch-friendly charts that work well on mobile devices in the gym.</p>
-        </article>
-        <article class="card landingFeature">
-          <h3 data-i18n="features.portableExports.title">Portable exports</h3>
-          <p data-i18n="features.portableExports.body">Download routines or body measurements in a stable JSON format and import them on any device — no cloud account needed.</p>
-        </article>
-        <article class="card landingFeature">
-          <h3 data-i18n="features.localFirst.title">Local-first</h3>
-          <p data-i18n="features.localFirst.body">All data — routines, sessions, and body measurements — stays only on your device through browser storage. Nothing is ever sent to a server.</p>
-        </article>
-        <article class="card landingFeature">
-          <h3 data-i18n="features.profileTracking.title">Profile tracking</h3>
-          <p data-i18n="features.profileTracking.body">Log weight, body fat, and muscle mass over time. Charts show daily peaks for each metric. All measurements remain private on your device.</p>
-        </article>
-      </div>
-    </section>
-
-    <section class="route landingRoute routeHidden" data-route="privacy" id="route-privacy">
-      <div class="landingHero card">
-        <p class="landingEyebrow" data-i18n="privacy.eyebrow">Privacy</p>
-        <h2 data-i18n="privacy.title">A simple privacy posture: keep workout data on your own device.</h2>
-        <p class="landingLead" data-i18n="privacy.lead">
-          This app is designed around local usage. Routines, sets, and session history are stored in the browser on the device you use, so you can manage training data without creating an account.
-        </p>
-        <nav class="landingActions" aria-label="Privacy links" data-i18n-aria-label="a11y.nav.privacyLinks">
-          <a href="/" class="btn primary" data-nav="/" data-i18n="privacy.cta.home">Home</a>
-          <a href="/features" class="btn" data-nav="/features" data-i18n="privacy.cta.features">Features</a>
-          <a href="/routines" class="btn" data-nav="/routines" data-i18n="privacy.cta.openApp">Open the app</a>
-        </nav>
-      </div>
-
-      <div class="landingGrid">
-        <article class="card landingFeature">
-          <h3 data-i18n="privacy.whatStored.title">What is stored</h3>
-          <p data-i18n="privacy.whatStored.body">Routine definitions, set targets, exercise descriptions, session history, and body measurements (weight, body fat, and muscle) are all saved in browser storage on your device. Nothing is ever sent to a server.</p>
-        </article>
-        <article class="card landingFeature">
-          <h3 data-i18n="privacy.notRequired.title">What is not required</h3>
-          <p data-i18n="privacy.notRequired.body">No user account, password, or remote profile is required to use the tracker.</p>
-        </article>
-        <article class="card landingFeature">
-          <h3 data-i18n="privacy.notifications.title">Notifications</h3>
-          <p data-i18n="privacy.notifications.body">If you allow notifications, they are used for session-related reminders and workout flow while the app is running on your device.</p>
-        </article>
-        <article class="card landingFeature">
-          <h3 data-i18n="privacy.exports.title">Data portability</h3>
-          <p data-i18n="privacy.exports.body">Export routines or body measurements to a portable JSON file at any time. Import files are processed locally — no data is uploaded to any server.</p>
-        </article>
-        <article class="card landingFeature">
-          <h3 data-i18n="privacy.localOnly.title">Your data stays private</h3>
-          <p data-i18n="privacy.localOnly.body">The app has no backend, no sync service, and no user accounts. Every byte of your workout and body data remains only in your own browser storage.</p>
-        </article>
-      </div>
-    </section>
-
-    <section class="route landingRoute routeHidden" data-route="about" id="route-about">
-      <div class="landingHero card">
-        <p class="landingEyebrow" data-i18n="about.eyebrow">How it works</p>
-        <h2 data-i18n="about.title">A workout tracker built for the gym floor, not a dashboard.</h2>
-        <p class="landingLead" data-i18n="about.lead">
-          Easy Gym Routine Tracker keeps everything simple. Build a routine once, then run through it session by session without touching complex settings.
-        </p>
-        <nav class="landingActions" aria-label="About links" data-i18n-aria-label="a11y.nav.aboutLinks">
-          <a href="/" class="btn primary" data-nav="/" data-i18n="about.cta.home">Home</a>
-          <a href="/routines" class="btn" data-nav="/routines" data-i18n="about.cta.openApp">Try it</a>
-          <a href="/features" class="btn" data-nav="/features" data-i18n="about.cta.features">See features</a>
-        </nav>
-      </div>
-
-      <div class="landingGrid">
-        <article class="card landingFeature">
-          <h3 data-i18n="about.step1.title">Build your routine</h3>
-          <p data-i18n="about.step1.body">Add exercises with target reps, weights, and rest periods. Supports bilateral (two-handed) and unilateral (one-arm or one-leg) sets.</p>
-        </article>
-        <article class="card landingFeature">
-          <h3 data-i18n="about.step2.title">Start a session</h3>
-          <p data-i18n="about.step2.body">Open a routine and start a session. Work through each exercise set by set, logging what you actually did.</p>
-        </article>
-        <article class="card landingFeature">
-          <h3 data-i18n="about.step3.title">Track your progress</h3>
-          <p data-i18n="about.step3.body">After each session, rep and weight history is saved on your device. Review trends in the history charts for each exercise.</p>
-        </article>
-        <article class="card landingFeature">
-          <h3 data-i18n="about.step4.title">Stay in control</h3>
-          <p data-i18n="about.step4.body">Export routines to a JSON file at any time. Import them back on the same or a different device without needing an account.</p>
-        </article>
-      </div>
-    </section>
-
-    <section class="card route" data-route="routines" id="route-routines">
-      <div class="listHeader">
-        <h2 data-i18n="routines.title">Your routines</h2>
-        <div class="count" id="routineCount">0</div>
-      </div>
-
-      <div class="calendarSectionWrap">
-        <div id="routinesWorkoutCalendar"></div>
-      </div>
-
-      <div class="routineList" id="routineList"></div>
-
-      <div class="empty uHidden" id="emptyState">
-        <span data-i18n="routines.empty.prefix">No routines yet. Click</span>
-        <span class="chip" data-i18n="routines.empty.cta">+ New routine</span>
-        <span data-i18n="routines.empty.suffix">to create your first one.</span>
-      </div>
-    </section>
-
-    <section class="card route routeHidden" data-route="routine-new" id="route-new">
-      <div class="pageHeader">
-        <h2 data-i18n="routineNew.title">Create routine</h2>
-        <button class="btn" data-nav="/routines" data-i18n="common.back">Back</button>
-      </div>
-
-      <div class="form">
-        <div class="field">
-          <label for="routineName" data-i18n="routineNew.nameLabel">Name</label>
-          <input id="routineName" maxlength="60" data-i18n="routineNew.namePlaceholder" data-i18n-attr="placeholder"
-            placeholder="e.g., Push Day A" />
-        </div>
-
-        <div class="field">
-          <label for="routineDescription" data-i18n="routineNew.descriptionLabel">Description (optional)</label>
-          <textarea id="routineDescription" data-i18n="routineNew.descriptionPlaceholder" data-i18n-attr="placeholder"
-            placeholder="Quick notes: goals, intensity, focus..."></textarea>
-        </div>
-
-        <div class="actions">
-          <button class="btn" data-nav="/routines" data-i18n="common.cancel">Cancel</button>
-          <button class="btn primary" id="btnCreateRoutine" data-i18n="common.create">Create</button>
-        </div>
-
-        <p class="note" data-i18n="routineNew.note">
-          Saved on this device (localStorage). You can add exercises later in the routine screen.
-        </p>
-      </div>
-    </section>
-
-    <section class="card route routeHidden" data-route="routine" id="route-routine">
-      <div class="pageHeader routineHeader">
-        <button class="startSessionBtn" id="btnStartSession" type="button" data-action="start-session"
-          data-i18n="routine.session.startHelp" data-i18n-attr="title,aria-label"
-          title="Start a session using this routine" aria-label="Start a session using this routine">
-          <svg class="icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <polygon points="8 5 19 12 8 19 8 5"></polygon>
-          </svg>
-        </button>
-
-        <div class="routineHeaderBody">
-          <div class="uFlexRowWrap uGap10 uMinW0">
-            <h2 id="routineTitle" class="uM0 textTruncate">
-              Routine
-            </h2>
-
-            <button class="btn btnIconCompact" id="btnEditRoutine" type="button" data-i18n="routine.edit"
-              data-i18n-attr="title,aria-label" title="Edit routine name and description"
-              aria-label="Edit routine name and description">
-              <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M12 20h9"></path>
-                <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path>
-              </svg>
-            </button>
-          </div>
-
-          <button class="iconBtn pageHeaderIconBtn pageHeaderDownloadBtn" type="button" data-action="download"
-            data-i18n="routines.downloadHelp" data-i18n-attr="title,aria-label"
-            title="Download this routine in a fixed format you can use to import your routines"
-            aria-label="Download this routine in a fixed format you can use to import your routines">
-            <svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-              stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M12 3v12"></path>
-              <path d="M8 11l4 4 4-4"></path>
-              <path d="M5 21h14"></path>
-            </svg>
-          </button>
-
-          <div class="toolbar">
-            <button class="btn" data-nav="/routines" data-i18n="common.back">Back</button>
-            <button class="btn danger" id="btnDeleteRoutine" data-i18n="common.delete">Delete</button>
+          <div class="landingStats" aria-label="Product highlights" data-i18n-aria-label="a11y.home.productHighlights">
+            <div class="landingStat card">
+              <strong data-i18n="home.stat.offlineValue">100% local</strong>
+              <span data-i18n="home.stat.offlineLabel">Your routines stay on this device.</span>
+            </div>
+            <div class="landingStat card">
+              <strong data-i18n="home.stat.fastValue">Touch-first</strong>
+              <span data-i18n="home.stat.fastLabel">Built for fast in-gym logging.</span>
+            </div>
+            <div class="landingStat card">
+              <strong data-i18n="home.stat.flexValue">Bilateral + unilateral</strong>
+              <span data-i18n="home.stat.flexLabel">Supports left/right work and history.</span>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="routineDetail">
-        <p class="muted" id="routineDesc">—</p>
+        <div class="landingGrid">
+          <article class="card landingFeature">
+            <h3 data-i18n="home.feature.privacyTitle">Private by default</h3>
+            <p data-i18n="home.feature.privacyBody">Routines are stored locally, so you can use the tracker without
+              creating an account or syncing to a third-party service.</p>
+          </article>
+          <article class="card landingFeature">
+            <h3 data-i18n="home.feature.sessionTitle">Session-ready</h3>
+            <p data-i18n="home.feature.sessionBody">Run actual workout sessions with timers, set completion flows, rest
+              tracking, and post-workout summaries.</p>
+          </article>
+          <article class="card landingFeature">
+            <h3 data-i18n="home.feature.progressTitle">Progress visibility</h3>
+            <p data-i18n="home.feature.progressBody">Review rep and weight history over time, including unilateral work,
+              with lightweight charts designed for mobile use.</p>
+          </article>
+        </div>
+      </section>
 
-        <div id="routineMetaEditor" class="form formTopInset uHidden">
+      <section class="route landingRoute routeHidden" data-route="features" id="route-features">
+        <div class="landingHero card">
+          <p class="landingEyebrow" data-i18n="features.eyebrow">Features</p>
+          <h2 data-i18n="features.title">Fast workout tracking without the usual clutter.</h2>
+          <p class="landingLead" data-i18n="features.lead">
+            Easy Gym Routine Tracker focuses on the core job: creating routines quickly, running sessions smoothly, and
+            reviewing progress without sending your data to a remote backend.
+          </p>
+          <nav class="landingActions" aria-label="Features links" data-i18n-aria-label="a11y.nav.featuresLinks">
+            <a href="/" class="btn primary" data-nav="/" data-i18n="features.cta.home">Home</a>
+            <a href="/routines" class="btn" data-nav="/routines" data-i18n="features.cta.openApp">Open the app</a>
+            <a href="/privacy" class="btn" data-nav="/privacy" data-i18n="features.cta.privacy">Privacy</a>
+          </nav>
+        </div>
+
+        <div class="landingGrid">
+          <article class="card landingFeature">
+            <h3 data-i18n="features.routineBuilder.title">Routine builder</h3>
+            <p data-i18n="features.routineBuilder.body">Create exercises, add set structures, edit descriptions, and
+              configure rest flows without dealing with a complex setup wizard.</p>
+          </article>
+          <article class="card landingFeature">
+            <h3 data-i18n="features.sessionMode.title">Session mode</h3>
+            <p data-i18n="features.sessionMode.body">Track live workouts with start/pause controls, set completion
+              modals, rest timers, and workout-end summaries.</p>
+          </article>
+          <article class="card landingFeature">
+            <h3 data-i18n="features.unilateral.title">Unilateral support</h3>
+            <p data-i18n="features.unilateral.body">Handle left/right reps and left/right weight when an exercise needs
+              side-specific tracking.</p>
+          </article>
+          <article class="card landingFeature">
+            <h3 data-i18n="features.historyCharts.title">History charts</h3>
+            <p data-i18n="features.historyCharts.body">Inspect rep and weight trends with touch-friendly charts that
+              work well on mobile devices in the gym.</p>
+          </article>
+          <article class="card landingFeature">
+            <h3 data-i18n="features.portableExports.title">Portable exports</h3>
+            <p data-i18n="features.portableExports.body">Download routines or body measurements in a stable JSON format
+              and import them on any device — no cloud account needed.</p>
+          </article>
+          <article class="card landingFeature">
+            <h3 data-i18n="features.localFirst.title">Local-first</h3>
+            <p data-i18n="features.localFirst.body">All data — routines, sessions, and body measurements — stays only on
+              your device through browser storage. Nothing is ever sent to a server.</p>
+          </article>
+          <article class="card landingFeature">
+            <h3 data-i18n="features.profileTracking.title">Profile tracking</h3>
+            <p data-i18n="features.profileTracking.body">Log weight, body fat, and muscle mass over time. Charts show
+              daily peaks for each metric. All measurements remain private on your device.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="route landingRoute routeHidden" data-route="privacy" id="route-privacy">
+        <div class="landingHero card">
+          <p class="landingEyebrow" data-i18n="privacy.eyebrow">Privacy</p>
+          <h2 data-i18n="privacy.title">A simple privacy posture: keep workout data on your own device.</h2>
+          <p class="landingLead" data-i18n="privacy.lead">
+            This app is designed around local usage. Routines, sets, and session history are stored in the browser on
+            the device you use, so you can manage training data without creating an account.
+          </p>
+          <nav class="landingActions" aria-label="Privacy links" data-i18n-aria-label="a11y.nav.privacyLinks">
+            <a href="/" class="btn primary" data-nav="/" data-i18n="privacy.cta.home">Home</a>
+            <a href="/features" class="btn" data-nav="/features" data-i18n="privacy.cta.features">Features</a>
+            <a href="/routines" class="btn" data-nav="/routines" data-i18n="privacy.cta.openApp">Open the app</a>
+          </nav>
+        </div>
+
+        <div class="landingGrid">
+          <article class="card landingFeature">
+            <h3 data-i18n="privacy.whatStored.title">What is stored</h3>
+            <p data-i18n="privacy.whatStored.body">Routine definitions, set targets, exercise descriptions, session
+              history, and body measurements (weight, body fat, and muscle) are all saved in browser storage on your
+              device. Nothing is ever sent to a server.</p>
+          </article>
+          <article class="card landingFeature">
+            <h3 data-i18n="privacy.notRequired.title">What is not required</h3>
+            <p data-i18n="privacy.notRequired.body">No user account, password, or remote profile is required to use the
+              tracker.</p>
+          </article>
+          <article class="card landingFeature">
+            <h3 data-i18n="privacy.notifications.title">Notifications</h3>
+            <p data-i18n="privacy.notifications.body">If you allow notifications, they are used for session-related
+              reminders and workout flow while the app is running on your device.</p>
+          </article>
+          <article class="card landingFeature">
+            <h3 data-i18n="privacy.exports.title">Data portability</h3>
+            <p data-i18n="privacy.exports.body">Export routines or body measurements to a portable JSON file at any
+              time. Import files are processed locally — no data is uploaded to any server.</p>
+          </article>
+          <article class="card landingFeature">
+            <h3 data-i18n="privacy.localOnly.title">Your data stays private</h3>
+            <p data-i18n="privacy.localOnly.body">The app has no backend, no sync service, and no user accounts. Every
+              byte of your workout and body data remains only in your own browser storage.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="route landingRoute routeHidden" data-route="about" id="route-about">
+        <div class="landingHero card">
+          <p class="landingEyebrow" data-i18n="about.eyebrow">How it works</p>
+          <h2 data-i18n="about.title">A workout tracker built for the gym floor, not a dashboard.</h2>
+          <p class="landingLead" data-i18n="about.lead">
+            Easy Gym Routine Tracker keeps everything simple. Build a routine once, then run through it session by
+            session without touching complex settings.
+          </p>
+          <nav class="landingActions" aria-label="About links" data-i18n-aria-label="a11y.nav.aboutLinks">
+            <a href="/" class="btn primary" data-nav="/" data-i18n="about.cta.home">Home</a>
+            <a href="/routines" class="btn" data-nav="/routines" data-i18n="about.cta.openApp">Try it</a>
+            <a href="/features" class="btn" data-nav="/features" data-i18n="about.cta.features">See features</a>
+          </nav>
+        </div>
+
+        <div class="landingGrid">
+          <article class="card landingFeature">
+            <h3 data-i18n="about.step1.title">Build your routine</h3>
+            <p data-i18n="about.step1.body">Add exercises with target reps, weights, and rest periods. Supports
+              bilateral (two-handed) and unilateral (one-arm or one-leg) sets.</p>
+          </article>
+          <article class="card landingFeature">
+            <h3 data-i18n="about.step2.title">Start a session</h3>
+            <p data-i18n="about.step2.body">Open a routine and start a session. Work through each exercise set by set,
+              logging what you actually did.</p>
+          </article>
+          <article class="card landingFeature">
+            <h3 data-i18n="about.step3.title">Track your progress</h3>
+            <p data-i18n="about.step3.body">After each session, rep and weight history is saved on your device. Review
+              trends in the history charts for each exercise.</p>
+          </article>
+          <article class="card landingFeature">
+            <h3 data-i18n="about.step4.title">Stay in control</h3>
+            <p data-i18n="about.step4.body">Export routines to a JSON file at any time. Import them back on the same or
+              a different device without needing an account.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="card route" data-route="routines" id="route-routines">
+        <div class="listHeader">
+          <h2 data-i18n="routines.title">Your routines</h2>
+          <div class="count" id="routineCount">0</div>
+        </div>
+
+        <div class="calendarSectionWrap">
+          <div id="routinesWorkoutCalendar"></div>
+        </div>
+
+        <div class="routineList" id="routineList"></div>
+
+        <div class="empty uHidden" id="emptyState">
+          <span data-i18n="routines.empty.prefix">No routines yet. Click</span>
+          <span class="chip" data-i18n="routines.empty.cta">+ New routine</span>
+          <span data-i18n="routines.empty.suffix">to create your first one.</span>
+        </div>
+      </section>
+
+      <section class="card route routeHidden" data-route="routine-new" id="route-new">
+        <div class="pageHeader">
+          <h2 data-i18n="routineNew.title">Create routine</h2>
+          <button class="btn" data-nav="/routines" data-i18n="common.back">Back</button>
+        </div>
+
+        <div class="form">
           <div class="field">
-            <label for="editRoutineName" data-i18n="routine.edit.nameLabel">Name</label>
-            <input id="editRoutineName" maxlength="60" data-i18n="routine.edit.namePlaceholder"
-              data-i18n-attr="placeholder" placeholder="e.g., Push Day A" />
+            <label for="routineName" data-i18n="routineNew.nameLabel">Name</label>
+            <input id="routineName" maxlength="60" data-i18n="routineNew.namePlaceholder" data-i18n-attr="placeholder"
+              placeholder="e.g., Push Day A" />
           </div>
 
           <div class="field">
-            <label for="editRoutineDescription" data-i18n="routine.edit.descLabel">Description</label>
-            <textarea id="editRoutineDescription" data-i18n="routine.edit.descPlaceholder" data-i18n-attr="placeholder"
+            <label for="routineDescription" data-i18n="routineNew.descriptionLabel">Description (optional)</label>
+            <textarea id="routineDescription" data-i18n="routineNew.descriptionPlaceholder" data-i18n-attr="placeholder"
               placeholder="Quick notes: goals, intensity, focus..."></textarea>
           </div>
 
-          <div class="actions actionsStart">
-            <button class="btn primary" id="btnSaveRoutineMeta" type="button" data-i18n="common.save">Save</button>
-            <button class="btn" id="btnCancelRoutineMeta" type="button" data-i18n="common.cancel">Cancel</button>
-          </div>
-        </div>
-
-        <div class="divider"></div>
-
-        <div class="form">
-          <h3 class="sectionSubheading" data-i18n="routine.addSeries.title">
-            Add exercise
-          </h3>
-
-          <div class="field">
-            <label for="exerciseInput" data-i18n="routine.addSeries.exerciseLabel">Exercise</label>
-            <input id="exerciseInput" list="exerciseOptions" data-i18n="routine.addSeries.exercisePlaceholder"
-              data-i18n-attr="placeholder" placeholder="Type or pick an exercise..." />
-            <datalist id="exerciseOptions"></datalist>
-            <div class="note" data-i18n="routine.addSeries.exerciseHelp">
-              Type a new name to create an exercise automatically.
-            </div>
-          </div>
-
-          <div class="field">
-            <label for="seriesDescription" data-i18n="routine.addSeries.seriesDescriptionLabel">
-              Exercise description (optional)
-            </label>
-            <input id="seriesDescription" data-i18n="routine.addSeries.seriesDescriptionPlaceholder"
-              data-i18n-attr="placeholder" placeholder="e.g., Working sets, Warm-up..." />
-          </div>
-
           <div class="actions">
-            <button class="btn primary" id="btnAddSeries" data-i18n="routine.addSeries.button">
-              Add exercise
-            </button>
+            <button class="btn" data-nav="/routines" data-i18n="common.cancel">Cancel</button>
+            <button class="btn primary" id="btnCreateRoutine" data-i18n="common.create">Create</button>
           </div>
-        </div>
 
-        <div class="divider"></div>
-
-        <div>
-          <h3 class="sectionSubheading" data-i18n="routine.seriesList.title">
-            Exercises in this routine
-          </h3>
-          <div id="seriesList"></div>
-          <p class="note uHidden" id="seriesEmpty" data-i18n="routine.seriesList.empty">
-            No exercise yet. Add one above.
+          <p class="note" data-i18n="routineNew.note">
+            Saved on this device (localStorage). You can add exercises later in the routine screen.
           </p>
         </div>
+      </section>
 
-        <div class="divider"></div>
+      <section class="card route routeHidden" data-route="routine" id="route-routine">
+        <div class="pageHeader routineHeader">
+          <button class="startSessionBtn" id="btnStartSession" type="button" data-action="start-session"
+            data-i18n="routine.session.startHelp" data-i18n-attr="title,aria-label"
+            title="Start a session using this routine" aria-label="Start a session using this routine">
+            <svg class="icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polygon points="8 5 19 12 8 19 8 5"></polygon>
+            </svg>
+          </button>
 
-        <section id="seriesEditor" class="uHidden">
-          <div class="pageHeader uNoBorder formCompact uMb10">
-            <h2 id="seriesEditorTitle">Edit exercise</h2>
-            <button class="btn" id="btnCloseSeriesEditor" data-i18n="common.close">Close</button>
-          </div>
+          <div class="routineHeaderBody">
+            <div class="uFlexRowWrap uGap10 uMinW0">
+              <h2 id="routineTitle" class="uM0 textTruncate">
+                Routine
+              </h2>
 
-          <div class="form formCompact">
-            <div class="field">
-              <label for="editSeriesDescription" data-i18n="seriesEditor.seriesDescriptionLabel">
-                Exercise description
-              </label>
-              <input id="editSeriesDescription" data-i18n="seriesEditor.seriesDescriptionPlaceholder"
-                data-i18n-attr="placeholder" placeholder="e.g., Working sets" />
-            </div>
-
-            <div class="field">
-              <label for="editSeriesRest" data-i18n="seriesEditor.restAfterSeriesLabel">
-                Rest after exercise (seconds)
-              </label>
-              <input id="editSeriesRest" type="number" min="0" step="5"
-                data-i18n="seriesEditor.restAfterSeriesPlaceholder" data-i18n-attr="placeholder" placeholder="0" />
-            </div>
-
-            <div class="actions">
-              <button class="btn primary" id="btnSaveSeries" data-i18n="seriesEditor.saveSeriesButton">
-                Save exercise
+              <button class="btn btnIconCompact" id="btnEditRoutine" type="button" data-i18n="routine.edit"
+                data-i18n-attr="title,aria-label" title="Edit routine name and description"
+                aria-label="Edit routine name and description">
+                <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M12 20h9"></path>
+                  <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path>
+                </svg>
               </button>
             </div>
 
-            <div class="divider"></div>
+            <button class="iconBtn pageHeaderIconBtn pageHeaderDownloadBtn" type="button" data-action="download"
+              data-i18n="routines.downloadHelp" data-i18n-attr="title,aria-label"
+              title="Download this routine in a fixed format you can use to import your routines"
+              aria-label="Download this routine in a fixed format you can use to import your routines">
+              <svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M12 3v12"></path>
+                <path d="M8 11l4 4 4-4"></path>
+                <path d="M5 21h14"></path>
+              </svg>
+            </button>
 
-            <h3 class="sectionSubheading"
-              data-i18n="seriesEditor.repGroupsTitle">
-              Sets
-            </h3>
-            <div id="repGroupList"></div>
-            <p class="note uHidden" id="repGroupEmpty" data-i18n="seriesEditor.repGroupsEmpty">
-              No sets yet. Add one below.
-            </p>
-
-            <div class="divider"></div>
-
-            <h3 class="sectionSubheading"
-              data-i18n="seriesEditor.addRepGroupTitle">
-              Add set
-            </h3>
-
-            <div class="field">
-              <label for="rgLaterality" data-i18n="repGroup.lateralityLabel">Laterality</label>
-              <select id="rgLaterality">
-                <option value="bilateral" data-i18n="repGroup.laterality.bilateral">Bilateral</option>
-                <option value="unilateral" data-i18n="repGroup.laterality.unilateral">Unilateral</option>
-              </select>
-            </div>
-
-            <div class="field" id="rgRepsSingleWrap">
-              <label for="rgTargetReps" data-i18n="repGroup.targetRepsLabel">Target reps</label>
-              <input id="rgTargetReps" type="number" min="1" step="1" data-i18n="repGroup.targetRepsPlaceholder"
-                data-i18n-attr="placeholder" placeholder="e.g., 10" />
-            </div>
-
-            <div class="field uHidden" id="rgRepsTupleWrap">
-              <label data-i18n="repGroup.targetRepsTupleLabel">Target reps (left / right)</label>
-              <div class="tupleInputGrid">
-                <input id="rgRepsLeft" type="number" min="1" step="1" data-i18n="repGroup.targetRepsLeftPlaceholder"
-                  data-i18n-attr="placeholder" placeholder="Left" />
-                <input id="rgRepsRight" type="number" min="1" step="1" data-i18n="repGroup.targetRepsRightPlaceholder"
-                  data-i18n-attr="placeholder" placeholder="Right" />
-              </div>
-            </div>
-
-            <div class="field" id="rgWeightSingleWrap">
-              <label for="rgWeightSingle" data-i18n="repGroup.targetWeightSingleLabel">Target weight</label>
-              <input id="rgWeightSingle" type="number" min="0" step="0.5"
-                data-i18n="repGroup.targetWeightSinglePlaceholder" data-i18n-attr="placeholder"
-                placeholder="e.g., 30" />
-            </div>
-
-            <div class="field uHidden" id="rgWeightTupleWrap">
-              <label data-i18n="repGroup.targetWeightTupleLabel">Target weight (left / right)</label>
-              <div class="tupleInputGrid">
-                <input id="rgWeightLeft" type="number" min="0" step="0.5"
-                  data-i18n="repGroup.targetWeightLeftPlaceholder" data-i18n-attr="placeholder" placeholder="Left" />
-                <input id="rgWeightRight" type="number" min="0" step="0.5"
-                  data-i18n="repGroup.targetWeightRightPlaceholder" data-i18n-attr="placeholder" placeholder="Right" />
-              </div>
-            </div>
-
-            <div class="field">
-              <label for="rgRestAfter" data-i18n="repGroup.restAfterLabel">Rest after set (seconds)</label>
-              <input id="rgRestAfter" type="number" min="0" step="5" data-i18n="repGroup.restAfterPlaceholder"
-                data-i18n-attr="placeholder" placeholder="0" />
-            </div>
-
-            <div class="actions">
-              <button class="btn primary" id="btnAddRepGroup" data-i18n="seriesEditor.addRepGroupButton">
-                Add set
-              </button>
-              <button class="btn uHidden" id="btnCancelRepGroupEdit" data-i18n="common.cancel">
-                Cancel
-              </button>
+            <div class="toolbar">
+              <button class="btn" data-nav="/routines" data-i18n="common.back">Back</button>
+              <button class="btn danger" id="btnDeleteRoutine" data-i18n="common.delete">Delete</button>
             </div>
           </div>
-        </section>
-      </div>
-    </section>
-
-    <section class="card route routeHidden" data-route="session" id="route-session">
-      <div class="pageHeader">
-        <h2 id="sessionTitle" data-i18n="session.title">Workout session</h2>
-        <div>
-          <button class="btn" data-nav="/routines" data-i18n="common.back">Back</button>
         </div>
-      </div>
 
-      <div class="routineDetail">
-        <p class="muted" id="sessionRoutineMeta">—</p>
+        <div class="routineDetail">
+          <p class="muted" id="routineDesc">—</p>
 
-        <div class="divider"></div>
-
-        <div class="form formNoTopPadding">
-          <div class="sessionTimerRow">
-            <div>
-              <div class="sessionTimerLabel" data-i18n="session.timer.label">
-                Timer
-              </div>
-
-              <div id="sessionTimer" class="sessionTimerDisplay">00:00</div>
+          <div id="routineMetaEditor" class="form formTopInset uHidden">
+            <div class="field">
+              <label for="editRoutineName" data-i18n="routine.edit.nameLabel">Name</label>
+              <input id="editRoutineName" maxlength="60" data-i18n="routine.edit.namePlaceholder"
+                data-i18n-attr="placeholder" placeholder="e.g., Push Day A" />
             </div>
 
-            <div class="uFlexRowWrap uGap10 uJustifyEnd">
-              <button class="btn primary" id="btnSessionStartPause" type="button" data-i18n="session.timer.start"
-                data-i18n-attr="title,aria-label" title="Start" aria-label="Start">Start</button>
+            <div class="field">
+              <label for="editRoutineDescription" data-i18n="routine.edit.descLabel">Description</label>
+              <textarea id="editRoutineDescription" data-i18n="routine.edit.descPlaceholder"
+                data-i18n-attr="placeholder" placeholder="Quick notes: goals, intensity, focus..."></textarea>
+            </div>
+
+            <div class="actions actionsStart">
+              <button class="btn primary" id="btnSaveRoutineMeta" type="button" data-i18n="common.save">Save</button>
+              <button class="btn" id="btnCancelRoutineMeta" type="button" data-i18n="common.cancel">Cancel</button>
             </div>
           </div>
 
           <div class="divider"></div>
 
-          <h3 class="sectionSubheading" data-i18n="session.series.title">
-            Ordered exercises</h3>
+          <div class="form">
+            <h3 class="sectionSubheading" data-i18n="routine.addSeries.title">
+              Add exercise
+            </h3>
 
-          <div id="sessionSeriesList"></div>
+            <div class="field">
+              <label for="exerciseInput" data-i18n="routine.addSeries.exerciseLabel">Exercise</label>
+              <input id="exerciseInput" list="exerciseOptions" data-i18n="routine.addSeries.exercisePlaceholder"
+                data-i18n-attr="placeholder" placeholder="Type or pick an exercise..." />
+              <datalist id="exerciseOptions"></datalist>
+              <div class="note" data-i18n="routine.addSeries.exerciseHelp">
+                Type a new name to create an exercise automatically.
+              </div>
+            </div>
 
-          <p class="note uHidden" id="sessionEmpty" data-i18n="session.series.empty">
-            This routine has no exercises yet.
+            <div class="field">
+              <label for="seriesDescription" data-i18n="routine.addSeries.seriesDescriptionLabel">
+                Exercise description (optional)
+              </label>
+              <input id="seriesDescription" data-i18n="routine.addSeries.seriesDescriptionPlaceholder"
+                data-i18n-attr="placeholder" placeholder="e.g., Working sets, Warm-up..." />
+            </div>
+
+            <div class="actions">
+              <button class="btn primary" id="btnAddSeries" data-i18n="routine.addSeries.button">
+                Add exercise
+              </button>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div>
+            <h3 class="sectionSubheading" data-i18n="routine.seriesList.title">
+              Exercises in this routine
+            </h3>
+            <div id="seriesList"></div>
+            <p class="note uHidden" id="seriesEmpty" data-i18n="routine.seriesList.empty">
+              No exercise yet. Add one above.
+            </p>
+          </div>
+
+          <div class="divider"></div>
+
+          <section id="seriesEditor" class="uHidden">
+            <div class="pageHeader uNoBorder formCompact uMb10">
+              <h2 id="seriesEditorTitle">Edit exercise</h2>
+              <button class="btn" id="btnCloseSeriesEditor" data-i18n="common.close">Close</button>
+            </div>
+
+            <div class="form formCompact">
+              <div class="field">
+                <label for="editSeriesDescription" data-i18n="seriesEditor.seriesDescriptionLabel">
+                  Exercise description
+                </label>
+                <input id="editSeriesDescription" data-i18n="seriesEditor.seriesDescriptionPlaceholder"
+                  data-i18n-attr="placeholder" placeholder="e.g., Working sets" />
+              </div>
+
+              <div class="field">
+                <label for="editSeriesRest" data-i18n="seriesEditor.restAfterSeriesLabel">
+                  Rest after exercise (seconds)
+                </label>
+                <input id="editSeriesRest" type="number" min="0" step="5"
+                  data-i18n="seriesEditor.restAfterSeriesPlaceholder" data-i18n-attr="placeholder" placeholder="0" />
+              </div>
+
+              <div class="actions">
+                <button class="btn primary" id="btnSaveSeries" data-i18n="seriesEditor.saveSeriesButton">
+                  Save exercise
+                </button>
+              </div>
+
+              <div class="divider"></div>
+
+              <h3 class="sectionSubheading" data-i18n="seriesEditor.repGroupsTitle">
+                Sets
+              </h3>
+              <div id="repGroupList"></div>
+              <p class="note uHidden" id="repGroupEmpty" data-i18n="seriesEditor.repGroupsEmpty">
+                No sets yet. Add one below.
+              </p>
+
+              <div class="divider"></div>
+
+              <h3 class="sectionSubheading" data-i18n="seriesEditor.addRepGroupTitle">
+                Add set
+              </h3>
+
+              <div class="field">
+                <label for="rgLaterality" data-i18n="repGroup.lateralityLabel">Laterality</label>
+                <select id="rgLaterality">
+                  <option value="bilateral" data-i18n="repGroup.laterality.bilateral">Bilateral</option>
+                  <option value="unilateral" data-i18n="repGroup.laterality.unilateral">Unilateral</option>
+                </select>
+              </div>
+
+              <div class="field" id="rgRepsSingleWrap">
+                <label for="rgTargetReps" data-i18n="repGroup.targetRepsLabel">Target reps</label>
+                <input id="rgTargetReps" type="number" min="1" step="1" data-i18n="repGroup.targetRepsPlaceholder"
+                  data-i18n-attr="placeholder" placeholder="e.g., 10" />
+              </div>
+
+              <div class="field uHidden" id="rgRepsTupleWrap">
+                <label data-i18n="repGroup.targetRepsTupleLabel">Target reps (left / right)</label>
+                <div class="tupleInputGrid">
+                  <input id="rgRepsLeft" type="number" min="1" step="1" data-i18n="repGroup.targetRepsLeftPlaceholder"
+                    data-i18n-attr="placeholder" placeholder="Left" />
+                  <input id="rgRepsRight" type="number" min="1" step="1" data-i18n="repGroup.targetRepsRightPlaceholder"
+                    data-i18n-attr="placeholder" placeholder="Right" />
+                </div>
+              </div>
+
+              <div class="field" id="rgWeightSingleWrap">
+                <label for="rgWeightSingle" data-i18n="repGroup.targetWeightSingleLabel">Target weight</label>
+                <input id="rgWeightSingle" type="number" min="0" step="0.5"
+                  data-i18n="repGroup.targetWeightSinglePlaceholder" data-i18n-attr="placeholder"
+                  placeholder="e.g., 30" />
+              </div>
+
+              <div class="field uHidden" id="rgWeightTupleWrap">
+                <label data-i18n="repGroup.targetWeightTupleLabel">Target weight (left / right)</label>
+                <div class="tupleInputGrid">
+                  <input id="rgWeightLeft" type="number" min="0" step="0.5"
+                    data-i18n="repGroup.targetWeightLeftPlaceholder" data-i18n-attr="placeholder" placeholder="Left" />
+                  <input id="rgWeightRight" type="number" min="0" step="0.5"
+                    data-i18n="repGroup.targetWeightRightPlaceholder" data-i18n-attr="placeholder"
+                    placeholder="Right" />
+                </div>
+              </div>
+
+              <div class="field">
+                <label for="rgRestAfter" data-i18n="repGroup.restAfterLabel">Rest after set (seconds)</label>
+                <input id="rgRestAfter" type="number" min="0" step="5" data-i18n="repGroup.restAfterPlaceholder"
+                  data-i18n-attr="placeholder" placeholder="0" />
+              </div>
+
+              <div class="actions">
+                <button class="btn primary" id="btnAddRepGroup" data-i18n="seriesEditor.addRepGroupButton">
+                  Add set
+                </button>
+                <button class="btn uHidden" id="btnCancelRepGroupEdit" data-i18n="common.cancel">
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section class="card route routeHidden" data-route="session" id="route-session">
+        <div class="pageHeader">
+          <h2 id="sessionTitle" data-i18n="session.title">Workout session</h2>
+          <div>
+            <button class="btn" data-nav="/routines" data-i18n="common.back">Back</button>
+          </div>
+        </div>
+
+        <div class="routineDetail">
+          <p class="muted" id="sessionRoutineMeta">—</p>
+
+          <div class="divider"></div>
+
+          <div class="form formNoTopPadding">
+            <div class="sessionTimerRow">
+              <div>
+                <div class="sessionTimerLabel" data-i18n="session.timer.label">
+                  Timer
+                </div>
+
+                <div id="sessionTimer" class="sessionTimerDisplay">00:00</div>
+              </div>
+
+              <div class="uFlexRowWrap uGap10 uJustifyEnd">
+                <button class="btn primary" id="btnSessionStartPause" type="button" data-i18n="session.timer.start"
+                  data-i18n-attr="title,aria-label" title="Start" aria-label="Start">Start</button>
+              </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <h3 class="sectionSubheading" data-i18n="session.series.title">
+              Ordered exercises</h3>
+
+            <div id="sessionSeriesList"></div>
+
+            <p class="note uHidden" id="sessionEmpty" data-i18n="session.series.empty">
+              This routine has no exercises yet.
+            </p>
+
+            <p class="note uHidden" id="sessionNotFound" data-i18n="session.routineNotFound">
+              Routine not found.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="card route routeHidden" data-route="profile" id="route-profile">
+        <div class="pageHeader">
+          <h2 data-i18n="profile.title">Profile tracking</h2>
+          <div class="uFlexRowWrap uGap10">
+            <button class="btn" data-nav="/profile/history" type="button" data-i18n="profile.historyManager">History
+              manager</button>
+            <button class="btn" id="btnExportProfile" type="button" data-i18n="common.export">Export</button>
+            <button class="btn" id="btnImportProfile" type="button" data-i18n="common.import">Import</button>
+            <input type="file" id="profileImportFile" accept=".json,.gymprofile.json" class="uHidden">
+            <button class="btn danger uHidden" id="btnClearProfileEntries" type="button"
+              data-i18n="profile.clearHistory">
+              Clear history
+            </button>
+            <button class="btn" data-nav="/routines" data-i18n="common.back">Back</button>
+          </div>
+        </div>
+
+        <div class="routineDetail uGridGap16">
+          <p class="muted uM0" data-i18n="profile.intro">
+            Track body weight, body fat percentage, and muscle mass. Charts below show the maximum value recorded for
+            each day.
           </p>
 
-          <p class="note uHidden" id="sessionNotFound" data-i18n="session.routineNotFound">
-            Routine not found.
-          </p>
-        </div>
-      </div>
-    </section>
+          <div id="profileWorkoutCalendar"></div>
 
-    <section class="card route routeHidden" data-route="profile" id="route-profile">
-      <div class="pageHeader">
-        <h2 data-i18n="profile.title">Profile tracking</h2>
-        <div class="uFlexRowWrap uGap10">
-          <button class="btn" data-nav="/profile/history" type="button" data-i18n="profile.historyManager">History manager</button>
-          <button class="btn" id="btnExportProfile" type="button" data-i18n="common.export">Export</button>
-          <button class="btn" id="btnImportProfile" type="button" data-i18n="common.import">Import</button>
-          <input type="file" id="profileImportFile" accept=".json,.gymprofile.json" class="uHidden">
-          <button class="btn danger uHidden" id="btnClearProfileEntries" type="button" data-i18n="profile.clearHistory">
-            Clear history
-          </button>
-          <button class="btn" data-nav="/routines" data-i18n="common.back">Back</button>
-        </div>
-      </div>
-
-      <div class="routineDetail uGridGap16">
-        <p class="muted uM0" data-i18n="profile.intro">
-          Track body weight, body fat percentage, and muscle mass. Charts below show the maximum value recorded for each day.
-        </p>
-
-        <div id="profileWorkoutCalendar"></div>
-
-        <form id="profileForm" class="form formNoTopPadding">
-          <div class="field">
-            <label for="profileRecordedAt" data-i18n="profile.recordedAt">Recorded at</label>
-            <input id="profileRecordedAt" type="datetime-local" required />
-          </div>
-
-          <div class="uGridAuto180">
+          <form id="profileForm" class="form formNoTopPadding">
             <div class="field">
-              <label for="profileWeightKg" data-i18n="profile.weightKg">Weight (kg)</label>
-              <input id="profileWeightKg" type="number" min="0" step="0.1" placeholder="e.g., 82.4" data-i18n="profile.weightPlaceholder" data-i18n-attr="placeholder" />
+              <label for="profileRecordedAt" data-i18n="profile.recordedAt">Recorded at</label>
+              <input id="profileRecordedAt" type="datetime-local" required />
             </div>
 
-            <div class="field">
-              <label for="profileBodyFatPct" data-i18n="profile.bodyFatPct">Body fat (%)</label>
-              <input id="profileBodyFatPct" type="number" min="0" max="100" step="0.1" placeholder="e.g., 14.8" data-i18n="profile.bodyFatPlaceholder" data-i18n-attr="placeholder" />
-            </div>
-
-            <div class="field">
-              <label for="profileMuscleKg" data-i18n="profile.muscleKg">Muscle (kg)</label>
-              <input id="profileMuscleKg" type="number" min="0" step="0.1" placeholder="e.g., 36.2" data-i18n="profile.musclePlaceholder" data-i18n-attr="placeholder" />
-            </div>
-          </div>
-
-          <div class="actions">
-            <button class="btn primary" type="submit" data-i18n="profile.saveMeasurement">Save measurement</button>
-          </div>
-        </form>
-
-        <div id="profileCharts" class="uGridAuto240"></div>
-
-        <div>
-          <h3 class="sectionSubheading" data-i18n="profile.savedEntries">Saved entries</h3>
-          <div id="profileEntryList" class="uGridGap10"></div>
-          <p class="note uHidden" id="profileEmpty" data-i18n="profile.empty">No measurements yet. Add your first entry above.</p>
-        </div>
-      </div>
-    </section>
-
-    <section class="card route routeHidden" data-route="profile-history" id="route-profile-history">
-      <div class="pageHeader">
-        <h2 data-i18n="profileHistory.title">Profile history manager</h2>
-        <div class="uFlexRowWrap uGap10">
-          <button class="btn" data-nav="/profile" type="button" data-i18n="profileHistory.backToProfile">Back to profile</button>
-        </div>
-      </div>
-
-      <div class="routineDetail uGridGap16">
-        <p class="muted uM0" data-i18n="profileHistory.intro">
-          Review every saved profile entry, update values, and inspect overall trends with stats, charts, and tabular history.
-        </p>
-
-        <div id="profileHistoryStats" class="uGridGap10"></div>
-
-        <div id="profileHistoryCharts" class="uGridAuto240"></div>
-
-        <article class="card historyCard">
-          <h3 class="sectionSubheading uMb10" data-i18n="profileHistory.editSelectedEntry">Edit selected entry</h3>
-          <form id="profileHistoryEditForm" class="form formCompact">
-            <input id="profileHistoryEditId" type="hidden" />
-            <div class="field">
-              <label for="profileHistoryEditRecordedAt" data-i18n="profile.recordedAt">Recorded at</label>
-              <input id="profileHistoryEditRecordedAt" type="datetime-local" required />
-            </div>
             <div class="uGridAuto180">
               <div class="field">
-                <label for="profileHistoryEditWeightKg" data-i18n="profile.weightKg">Weight (kg)</label>
-                <input id="profileHistoryEditWeightKg" type="number" min="0" step="0.1" placeholder="e.g., 82.4" data-i18n="profile.weightPlaceholder" data-i18n-attr="placeholder" />
+                <label for="profileWeightKg" data-i18n="profile.weightKg">Weight (kg)</label>
+                <input id="profileWeightKg" type="number" min="0" step="0.1" placeholder="e.g., 82.4"
+                  data-i18n="profile.weightPlaceholder" data-i18n-attr="placeholder" />
               </div>
+
               <div class="field">
-                <label for="profileHistoryEditBodyFatPct" data-i18n="profile.bodyFatPct">Body fat (%)</label>
-                <input id="profileHistoryEditBodyFatPct" type="number" min="0" max="100" step="0.1" placeholder="e.g., 14.8" data-i18n="profile.bodyFatPlaceholder" data-i18n-attr="placeholder" />
+                <label for="profileBodyFatPct" data-i18n="profile.bodyFatPct">Body fat (%)</label>
+                <input id="profileBodyFatPct" type="number" min="0" max="100" step="0.1" placeholder="e.g., 14.8"
+                  data-i18n="profile.bodyFatPlaceholder" data-i18n-attr="placeholder" />
               </div>
+
               <div class="field">
-                <label for="profileHistoryEditMuscleKg" data-i18n="profile.muscleKg">Muscle (kg)</label>
-                <input id="profileHistoryEditMuscleKg" type="number" min="0" step="0.1" placeholder="e.g., 36.2" data-i18n="profile.musclePlaceholder" data-i18n-attr="placeholder" />
+                <label for="profileMuscleKg" data-i18n="profile.muscleKg">Muscle (kg)</label>
+                <input id="profileMuscleKg" type="number" min="0" step="0.1" placeholder="e.g., 36.2"
+                  data-i18n="profile.musclePlaceholder" data-i18n-attr="placeholder" />
               </div>
             </div>
 
             <div class="actions">
-              <button class="btn primary" type="submit" data-i18n="profileHistory.saveChanges">Save changes</button>
-              <button class="btn" type="button" id="btnCancelProfileHistoryEdit" data-i18n="profileHistory.clearSelection">Clear selection</button>
+              <button class="btn primary" type="submit" data-i18n="profile.saveMeasurement">Save measurement</button>
             </div>
           </form>
-        </article>
 
-        <article class="card historyCard">
-          <h3 class="sectionSubheading uMb10" data-i18n="profileHistory.historyTable">History table</h3>
-          <div class="uOverflowAuto">
-            <table class="historyTable">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th data-i18n="profile.recordedAt">Recorded at</th>
-                  <th data-i18n="profileHistory.weightShort">Weight</th>
-                  <th data-i18n="profileHistory.bodyFatShort">Body fat</th>
-                  <th data-i18n="profileHistory.muscleShort">Muscle</th>
-                  <th class="actions" data-i18n="profileHistory.actions">Actions</th>
-                </tr>
-              </thead>
-              <tbody id="profileHistoryTableBody"></tbody>
-            </table>
+          <div id="profileCharts" class="uGridAuto240"></div>
+
+          <div>
+            <h3 class="sectionSubheading" data-i18n="profile.savedEntries">Saved entries</h3>
+            <div id="profileEntryList" class="uGridGap10"></div>
+            <p class="note uHidden" id="profileEmpty" data-i18n="profile.empty">No measurements yet. Add your first
+              entry above.</p>
           </div>
-          <p class="note noteTop10 uHidden" id="profileHistoryEmpty" data-i18n="profileHistory.empty">No entries available yet.</p>
-        </article>
-      </div>
-    </section>
+        </div>
+      </section>
+
+      <section class="card route routeHidden" data-route="profile-history" id="route-profile-history">
+        <div class="pageHeader">
+          <h2 data-i18n="profileHistory.title">Profile history manager</h2>
+          <div class="uFlexRowWrap uGap10">
+            <button class="btn" data-nav="/profile" type="button" data-i18n="profileHistory.backToProfile">Back to
+              profile</button>
+          </div>
+        </div>
+
+        <div class="routineDetail uGridGap16">
+          <p class="muted uM0" data-i18n="profileHistory.intro">
+            Review every saved profile entry, update values, and inspect overall trends with stats, charts, and tabular
+            history.
+          </p>
+
+          <div id="profileHistoryStats" class="uGridGap10"></div>
+
+          <div id="profileHistoryCharts" class="uGridAuto240"></div>
+
+          <article class="card historyCard">
+            <h3 class="sectionSubheading uMb10" data-i18n="profileHistory.editSelectedEntry">Edit selected entry</h3>
+            <form id="profileHistoryEditForm" class="form formCompact">
+              <input id="profileHistoryEditId" type="hidden" />
+              <div class="field">
+                <label for="profileHistoryEditRecordedAt" data-i18n="profile.recordedAt">Recorded at</label>
+                <input id="profileHistoryEditRecordedAt" type="datetime-local" required />
+              </div>
+              <div class="uGridAuto180">
+                <div class="field">
+                  <label for="profileHistoryEditWeightKg" data-i18n="profile.weightKg">Weight (kg)</label>
+                  <input id="profileHistoryEditWeightKg" type="number" min="0" step="0.1" placeholder="e.g., 82.4"
+                    data-i18n="profile.weightPlaceholder" data-i18n-attr="placeholder" />
+                </div>
+                <div class="field">
+                  <label for="profileHistoryEditBodyFatPct" data-i18n="profile.bodyFatPct">Body fat (%)</label>
+                  <input id="profileHistoryEditBodyFatPct" type="number" min="0" max="100" step="0.1"
+                    placeholder="e.g., 14.8" data-i18n="profile.bodyFatPlaceholder" data-i18n-attr="placeholder" />
+                </div>
+                <div class="field">
+                  <label for="profileHistoryEditMuscleKg" data-i18n="profile.muscleKg">Muscle (kg)</label>
+                  <input id="profileHistoryEditMuscleKg" type="number" min="0" step="0.1" placeholder="e.g., 36.2"
+                    data-i18n="profile.musclePlaceholder" data-i18n-attr="placeholder" />
+                </div>
+              </div>
+
+              <div class="actions">
+                <button class="btn primary" type="submit" data-i18n="profileHistory.saveChanges">Save changes</button>
+                <button class="btn" type="button" id="btnCancelProfileHistoryEdit"
+                  data-i18n="profileHistory.clearSelection">Clear selection</button>
+              </div>
+            </form>
+          </article>
+
+          <article class="card historyCard">
+            <h3 class="sectionSubheading uMb10" data-i18n="profileHistory.historyTable">History table</h3>
+            <div class="uOverflowAuto">
+              <table class="historyTable">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th data-i18n="profile.recordedAt">Recorded at</th>
+                    <th data-i18n="profileHistory.weightShort">Weight</th>
+                    <th data-i18n="profileHistory.bodyFatShort">Body fat</th>
+                    <th data-i18n="profileHistory.muscleShort">Muscle</th>
+                    <th class="actions" data-i18n="profileHistory.actions">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="profileHistoryTableBody"></tbody>
+              </table>
+            </div>
+            <p class="note noteTop10 uHidden" id="profileHistoryEmpty" data-i18n="profileHistory.empty">No entries
+              available yet.</p>
+          </article>
+        </div>
+      </section>
 
     </main>
 

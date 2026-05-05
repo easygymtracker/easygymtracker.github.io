@@ -69,6 +69,20 @@ function formatRepsForSummary(reps) {
     return String(reps);
 }
 
+function syncSeriesRestFromLastRepGroup(setSeries) {
+    if (!setSeries) return;
+
+    const groups = Array.isArray(setSeries.repGroups) ? setSeries.repGroups : [];
+    if (groups.length === 0) {
+        setSeries.restSecondsAfter = 0;
+        return;
+    }
+
+    const last = groups[groups.length - 1];
+    const lastRest = Number(last?.restSecondsAfter);
+    setSeries.restSecondsAfter = Number.isFinite(lastRest) && lastRest >= 0 ? lastRest : 0;
+}
+
 export function createSeriesEditorView({
     routineStore,
     exerciseStore,
@@ -292,6 +306,7 @@ export function createSeriesEditorView({
         ) return;
 
         moveItem(s.repGroups, fromIdx, toIdx);
+        syncSeriesRestFromLastRepGroup(s);
 
         if (Number.isInteger(editingRepGroupIndex)) {
             if (editingRepGroupIndex === fromIdx) {
@@ -388,6 +403,7 @@ export function createSeriesEditorView({
             g.targetReps = targetReps;
             g.targetWeight = targetWeight;
             g.restSecondsAfter = restSecondsAfter;
+            syncSeriesRestFromLastRepGroup(s);
 
             upsertPerformedHistory(g, targetReps, targetWeight);
 
@@ -416,6 +432,7 @@ export function createSeriesEditorView({
         });
 
         s.repGroups.push(rg);
+        syncSeriesRestFromLastRepGroup(s);
         routineStore.update(routine);
 
         if (rgTargetReps) rgTargetReps.value = "";
@@ -469,6 +486,7 @@ export function createSeriesEditorView({
             if (!ok) return;
 
             s.repGroups.splice(idx, 1);
+            syncSeriesRestFromLastRepGroup(s);
 
             if (Number.isInteger(editingRepGroupIndex)) {
                 if (idx === editingRepGroupIndex) {
