@@ -15,6 +15,7 @@ import { mountRoutineNewPage } from "./pages/routinesPage/routineNewPage.js";
 import { mountRoutineDetailPage } from "./pages/routinesPage/routineDetailPage.js";
 import { mountProfilePage } from "./pages/profilePage/profilePage.js";
 import { mountProfileHistoryPage } from "./pages/profilePage/profileHistoryPage.js";
+import { mountExerciseHistoryPage } from "./pages/exerciseHistoryPage/exerciseHistoryPage.js";
 
 import { setLocale, getLocale, getLocaleFromUrl, translateDocument, t } from "./internationalization/i18n.js";
 
@@ -63,6 +64,7 @@ const pages = {
     session: mountSessionPage({ routineStore, exerciseStore, profileStore, workoutSessionStore }),
     profile: mountProfilePage({ profileStore, workoutSessionStore }),
     "profile-history": mountProfileHistoryPage({ profileStore }),
+    "exercise-history": mountExerciseHistoryPage({ routineStore, exerciseStore }),
 };
 
 const PUBLIC_ROUTES = new Set(["home", "features", "privacy", "about"]);
@@ -75,6 +77,7 @@ const styleRouter = createStyleRouter({
         "routine-new": ["../styles/components/routines.css"],
         routine: ["../styles/components/routines.css"],
         profile: ["../styles/components/workoutCalendar.css"],
+        "exercise-history": ["../styles/components/exerciseHistory.css"],
     },
     resolveFrom: import.meta.url,
 });

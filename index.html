@@ -718,6 +718,75 @@
         </div>
       </section>
 
+      <section class="card route routeHidden" data-route="exercise-history" id="route-exercise-history">
+        <div class="pageHeader">
+          <h2 id="exerciseHistoryTitle" data-i18n="exerciseHistory.title">Exercise History</h2>
+          <div class="uFlexRowWrap uGap10">
+            <button class="btn" id="btnBackFromExerciseHistory" type="button" data-i18n="common.back">Back</button>
+          </div>
+        </div>
+
+        <div class="routineDetail uGridGap16">
+          <p class="muted uM0" id="exerciseHistorySubtitle" data-i18n="exerciseHistory.subtitle">
+            Review and manage all logged entries for this exercise.
+          </p>
+
+          <div id="exerciseHistoryNotFound" class="note uHidden" data-i18n="exerciseHistory.notFound">
+            Exercise not found.
+          </div>
+
+          <div id="exerciseHistoryStats" class="summaryKpis"></div>
+
+          <div id="exerciseHistoryCharts" class="exHistoryCharts"></div>
+
+          <div id="exerciseHistoryAddSection" class="uHidden">
+            <h3 class="sectionSubheading" data-i18n="exerciseHistory.addEntry.title">Add entry</h3>
+            <div class="form formCompact" id="exerciseHistoryAddForm">
+              <div class="field">
+                <label for="exHistAddGroup" data-i18n="exerciseHistory.addEntry.repGroup">Set group</label>
+                <select id="exHistAddGroup"></select>
+              </div>
+              <div class="field">
+                <label for="exHistAddDate" data-i18n="exerciseHistory.addEntry.date">Date</label>
+                <input id="exHistAddDate" type="datetime-local" required />
+              </div>
+              <div id="exHistAddRepsWrap" class="field">
+                <label for="exHistAddReps" data-i18n="exerciseHistory.addEntry.reps">Reps</label>
+                <input id="exHistAddReps" type="number" min="1" step="1" />
+              </div>
+              <div id="exHistAddRepsTupleWrap" class="field uHidden">
+                <label data-i18n="exerciseHistory.addEntry.repsTuple">Reps (left / right)</label>
+                <div class="tupleInputGrid">
+                  <input id="exHistAddRepsLeft" type="number" min="1" step="1" />
+                  <input id="exHistAddRepsRight" type="number" min="1" step="1" />
+                </div>
+              </div>
+              <div id="exHistAddWeightWrap" class="field">
+                <label for="exHistAddWeight" data-i18n="exerciseHistory.addEntry.weight">Weight (kg)</label>
+                <input id="exHistAddWeight" type="number" min="0" step="0.5" />
+              </div>
+              <div id="exHistAddWeightTupleWrap" class="field uHidden">
+                <label data-i18n="exerciseHistory.addEntry.weightTuple">Weight (left / right kg)</label>
+                <div class="tupleInputGrid">
+                  <input id="exHistAddWeightLeft" type="number" min="0" step="0.5" />
+                  <input id="exHistAddWeightRight" type="number" min="0" step="0.5" />
+                </div>
+              </div>
+              <div class="actions actionsStart">
+                <button class="btn primary" id="btnExHistAddSave" type="button" data-i18n="common.save">Save</button>
+                <button class="btn" id="btnExHistAddCancel" type="button" data-i18n="common.cancel">Cancel</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="exerciseHistoryList"></div>
+
+          <p class="note uHidden" id="exerciseHistoryEmpty" data-i18n="exerciseHistory.empty">
+            No history recorded for this exercise yet.
+          </p>
+        </div>
+      </section>
+
       <section class="card route routeHidden" data-route="profile-history" id="route-profile-history">
         <div class="pageHeader">
           <h2 data-i18n="profileHistory.title">Profile history manager</h2>

@@ -3,6 +3,7 @@
 import { t } from "/src/internationalization/i18n.js";
 import { escapeHtml } from "./viewUtils.js";
 import { flashMoved, moveItem, attachDragReorder } from "/src/ui/common/reorderUtils.js";
+import { navigate } from "/src/router.js";
 
 function restAfterLabel(seconds) {
     return t("routine.seriesList.restAfter", { seconds });
@@ -62,6 +63,9 @@ export function createSeriesListView({
                 </div>
                 <div class="rowActions">
                     <span class="chip">${escapeHtml(repGroupCountLabel(repGroupCount))}</span>
+                    <button class="btn" data-action="view-history" data-index="${i}" title="${escapeHtml(t('exerciseHistory.viewHistory') || 'History')}">
+                        ${escapeHtml(t('exerciseHistory.viewHistory') || 'History')}
+                    </button>
                     <button class="btn" data-action="edit-series" data-index="${i}">
                         ${escapeHtml(t("common.edit"))}
                     </button>
@@ -110,6 +114,16 @@ export function createSeriesListView({
         const btn = e.target.closest("button[data-action]");
         const idx = Number(row.getAttribute("data-index"));
         const action = btn ? btn.getAttribute("data-action") : "edit-series";
+
+        if (action === "view-history") {
+            const routineId = getCurrentRoutineId();
+            const routine = routineStore.getById(routineId);
+            if (!routine) return;
+            const series = routine.series[idx];
+            if (!series?.exerciseId) return;
+            navigate(`/exercise/${series.exerciseId}/history?back=/routine/${routineId}`);
+            return;
+        }
 
         if (action === "edit-series") {
             onEditSeries(idx);
