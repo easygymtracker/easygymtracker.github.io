@@ -45,7 +45,11 @@
 }
 
 .workoutCalendarMonthSummary {
-    margin-top: -2px;
+    margin-top: 0;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.02);
+    padding: 8px 10px;
 }
 
 .workoutCalendarWeekdays span {
@@ -88,6 +92,7 @@
 
 .workoutCalendarDayMeta {
     font-size: 10px;
+    line-height: 1.35;
     color: var(--muted);
     text-align: left;
     min-height: 12px;
@@ -104,7 +109,7 @@
 }
 
 .workoutCalendarDetails {
-    padding: 10px;
+    padding: 12px;
     display: grid;
     gap: 10px;
 }
@@ -148,4 +153,15 @@
 
 .workoutCalendarSessionStats {
     line-height: 1.4;
+}
+
+@media (max-width: 480px) {
+    .workoutCalendarCell {
+        min-height: 52px;
+        padding: 6px;
+    }
+
+    .workoutCalendarMonthLabel {
+        min-width: 120px;
+    }
 }

@@ -18,6 +18,13 @@
     --border: rgba(255, 255, 255, 0.10);
     --shadow: 0 12px 34px rgba(0, 0, 0, 0.55);
     --radius: 14px;
+    --radius-sm: 10px;
+    --radius-md: 12px;
+    --radius-lg: 14px;
+    --space-1: 6px;
+    --space-2: 10px;
+    --space-3: 12px;
+    --space-4: 16px;
 }
 
 * {
@@ -82,10 +89,10 @@ header {
     border: 1px solid var(--border);
     background: rgba(255, 255, 255, 0.04);
     color: var(--text);
-    padding: 12px 14px;
+    padding: 10px 14px;
     min-height: 44px;
     /* recommended tap target */
-    border-radius: 14px;
+    border-radius: var(--radius-md);
     cursor: pointer;
     transition: transform 0.06s ease, background 0.2s ease, border-color 0.2s ease;
     user-select: none;
@@ -132,14 +139,14 @@ header {
         linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.015)),
         var(--panel);
     border: 1px solid var(--border);
-    border-radius: var(--radius);
+    border-radius: var(--radius-lg);
     box-shadow: var(--shadow);
     overflow: hidden;
 }
 
 /* List header */
 .listHeader {
-    padding: 14px 16px;
+    padding: var(--space-3) var(--space-4);
     display: flex;
     align-items: baseline;
     justify-content: space-between;
@@ -160,14 +167,14 @@ header {
 }
 
 .empty {
-    padding: 22px 16px;
+    padding: 20px var(--space-4);
     color: var(--muted);
     text-align: center;
 }
 
 /* Page header */
 .pageHeader {
-    padding: 14px 16px;
+    padding: var(--space-3) var(--space-4);
     border-bottom: 1px solid var(--border);
     display: flex;
     align-items: center;
@@ -199,11 +206,11 @@ header {
 
 /* Forms */
 .form {
-    padding: 14px 16px;
+    padding: var(--space-3) var(--space-4);
 }
 
 .field {
-    margin-bottom: 12px;
+    margin-bottom: var(--space-3);
 }
 
 label {
@@ -217,12 +224,13 @@ input,
 textarea,
 select {
     width: 100%;
-    padding: 12px 14px;
-    border-radius: 14px;
+    padding: 10px 12px;
+    border-radius: var(--radius-md);
     border: 1px solid var(--border);
     background: rgba(255, 255, 255, 0.03);
     color: var(--text);
     outline: none;
+    line-height: 1.4;
 }
 
 input:focus,
@@ -240,14 +248,15 @@ textarea {
 .actions {
     display: flex;
     justify-content: flex-end;
-    gap: 10px;
+    gap: var(--space-2);
     margin-top: 8px;
 }
 
 .note {
     color: var(--muted);
     font-size: 12px;
-    margin-top: 10px;
+    margin-top: 8px;
+    line-height: 1.45;
 }
 
 .muted {
@@ -257,13 +266,192 @@ textarea {
 .divider {
     height: 1px;
     background: var(--border);
-    margin: 14px 0;
+    margin: var(--space-3) 0;
 }
 
 .placeholder p {
     margin: 10px 0 0;
     color: var(--muted);
     line-height: 1.45;
+}
+
+.routeHidden {
+    display: none;
+}
+
+.uHidden {
+    display: none;
+}
+
+.uFlexRowWrap {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.uGap10 {
+    gap: 10px;
+}
+
+.uGap12 {
+    gap: 12px;
+}
+
+.uGap16 {
+    gap: 16px;
+}
+
+.uGrid {
+    display: grid;
+}
+
+.uGridAuto180 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+}
+
+.uGridAuto240 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 12px;
+}
+
+.uGridGap10 {
+    display: grid;
+    gap: 10px;
+}
+
+.uGridGap16 {
+    display: grid;
+    gap: 16px;
+}
+
+.uJustifyBetween {
+    justify-content: space-between;
+}
+
+.uJustifyEnd {
+    justify-content: flex-end;
+}
+
+.uMinW0 {
+    min-width: 0;
+}
+
+.uM0 {
+    margin: 0;
+}
+
+.uMb10 {
+    margin-bottom: 10px;
+}
+
+.uNoBorder {
+    border: none;
+}
+
+.uOverflowAuto {
+    overflow: auto;
+}
+
+.calendarSectionWrap {
+    padding: 12px;
+    border-bottom: 1px solid var(--border);
+}
+
+.formTopInset {
+    padding: 10px 0 0;
+}
+
+.formCompact {
+    padding: 0;
+}
+
+.formNoTopPadding {
+    padding-top: 0;
+}
+
+.actionsStart {
+    justify-content: flex-start;
+}
+
+.sectionSubheading {
+    margin: 0 0 10px 0;
+    font-size: 14px;
+    color: var(--accent2);
+}
+
+.sessionTimerRow {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.sessionTimerLabel {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 6px;
+}
+
+.sessionTimerDisplay {
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: 0.35px;
+}
+
+.historyCard {
+    padding: 12px;
+}
+
+.historyTable {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 720px;
+}
+
+.historyTable th {
+    text-align: left;
+    padding: 8px;
+    border-bottom: 1px solid var(--border);
+}
+
+.historyTable th.actions {
+    text-align: right;
+}
+
+.noteTop10 {
+    margin: 10px 0 0 0;
+}
+
+.textTruncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.btnIconCompact {
+    padding: 8px 10px;
+    min-height: 36px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.tupleInputGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.card,
+.btn,
+input,
+textarea,
+select {
+    overflow-wrap: anywhere;
 }
 
 /* Screen-reader only */

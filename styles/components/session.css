@@ -30,6 +30,7 @@
     margin: 6px 0 0;
     font-size: 13px;
     color: var(--muted);
+    line-height: 1.45;
 }
 
 /* Status pill */
@@ -107,6 +108,7 @@
 
 .repGroupMetric {
     font-size: 13px;
+    line-height: 1.35;
 }
 
 .repGroupActions {
@@ -194,15 +196,22 @@
     align-items: baseline;
     gap: 6px;
     min-width: 0;
+    line-height: 1.35;
 }
 
 .currentExerciseDescRow {
     margin-top: 6px;
     max-width: 560px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.02);
+    padding: 4px;
 }
 
 .currentSeriesDescInput {
     width: 100%;
+    line-height: 1.45;
+    min-height: 48px;
 }
 
 .currentExerciseIdx {
@@ -291,7 +300,7 @@
 .currentSetMetricLine {
     font-size: 18px;
     font-weight: 900;
-    line-height: 1.25;
+    line-height: 1.35;
 }
 
 .currentSetMetricLine .muted {

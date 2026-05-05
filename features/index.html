@@ -142,7 +142,7 @@
       </div>
     </section>
 
-    <section class="route landingRoute" data-route="features" id="route-features">
+    <section class="route landingRoute routeHidden" data-route="features" id="route-features">
       <div class="landingHero card">
         <p class="landingEyebrow" data-i18n="features.eyebrow">Features</p>
         <h2 data-i18n="features.title">Fast workout tracking without the usual clutter.</h2>
@@ -188,7 +188,7 @@
       </div>
     </section>
 
-    <section class="route landingRoute" data-route="privacy" id="route-privacy" style="display:none;">
+    <section class="route landingRoute routeHidden" data-route="privacy" id="route-privacy" style="display:none;">
       <div class="landingHero card">
         <p class="landingEyebrow" data-i18n="privacy.eyebrow">Privacy</p>
         <h2 data-i18n="privacy.title">A simple privacy posture: keep workout data on your own device.</h2>
@@ -226,7 +226,7 @@
       </div>
     </section>
 
-    <section class="route landingRoute" data-route="about" id="route-about" style="display:none;">
+    <section class="route landingRoute routeHidden" data-route="about" id="route-about" style="display:none;">
       <div class="landingHero card">
         <p class="landingEyebrow" data-i18n="about.eyebrow">How it works</p>
         <h2 data-i18n="about.title">A workout tracker built for the gym floor, not a dashboard.</h2>
@@ -266,20 +266,20 @@
         <div class="count" id="routineCount">0</div>
       </div>
 
-      <div style="padding:12px; border-bottom:1px solid var(--border);">
+      <div class="calendarSectionWrap">
         <div id="routinesWorkoutCalendar"></div>
       </div>
 
       <div class="routineList" id="routineList"></div>
 
-      <div class="empty" id="emptyState" style="display:none;">
+      <div class="empty uHidden" id="emptyState">
         <span data-i18n="routines.empty.prefix">No routines yet. Click</span>
         <span class="chip" data-i18n="routines.empty.cta">+ New routine</span>
         <span data-i18n="routines.empty.suffix">to create your first one.</span>
       </div>
     </section>
 
-    <section class="card route" data-route="routine-new" id="route-new" style="display:none;">
+    <section class="card route routeHidden" data-route="routine-new" id="route-new" style="display:none;">
       <div class="pageHeader">
         <h2 data-i18n="routineNew.title">Create routine</h2>
         <button class="btn" data-nav="/routines" data-i18n="common.back">Back</button>
@@ -309,7 +309,7 @@
       </div>
     </section>
 
-    <section class="card route" data-route="routine" id="route-routine" style="display:none;">
+    <section class="card route routeHidden" data-route="routine" id="route-routine" style="display:none;">
       <div class="pageHeader routineHeader">
         <button class="startSessionBtn" id="btnStartSession" type="button" data-action="start-session"
           data-i18n="routine.session.startHelp" data-i18n-attr="title,aria-label"
@@ -321,15 +321,14 @@
         </button>
 
         <div class="routineHeaderBody">
-          <div style="display:flex; align-items:center; gap:10px; min-width: 0;">
-            <h2 id="routineTitle" style="margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+          <div class="uFlexRowWrap uGap10 uMinW0">
+            <h2 id="routineTitle" class="uM0 textTruncate">
               Routine
             </h2>
 
-            <button class="btn" id="btnEditRoutine" type="button" data-i18n="routine.edit"
+            <button class="btn btnIconCompact" id="btnEditRoutine" type="button" data-i18n="routine.edit"
               data-i18n-attr="title,aria-label" title="Edit routine name and description"
-              aria-label="Edit routine name and description"
-              style="padding: 8px 10px; min-height: 36px; display:inline-flex; align-items:center; gap:8px;">
+              aria-label="Edit routine name and description">
               <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M12 20h9"></path>
@@ -360,7 +359,7 @@
       <div class="routineDetail">
         <p class="muted" id="routineDesc">—</p>
 
-        <div id="routineMetaEditor" class="form" style="display:none; padding: 10px 0 0;">
+        <div id="routineMetaEditor" class="form formTopInset uHidden">
           <div class="field">
             <label for="editRoutineName" data-i18n="routine.edit.nameLabel">Name</label>
             <input id="editRoutineName" maxlength="60" data-i18n="routine.edit.namePlaceholder"
@@ -373,7 +372,7 @@
               placeholder="Quick notes: goals, intensity, focus..."></textarea>
           </div>
 
-          <div class="actions" style="justify-content:flex-start;">
+          <div class="actions actionsStart">
             <button class="btn primary" id="btnSaveRoutineMeta" type="button" data-i18n="common.save">Save</button>
             <button class="btn" id="btnCancelRoutineMeta" type="button" data-i18n="common.cancel">Cancel</button>
           </div>
@@ -382,7 +381,7 @@
         <div class="divider"></div>
 
         <div class="form">
-          <h3 style="margin:0 0 10px 0; font-size:14px; color: var(--accent2);" data-i18n="routine.addSeries.title">
+          <h3 class="sectionSubheading" data-i18n="routine.addSeries.title">
             Add exercise
           </h3>
 
@@ -414,24 +413,24 @@
         <div class="divider"></div>
 
         <div>
-          <h3 style="margin: 0 0 10px 0; font-size: 14px; color: var(--accent2);" data-i18n="routine.seriesList.title">
+          <h3 class="sectionSubheading" data-i18n="routine.seriesList.title">
             Exercises in this routine
           </h3>
           <div id="seriesList"></div>
-          <p class="note" id="seriesEmpty" style="display: none;" data-i18n="routine.seriesList.empty">
+          <p class="note uHidden" id="seriesEmpty" data-i18n="routine.seriesList.empty">
             No exercise yet. Add one above.
           </p>
         </div>
 
         <div class="divider"></div>
 
-        <section id="seriesEditor" style="display: none;">
-          <div class="pageHeader" style="border: none; padding: 0; margin-bottom: 10px;">
+        <section id="seriesEditor" class="uHidden">
+          <div class="pageHeader uNoBorder formCompact uMb10">
             <h2 id="seriesEditorTitle">Edit exercise</h2>
             <button class="btn" id="btnCloseSeriesEditor" data-i18n="common.close">Close</button>
           </div>
 
-          <div class="form" style="padding: 0;">
+          <div class="form formCompact">
             <div class="field">
               <label for="editSeriesDescription" data-i18n="seriesEditor.seriesDescriptionLabel">
                 Exercise description
@@ -456,18 +455,18 @@
 
             <div class="divider"></div>
 
-            <h3 style="margin: 0 0 10px 0; font-size: 14px; color: var(--accent2);"
+            <h3 class="sectionSubheading"
               data-i18n="seriesEditor.repGroupsTitle">
               Sets
             </h3>
             <div id="repGroupList"></div>
-            <p class="note" id="repGroupEmpty" style="display: none;" data-i18n="seriesEditor.repGroupsEmpty">
+            <p class="note uHidden" id="repGroupEmpty" data-i18n="seriesEditor.repGroupsEmpty">
               No sets yet. Add one below.
             </p>
 
             <div class="divider"></div>
 
-            <h3 style="margin: 0 0 10px 0; font-size: 14px; color: var(--accent2);"
+            <h3 class="sectionSubheading"
               data-i18n="seriesEditor.addRepGroupTitle">
               Add set
             </h3>
@@ -486,9 +485,9 @@
                 data-i18n-attr="placeholder" placeholder="e.g., 10" />
             </div>
 
-            <div class="field" id="rgRepsTupleWrap" style="display: none;">
+            <div class="field uHidden" id="rgRepsTupleWrap">
               <label data-i18n="repGroup.targetRepsTupleLabel">Target reps (left / right)</label>
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <div class="tupleInputGrid">
                 <input id="rgRepsLeft" type="number" min="1" step="1" data-i18n="repGroup.targetRepsLeftPlaceholder"
                   data-i18n-attr="placeholder" placeholder="Left" />
                 <input id="rgRepsRight" type="number" min="1" step="1" data-i18n="repGroup.targetRepsRightPlaceholder"
@@ -503,9 +502,9 @@
                 placeholder="e.g., 30" />
             </div>
 
-            <div class="field" id="rgWeightTupleWrap" style="display: none;">
+            <div class="field uHidden" id="rgWeightTupleWrap">
               <label data-i18n="repGroup.targetWeightTupleLabel">Target weight (left / right)</label>
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <div class="tupleInputGrid">
                 <input id="rgWeightLeft" type="number" min="0" step="0.5"
                   data-i18n="repGroup.targetWeightLeftPlaceholder" data-i18n-attr="placeholder" placeholder="Left" />
                 <input id="rgWeightRight" type="number" min="0" step="0.5"
@@ -523,7 +522,7 @@
               <button class="btn primary" id="btnAddRepGroup" data-i18n="seriesEditor.addRepGroupButton">
                 Add set
               </button>
-              <button class="btn" id="btnCancelRepGroupEdit" style="display: none;" data-i18n="common.cancel">
+              <button class="btn uHidden" id="btnCancelRepGroupEdit" data-i18n="common.cancel">
                 Cancel
               </button>
             </div>
@@ -532,7 +531,7 @@
       </div>
     </section>
 
-    <section class="card route" data-route="session" id="route-session" style="display:none;">
+    <section class="card route routeHidden" data-route="session" id="route-session" style="display:none;">
       <div class="pageHeader">
         <h2 id="sessionTitle" data-i18n="session.title">Workout session</h2>
         <div>
@@ -545,18 +544,17 @@
 
         <div class="divider"></div>
 
-        <div class="form" style="padding-top: 0;">
-          <div class="sessionTimerRow"
-            style="display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap;">
+        <div class="form formNoTopPadding">
+          <div class="sessionTimerRow">
             <div>
-              <div style="font-size:12px; color: var(--muted); margin-bottom:6px;" data-i18n="session.timer.label">
+              <div class="sessionTimerLabel" data-i18n="session.timer.label">
                 Timer
               </div>
 
-              <div id="sessionTimer" style="font-size: 22px; font-weight: 600; letter-spacing: 0.35px;">00:00</div>
+              <div id="sessionTimer" class="sessionTimerDisplay">00:00</div>
             </div>
 
-            <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:flex-end;">
+            <div class="uFlexRowWrap uGap10 uJustifyEnd">
               <button class="btn primary" id="btnSessionStartPause" type="button" data-i18n="session.timer.start"
                 data-i18n-attr="title,aria-label" title="Start" aria-label="Start">Start</button>
             </div>
@@ -564,51 +562,51 @@
 
           <div class="divider"></div>
 
-          <h3 style="margin: 0 0 10px 0; font-size: 14px; color: var(--accent2);" data-i18n="session.series.title">
+          <h3 class="sectionSubheading" data-i18n="session.series.title">
             Ordered exercises</h3>
 
           <div id="sessionSeriesList"></div>
 
-          <p class="note" id="sessionEmpty" style="display:none;" data-i18n="session.series.empty">
+          <p class="note uHidden" id="sessionEmpty" data-i18n="session.series.empty">
             This routine has no exercises yet.
           </p>
 
-          <p class="note" id="sessionNotFound" style="display:none;" data-i18n="session.routineNotFound">
+          <p class="note uHidden" id="sessionNotFound" data-i18n="session.routineNotFound">
             Routine not found.
           </p>
         </div>
       </div>
     </section>
 
-    <section class="card route" data-route="profile" id="route-profile" style="display:none;">
+    <section class="card route routeHidden" data-route="profile" id="route-profile" style="display:none;">
       <div class="pageHeader">
         <h2 data-i18n="profile.title">Profile tracking</h2>
-        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <div class="uFlexRowWrap uGap10">
           <button class="btn" data-nav="/profile/history" type="button" data-i18n="profile.historyManager">History manager</button>
           <button class="btn" id="btnExportProfile" type="button" data-i18n="common.export">Export</button>
           <button class="btn" id="btnImportProfile" type="button" data-i18n="common.import">Import</button>
-          <input type="file" id="profileImportFile" accept=".json,.gymprofile.json" style="display:none;">
-          <button class="btn danger" id="btnClearProfileEntries" type="button" style="display:none;" data-i18n="profile.clearHistory">
+          <input type="file" id="profileImportFile" accept=".json,.gymprofile.json" class="uHidden">
+          <button class="btn danger uHidden" id="btnClearProfileEntries" type="button" data-i18n="profile.clearHistory">
             Clear history
           </button>
           <button class="btn" data-nav="/routines" data-i18n="common.back">Back</button>
         </div>
       </div>
 
-      <div class="routineDetail" style="display:grid; gap:16px;">
-        <p class="muted" style="margin:0;" data-i18n="profile.intro">
+      <div class="routineDetail uGridGap16">
+        <p class="muted uM0" data-i18n="profile.intro">
           Track body weight, body fat percentage, and muscle mass. Charts below show the maximum value recorded for each day.
         </p>
 
         <div id="profileWorkoutCalendar"></div>
 
-        <form id="profileForm" class="form" style="padding-top:0;">
+        <form id="profileForm" class="form formNoTopPadding">
           <div class="field">
             <label for="profileRecordedAt" data-i18n="profile.recordedAt">Recorded at</label>
             <input id="profileRecordedAt" type="datetime-local" required />
           </div>
 
-          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:12px;">
+          <div class="uGridAuto180">
             <div class="field">
               <label for="profileWeightKg" data-i18n="profile.weightKg">Weight (kg)</label>
               <input id="profileWeightKg" type="number" min="0" step="0.1" placeholder="e.g., 82.4" data-i18n="profile.weightPlaceholder" data-i18n-attr="placeholder" />
@@ -630,42 +628,42 @@
           </div>
         </form>
 
-        <div id="profileCharts" style="display:grid; gap:12px; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));"></div>
+        <div id="profileCharts" class="uGridAuto240"></div>
 
         <div>
-          <h3 style="margin:0 0 10px 0; font-size:14px; color: var(--accent2);" data-i18n="profile.savedEntries">Saved entries</h3>
-          <div id="profileEntryList" style="display:grid; gap:10px;"></div>
-          <p class="note" id="profileEmpty" style="display:none;" data-i18n="profile.empty">No measurements yet. Add your first entry above.</p>
+          <h3 class="sectionSubheading" data-i18n="profile.savedEntries">Saved entries</h3>
+          <div id="profileEntryList" class="uGridGap10"></div>
+          <p class="note uHidden" id="profileEmpty" data-i18n="profile.empty">No measurements yet. Add your first entry above.</p>
         </div>
       </div>
     </section>
 
-    <section class="card route" data-route="profile-history" id="route-profile-history" style="display:none;">
+    <section class="card route routeHidden" data-route="profile-history" id="route-profile-history" style="display:none;">
       <div class="pageHeader">
         <h2 data-i18n="profileHistory.title">Profile history manager</h2>
-        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <div class="uFlexRowWrap uGap10">
           <button class="btn" data-nav="/profile" type="button" data-i18n="profileHistory.backToProfile">Back to profile</button>
         </div>
       </div>
 
-      <div class="routineDetail" style="display:grid; gap:16px;">
-        <p class="muted" style="margin:0;" data-i18n="profileHistory.intro">
+      <div class="routineDetail uGridGap16">
+        <p class="muted uM0" data-i18n="profileHistory.intro">
           Review every saved profile entry, update values, and inspect overall trends with stats, charts, and tabular history.
         </p>
 
-        <div id="profileHistoryStats" style="display:grid; gap:10px;"></div>
+        <div id="profileHistoryStats" class="uGridGap10"></div>
 
-        <div id="profileHistoryCharts" style="display:grid; gap:12px; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));"></div>
+        <div id="profileHistoryCharts" class="uGridAuto240"></div>
 
-        <article class="card" style="padding:12px;">
-          <h3 style="margin:0 0 12px 0; font-size:14px; color: var(--accent2);" data-i18n="profileHistory.editSelectedEntry">Edit selected entry</h3>
-          <form id="profileHistoryEditForm" class="form" style="padding:0;">
+        <article class="card historyCard">
+          <h3 class="sectionSubheading uMb10" data-i18n="profileHistory.editSelectedEntry">Edit selected entry</h3>
+          <form id="profileHistoryEditForm" class="form formCompact">
             <input id="profileHistoryEditId" type="hidden" />
             <div class="field">
               <label for="profileHistoryEditRecordedAt" data-i18n="profile.recordedAt">Recorded at</label>
               <input id="profileHistoryEditRecordedAt" type="datetime-local" required />
             </div>
-            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:12px;">
+            <div class="uGridAuto180">
               <div class="field">
                 <label for="profileHistoryEditWeightKg" data-i18n="profile.weightKg">Weight (kg)</label>
                 <input id="profileHistoryEditWeightKg" type="number" min="0" step="0.1" placeholder="e.g., 82.4" data-i18n="profile.weightPlaceholder" data-i18n-attr="placeholder" />
@@ -687,24 +685,24 @@
           </form>
         </article>
 
-        <article class="card" style="padding:12px;">
-          <h3 style="margin:0 0 12px 0; font-size:14px; color: var(--accent2);" data-i18n="profileHistory.historyTable">History table</h3>
-          <div style="overflow:auto;">
-            <table style="width:100%; border-collapse:collapse; min-width:720px;">
+        <article class="card historyCard">
+          <h3 class="sectionSubheading uMb10" data-i18n="profileHistory.historyTable">History table</h3>
+          <div class="uOverflowAuto">
+            <table class="historyTable">
               <thead>
                 <tr>
-                  <th style="text-align:left; padding:8px; border-bottom:1px solid var(--border);">#</th>
-                  <th style="text-align:left; padding:8px; border-bottom:1px solid var(--border);" data-i18n="profile.recordedAt">Recorded at</th>
-                  <th style="text-align:left; padding:8px; border-bottom:1px solid var(--border);" data-i18n="profileHistory.weightShort">Weight</th>
-                  <th style="text-align:left; padding:8px; border-bottom:1px solid var(--border);" data-i18n="profileHistory.bodyFatShort">Body fat</th>
-                  <th style="text-align:left; padding:8px; border-bottom:1px solid var(--border);" data-i18n="profileHistory.muscleShort">Muscle</th>
-                  <th style="text-align:right; padding:8px; border-bottom:1px solid var(--border);" data-i18n="profileHistory.actions">Actions</th>
+                  <th>#</th>
+                  <th data-i18n="profile.recordedAt">Recorded at</th>
+                  <th data-i18n="profileHistory.weightShort">Weight</th>
+                  <th data-i18n="profileHistory.bodyFatShort">Body fat</th>
+                  <th data-i18n="profileHistory.muscleShort">Muscle</th>
+                  <th class="actions" data-i18n="profileHistory.actions">Actions</th>
                 </tr>
               </thead>
               <tbody id="profileHistoryTableBody"></tbody>
             </table>
           </div>
-          <p class="note" id="profileHistoryEmpty" style="display:none; margin:10px 0 0 0;" data-i18n="profileHistory.empty">No entries available yet.</p>
+          <p class="note noteTop10 uHidden" id="profileHistoryEmpty" data-i18n="profileHistory.empty">No entries available yet.</p>
         </article>
       </div>
     </section>
