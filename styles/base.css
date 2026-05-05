@@ -355,9 +355,10 @@ textarea {
     overflow: auto;
 }
 
-/* Keep route content spacing uniform across Features, Privacy, Profile and Profile History. */
+/* Keep route content spacing uniform across Features, Privacy, Profile, Profile History and Session. */
 #route-profile .routineDetail,
-#route-profile-history .routineDetail {
+#route-profile-history .routineDetail,
+#route-session .routineDetail {
     padding: 16px;
 }
 

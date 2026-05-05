@@ -69,7 +69,7 @@ const pages = {
 
 const PUBLIC_ROUTES = new Set(["home", "features", "privacy", "about"]);
 const SITE_URL = "https://easygymtracker.github.io";
-const STYLE_VERSION = "20260505b";
+const STYLE_VERSION = "20260505d";
 const styleRouter = createStyleRouter({
     routeToStyles: {
         home: [`../styles/components/landing.css?v=${STYLE_VERSION}`],
