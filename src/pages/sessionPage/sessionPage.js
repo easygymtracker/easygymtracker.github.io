@@ -173,7 +173,8 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
     });
 
     function isOnSessionRoute() {
-        return (location.pathname || "").startsWith("/session/");
+        const pathname = location.pathname || "";
+        return pathname.startsWith("/session/") || pathname === "/session";
     }
 
     function shouldBlockLeaving() {
@@ -189,8 +190,10 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
     }
 
     setLeaveGuard(({ fromPath, toPath }) => {
-        const fromIsSession = (fromPath || "").startsWith("/session/");
-        const toIsSession = (toPath || "").startsWith("/session/");
+        const fromNorm = String(fromPath || "");
+        const toNorm = String(toPath || "");
+        const fromIsSession = fromNorm.startsWith("/session/") || fromNorm.startsWith("/session?") || fromNorm === "/session";
+        const toIsSession = toNorm.startsWith("/session/") || toNorm.startsWith("/session?") || toNorm === "/session";
 
         if (!fromIsSession) return true;
         if (toIsSession) return true;

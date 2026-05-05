@@ -200,7 +200,7 @@ export function mountRoutineDetailPage({ routineStore, exerciseStore }) {
             return;
         }
 
-        navigate(`/session/${currentId}`);
+        navigate(`/session?routineId=${encodeURIComponent(currentId)}`);
     });
 
     function render(params) {

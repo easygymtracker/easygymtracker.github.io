@@ -88,6 +88,7 @@
     font-weight: 700;
     font-size: 13px;
     text-align: left;
+    color: var(--text);
 }
 
 .workoutCalendarDayMeta {

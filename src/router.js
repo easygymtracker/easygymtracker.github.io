@@ -56,6 +56,7 @@ function currentAppPathWithSearch() {
 function parseCurrentRoute() {
     const path = currentAppPath();
     const parts = path.split("/").filter(Boolean);
+    const query = new URLSearchParams(location.search || "");
 
     if (parts.length === 0) return { name: "home", params: {} };
 
@@ -87,6 +88,11 @@ function parseCurrentRoute() {
 
     if (parts[0] === "session" && parts[1]) {
         return { name: "session", params: { routineId: parts[1] } };
+    }
+
+    if (parts[0] === "session") {
+        const routineId = query.get("routineId");
+        if (routineId) return { name: "session", params: { routineId } };
     }
 
     return { name: "home", params: {} };

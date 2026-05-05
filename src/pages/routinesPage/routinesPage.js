@@ -62,7 +62,7 @@ export function mountRoutinesPage({ routineStore, exerciseStore, workoutSessionS
         if (action === "start-session") {
             e.preventDefault();
             e.stopPropagation();
-            navigate(`/session/${id}`);
+            navigate(`/session?routineId=${encodeURIComponent(id)}`);
             return;
         }
     });

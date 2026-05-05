@@ -77,11 +77,15 @@ export function translateDocument(root = document) {
         // Supports single attr (e.g. "placeholder") and multi-attr
         // declarations (e.g. "title,aria-label").
         attr
-            .split(",")
+            .split(/[\s,]+/)
             .map((name) => name.trim())
             .filter(Boolean)
             .forEach((name) => {
-                el.setAttribute(name, t(key));
+                try {
+                    el.setAttribute(name, t(key));
+                } catch {
+                    // Ignore invalid attribute declarations in markup.
+                }
             });
     });
 

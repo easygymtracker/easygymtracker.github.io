@@ -211,7 +211,9 @@ const ROUTE_SEO = {
 // -----------------------------------------------------------------------------
 function showRoute(name) {
     document.querySelectorAll(".route").forEach((el) => {
-        el.style.display = (el.dataset.route === name) ? "" : "none";
+        const isActive = el.dataset.route === name;
+        el.classList.toggle("routeHidden", !isActive);
+        el.style.display = isActive ? "" : "none";
     });
 
     styleRouter.apply(name);
