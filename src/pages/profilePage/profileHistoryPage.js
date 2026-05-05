@@ -1,4 +1,5 @@
 import { escapeHtml } from "../../ui/dom.js";
+import { t } from "../../internationalization/i18n.js";
 
 function toInputDateTimeValue(value) {
     const date = value ? new Date(value) : new Date();
@@ -14,12 +15,12 @@ function parseOptionalNumber(value) {
 }
 
 function formatValue(value, suffix = "") {
-    if (value == null) return "-";
+    if (value == null) return t("common.dash");
     return `${value}${suffix}`;
 }
 
 function formatRecordedAt(value) {
-    if (!value) return "-";
+    if (!value) return t("common.dash");
     const date = new Date(value);
     if (Number.isNaN(date.getTime())) return value;
     return new Intl.DateTimeFormat(undefined, {
@@ -54,7 +55,7 @@ function buildDailyMax(entries, field) {
 
 function lineChartSvg(points, color, unit) {
     if (!points.length) {
-        return `<div class="note">No data yet.</div>`;
+        return `<div class="note">${escapeHtml(t("profileHistory.noDataYet"))}</div>`;
     }
 
     const width = 340;
@@ -83,7 +84,7 @@ function lineChartSvg(points, color, unit) {
     `).join("");
 
     return `
-      <svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Metric trend chart" style="width:100%; height:auto; display:block;">
+    <svg viewBox="0 0 ${width} ${height}" role="img" aria-label="${escapeHtml(t("profileHistory.metricTrendAria"))}" style="width:100%; height:auto; display:block;">
         <line x1="${padL}" y1="${padT}" x2="${padL}" y2="${height - padB}" stroke="var(--border)" />
         <line x1="${padL}" y1="${height - padB}" x2="${width - padR}" y2="${height - padB}" stroke="var(--border)" />
         <text x="${padL}" y="${padT - 2}" fill="var(--muted)" font-size="10">${escapeHtml(String(max))}${escapeHtml(unit)}</text>
@@ -116,21 +117,21 @@ function statsHtml(entries) {
 
     return `
       <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:10px;">
-        <article class="card" style="padding:10px;"><strong>${entries.length}</strong><div class="note">Entries</div></article>
-        <article class="card" style="padding:10px;"><strong>${escapeHtml(formatRecordedAt(newest?.recordedAt))}</strong><div class="note">Latest record</div></article>
-        <article class="card" style="padding:10px;"><strong>${escapeHtml(formatRecordedAt(oldest?.recordedAt))}</strong><div class="note">Oldest record</div></article>
-        <article class="card" style="padding:10px;"><strong>${escapeHtml(formatValue(avgWeight, " kg"))}</strong><div class="note">Avg weight</div></article>
-        <article class="card" style="padding:10px;"><strong>${escapeHtml(formatValue(avgFat, "%"))}</strong><div class="note">Avg body fat</div></article>
-        <article class="card" style="padding:10px;"><strong>${escapeHtml(formatValue(avgMuscle, " kg"))}</strong><div class="note">Avg muscle</div></article>
+                <article class="card" style="padding:10px;"><strong>${entries.length}</strong><div class="note">${escapeHtml(t("profileHistory.stats.entries"))}</div></article>
+                <article class="card" style="padding:10px;"><strong>${escapeHtml(formatRecordedAt(newest?.recordedAt))}</strong><div class="note">${escapeHtml(t("profileHistory.stats.latestRecord"))}</div></article>
+                <article class="card" style="padding:10px;"><strong>${escapeHtml(formatRecordedAt(oldest?.recordedAt))}</strong><div class="note">${escapeHtml(t("profileHistory.stats.oldestRecord"))}</div></article>
+                <article class="card" style="padding:10px;"><strong>${escapeHtml(formatValue(avgWeight, " kg"))}</strong><div class="note">${escapeHtml(t("profileHistory.stats.avgWeight"))}</div></article>
+                <article class="card" style="padding:10px;"><strong>${escapeHtml(formatValue(avgFat, "%"))}</strong><div class="note">${escapeHtml(t("profileHistory.stats.avgBodyFat"))}</div></article>
+                <article class="card" style="padding:10px;"><strong>${escapeHtml(formatValue(avgMuscle, " kg"))}</strong><div class="note">${escapeHtml(t("profileHistory.stats.avgMuscle"))}</div></article>
       </div>
     `;
 }
 
 function chartsHtml(entries) {
     const metrics = [
-        { title: "Weight", field: "weightKg", color: "#6bb6ff", suffix: " kg", latest: findLatest(entries, "weightKg") },
-        { title: "Body fat", field: "bodyFatPct", color: "#f59e0b", suffix: "%", latest: findLatest(entries, "bodyFatPct") },
-        { title: "Muscle", field: "muscleKg", color: "#22c55e", suffix: " kg", latest: findLatest(entries, "muscleKg") },
+                { title: t("profile.weightLabel"), field: "weightKg", color: "#6bb6ff", suffix: " kg", latest: findLatest(entries, "weightKg") },
+                { title: t("profile.bodyFatLabel"), field: "bodyFatPct", color: "#f59e0b", suffix: "%", latest: findLatest(entries, "bodyFatPct") },
+                { title: t("profile.muscleLabel"), field: "muscleKg", color: "#22c55e", suffix: " kg", latest: findLatest(entries, "muscleKg") },
     ];
 
     return metrics.map((metric) => {
@@ -156,8 +157,8 @@ function tableRowsHtml(entries) {
         <td style="padding:8px; border-bottom:1px solid var(--border);">${escapeHtml(formatValue(entry.bodyFatPct))}</td>
         <td style="padding:8px; border-bottom:1px solid var(--border);">${escapeHtml(formatValue(entry.muscleKg))}</td>
         <td style="padding:8px; border-bottom:1px solid var(--border); text-align:right;">
-          <button class="btn" type="button" data-action="edit">Edit</button>
-          <button class="btn danger" type="button" data-action="delete">Delete</button>
+                    <button class="btn" type="button" data-action="edit">${escapeHtml(t("common.edit"))}</button>
+                    <button class="btn danger" type="button" data-action="delete">${escapeHtml(t("common.delete"))}</button>
         </td>
       </tr>
     `).join("");
@@ -208,7 +209,7 @@ export function mountProfileHistoryPage({ profileStore }) {
         if (!id) return;
 
         if (button.dataset.action === "delete") {
-            if (!confirm("Delete this entry?")) return;
+            if (!confirm(t("profileHistory.confirm.deleteEntry"))) return;
             profileStore.removeEntry(id);
             if (idInput.value === id) clearForm();
             render();
@@ -227,7 +228,7 @@ export function mountProfileHistoryPage({ profileStore }) {
 
         const id = idInput.value;
         if (!id) {
-            alert("Select an entry to edit from the table.");
+            alert(t("profileHistory.alert.selectEntry"));
             return;
         }
 
@@ -236,7 +237,7 @@ export function mountProfileHistoryPage({ profileStore }) {
         const muscleKg = parseOptionalNumber(muscleInput.value);
 
         if (weightKg == null && bodyFatPct == null && muscleKg == null) {
-            alert("At least one metric is required.");
+            alert(t("profileHistory.alert.metricRequired"));
             return;
         }
 

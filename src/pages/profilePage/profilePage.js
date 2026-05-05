@@ -1,6 +1,7 @@
 import { escapeHtml } from "../../ui/dom.js";
 import { buildProfileExportV1, downloadProfileJson } from "../../export/profileExport.js";
 import { importProfileFromExport } from "../../import/profileImport.js";
+import { t } from "../../internationalization/i18n.js";
 
 function toInputDateTimeValue(date = new Date()) {
     const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
@@ -15,12 +16,12 @@ function parseOptionalNumber(value) {
 }
 
 function formatValue(value, suffix) {
-    if (value == null) return "—";
+    if (value == null) return t("common.dash");
     return `${value}${suffix}`;
 }
 
 function formatRecordedAt(value) {
-    if (!value) return "—";
+    if (!value) return t("common.dash");
     const date = new Date(value);
     if (Number.isNaN(date.getTime())) return value;
     return new Intl.DateTimeFormat(undefined, {
@@ -55,7 +56,7 @@ function buildDailyMax(entries, field) {
 
 function lineChartSvg(points, color, unit) {
     if (!points.length) {
-        return `<div class="note">No data yet.</div>`;
+        return `<div class="note">${escapeHtml(t("profileHistory.noDataYet"))}</div>`;
     }
 
     const width = 320;
@@ -86,7 +87,7 @@ function lineChartSvg(points, color, unit) {
     const endLabel = escapeHtml(coords[coords.length - 1].day.slice(5));
 
     return `
-      <svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Daily max trend chart" style="width:100%; height:auto; display:block;">
+    <svg viewBox="0 0 ${width} ${height}" role="img" aria-label="${escapeHtml(t("profile.chart.dailyMaxAria"))}" style="width:100%; height:auto; display:block;">
         <line x1="${padL}" y1="${padT}" x2="${padL}" y2="${height - padB}" stroke="var(--border)" />
         <line x1="${padL}" y1="${height - padB}" x2="${width - padR}" y2="${height - padB}" stroke="var(--border)" />
         <text x="${padL}" y="${padT - 2}" fill="var(--muted)" font-size="10">${escapeHtml(String(max))}${escapeHtml(unit)}</text>
@@ -109,7 +110,7 @@ function metricCard({ title, valueSuffix, color, entries, field }) {
           <strong style="font-size:18px; color:${color};">${escapeHtml(formatValue(latest, valueSuffix))}</strong>
         </div>
         ${lineChartSvg(points, color, valueSuffix)}
-        <p class="note" style="margin:0;">Chart shows the maximum recorded value for each day.</p>
+                <p class="note" style="margin:0;">${escapeHtml(t("profile.chart.maxPerDayNote"))}</p>
       </article>
     `;
 }
@@ -120,9 +121,9 @@ function entryRow(entry) {
         <div style="display:flex; justify-content:space-between; gap:10px; align-items:flex-start;">
           <div>
             <strong>${escapeHtml(formatRecordedAt(entry.recordedAt))}</strong>
-            <div class="note">Weight: ${escapeHtml(formatValue(entry.weightKg, " kg"))} · Body fat: ${escapeHtml(formatValue(entry.bodyFatPct, "%"))} · Muscle: ${escapeHtml(formatValue(entry.muscleKg, " kg"))}</div>
+                        <div class="note">${escapeHtml(t("profile.weightLabel"))}: ${escapeHtml(formatValue(entry.weightKg, " kg"))} · ${escapeHtml(t("profile.bodyFatLabel"))}: ${escapeHtml(formatValue(entry.bodyFatPct, "%"))} · ${escapeHtml(t("profile.muscleLabel"))}: ${escapeHtml(formatValue(entry.muscleKg, " kg"))}</div>
           </div>
-          <button class="btn danger" type="button" data-action="delete-entry">Delete</button>
+                    <button class="btn danger" type="button" data-action="delete-entry">${escapeHtml(t("common.delete"))}</button>
         </div>
       </div>
     `;
@@ -150,9 +151,9 @@ export function mountProfilePage({ profileStore }) {
     function render() {
         const entries = profileStore.listEntries();
         charts.innerHTML = [
-            metricCard({ title: "Weight", valueSuffix: " kg", color: "#6bb6ff", entries, field: "weightKg" }),
-            metricCard({ title: "Body fat", valueSuffix: "%", color: "#f59e0b", entries, field: "bodyFatPct" }),
-            metricCard({ title: "Muscle", valueSuffix: " kg", color: "#22c55e", entries, field: "muscleKg" }),
+            metricCard({ title: t("profile.weightLabel"), valueSuffix: " kg", color: "#6bb6ff", entries, field: "weightKg" }),
+            metricCard({ title: t("profile.bodyFatLabel"), valueSuffix: "%", color: "#f59e0b", entries, field: "bodyFatPct" }),
+            metricCard({ title: t("profile.muscleLabel"), valueSuffix: " kg", color: "#22c55e", entries, field: "muscleKg" }),
         ].join("");
 
         list.innerHTML = entries.map(entryRow).join("");
@@ -169,7 +170,7 @@ export function mountProfilePage({ profileStore }) {
         const muscleKg = parseOptionalNumber(muscleInput.value);
 
         if (weightKg == null && bodyFatPct == null && muscleKg == null) {
-            alert("Add at least one measurement before saving.");
+            alert(t("profile.alert.atLeastOneMeasurement"));
             return;
         }
 
@@ -189,7 +190,7 @@ export function mountProfilePage({ profileStore }) {
     });
 
     clearBtn.addEventListener("click", () => {
-        const ok = confirm("Delete all saved profile measurements?");
+        const ok = confirm(t("profile.confirm.clearAll"));
         if (!ok) return;
         profileStore.clearAll();
         render();
@@ -214,9 +215,16 @@ export function mountProfilePage({ profileStore }) {
                 const parsed = JSON.parse(event.target.result);
                 const { imported, skipped } = importProfileFromExport({ parsed, profileStore });
                 render();
-                alert(`Imported ${imported} measurement${imported !== 1 ? "s" : ""}.${skipped ? ` Skipped ${skipped} (duplicates or missing data).` : ""}`);
+                const importedBase = imported === 1
+                    ? t("profile.import.resultOne")
+                    : t("profile.import.resultMany").replace("{count}", String(imported));
+                const importedMsg = importedBase.replace(
+                    "{skipped}",
+                    skipped ? t("profile.import.skippedPart").replace("{count}", String(skipped)) : ""
+                );
+                alert(importedMsg.trim());
             } catch (err) {
-                alert(`Import failed: ${err.message}`);
+                alert(t("profile.import.failed").replace("{message}", String(err.message ?? err)));
             }
         };
         reader.readAsText(file);
