@@ -24,6 +24,7 @@ export class WorkoutSession {
         totals = null,
         exerciseBreakdown = [],
         prDetection = null,
+        isCompleted = false,
         createdAt = new Date().toISOString(),
     } = {}) {
         this.id = id;
@@ -57,6 +58,7 @@ export class WorkoutSession {
                 volumePr: Boolean(item?.volumePr),
             })),
         };
+        this.isCompleted = Boolean(isCompleted);
         this.createdAt = createdAt || new Date().toISOString();
 
         this.validate();
@@ -86,6 +88,7 @@ export class WorkoutSession {
             totals: this.totals,
             exerciseBreakdown: this.exerciseBreakdown,
             prDetection: this.prDetection,
+            isCompleted: this.isCompleted,
             createdAt: this.createdAt,
         };
     }

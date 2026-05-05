@@ -57,11 +57,11 @@ const pages = {
     features: { render() {} },
     privacy: { render() {} },
     about: { render() {} },
-    routines: mountRoutinesPage({ routineStore, exerciseStore }),
+    routines: mountRoutinesPage({ routineStore, exerciseStore, workoutSessionStore }),
     "routine-new": mountRoutineNewPage({ routineStore }),
     routine: mountRoutineDetailPage({ routineStore, exerciseStore }),
     session: mountSessionPage({ routineStore, exerciseStore, profileStore, workoutSessionStore }),
-    profile: mountProfilePage({ profileStore }),
+    profile: mountProfilePage({ profileStore, workoutSessionStore }),
     "profile-history": mountProfileHistoryPage({ profileStore }),
 };
 
@@ -71,9 +71,10 @@ const styleRouter = createStyleRouter({
     routeToStyles: {
         home: ["../styles/components/landing.css"],
         session: ["../styles/components/session.css"],
-        routines: ["../styles/components/routines.css"],
+        routines: ["../styles/components/routines.css", "../styles/components/workoutCalendar.css"],
         "routine-new": ["../styles/components/routines.css"],
         routine: ["../styles/components/routines.css"],
+        profile: ["../styles/components/workoutCalendar.css"],
     },
     resolveFrom: import.meta.url,
 });

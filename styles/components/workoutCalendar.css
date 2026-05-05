@@ -1,0 +1,151 @@
+/* /styles/components/workoutCalendar.css */
+
+.workoutCalendar {
+    display: grid;
+    gap: 12px;
+}
+
+.workoutCalendarHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.workoutCalendarHeader h3 {
+    margin: 0;
+    font-size: 15px;
+    color: var(--accent2);
+}
+
+.workoutCalendarNav {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.workoutCalendarNav .btn {
+    min-height: 34px;
+    height: 34px;
+    min-width: 34px;
+    padding: 0 10px;
+}
+
+.workoutCalendarMonthLabel {
+    min-width: 150px;
+    text-align: center;
+    font-size: 13px;
+}
+
+.workoutCalendarWeekdays {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 6px;
+}
+
+.workoutCalendarMonthSummary {
+    margin-top: -2px;
+}
+
+.workoutCalendarWeekdays span {
+    font-size: 11px;
+    color: var(--muted);
+    text-align: center;
+}
+
+.workoutCalendarGrid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 6px;
+}
+
+.workoutCalendarCell {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    min-height: 56px;
+    padding: 6px;
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.workoutCalendarCell--ghost {
+    border-style: dashed;
+    opacity: 0.25;
+}
+
+.workoutCalendarDay {
+    cursor: pointer;
+    display: grid;
+    align-content: space-between;
+    gap: 4px;
+}
+
+.workoutCalendarDayNum {
+    font-weight: 700;
+    font-size: 13px;
+    text-align: left;
+}
+
+.workoutCalendarDayMeta {
+    font-size: 10px;
+    color: var(--muted);
+    text-align: left;
+    min-height: 12px;
+}
+
+.workoutCalendarDay--has {
+    border-color: rgba(34, 197, 94, 0.5);
+    background: rgba(34, 197, 94, 0.08);
+}
+
+.workoutCalendarDay--selected {
+    border-color: rgba(96, 165, 250, 0.6);
+    background: rgba(96, 165, 250, 0.12);
+}
+
+.workoutCalendarDetails {
+    padding: 10px;
+    display: grid;
+    gap: 10px;
+}
+
+.workoutCalendarDetailsHeader {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    align-items: baseline;
+    flex-wrap: wrap;
+}
+
+.workoutCalendarDetailsBody {
+    display: grid;
+    gap: 8px;
+}
+
+.workoutCalendarDetails--compact .workoutCalendarDetailsBody {
+    display: none;
+}
+
+.workoutCalendarCompactHint {
+    margin: 0;
+}
+
+.workoutCalendarSessionCard {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.02);
+    display: grid;
+    gap: 6px;
+}
+
+.workoutCalendarSessionHead {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    align-items: baseline;
+}
+
+.workoutCalendarSessionStats {
+    line-height: 1.4;
+}

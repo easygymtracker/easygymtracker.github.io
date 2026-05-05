@@ -4,12 +4,21 @@ import { navigate } from "../../router.js";
 import { t } from "/src/internationalization/i18n.js";
 import { escapeHtml } from "../../ui/dom.js";
 import { routineListItem } from "../../ui/components/routineListItem.js";
+import { mountWorkoutCalendar } from "../../ui/components/workoutCalendar.js";
 import { buildRoutineExportV1, downloadJson, routineExportFilename } from "../../export/routineExport.js";
 
-export function mountRoutinesPage({ routineStore, exerciseStore }) {
+export function mountRoutinesPage({ routineStore, exerciseStore, workoutSessionStore }) {
     const elList = document.getElementById("routineList");
     const elCount = document.getElementById("routineCount");
     const elEmpty = document.getElementById("emptyState");
+    const calendarMount = document.getElementById("routinesWorkoutCalendar");
+
+    const workoutCalendar = mountWorkoutCalendar({
+        container: calendarMount,
+        workoutSessionStore,
+        titleKey: "workoutCalendar.routinesTitle",
+        mode: "compact",
+    });
 
     elList.addEventListener("click", (e) => {
         const row = e.target.closest(".routineRow");
@@ -66,6 +75,7 @@ export function mountRoutinesPage({ routineStore, exerciseStore }) {
 
         elCount.textContent = routineCountLabel(routines.length);
         elList.innerHTML = routines.map(routineListItem).join("");
+        workoutCalendar.render();
 
         elEmpty.style.display = routines.length === 0 ? "block" : "none";
     }

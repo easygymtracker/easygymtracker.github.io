@@ -189,6 +189,22 @@
     text-overflow: ellipsis;
 }
 
+.currentExerciseNameLine {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    min-width: 0;
+}
+
+.currentExerciseDescRow {
+    margin-top: 6px;
+    max-width: 560px;
+}
+
+.currentSeriesDescInput {
+    width: 100%;
+}
+
 .currentExerciseIdx {
     font-size: 12px;
     color: var(--muted);

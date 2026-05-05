@@ -2,6 +2,7 @@ import { escapeHtml } from "../../ui/dom.js";
 import { buildProfileExportV1, downloadProfileJson } from "../../export/profileExport.js";
 import { importProfileFromExport } from "../../import/profileImport.js";
 import { t } from "../../internationalization/i18n.js";
+import { mountWorkoutCalendar } from "../../ui/components/workoutCalendar.js";
 
 function toInputDateTimeValue(date = new Date()) {
     const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
@@ -129,7 +130,7 @@ function entryRow(entry) {
     `;
 }
 
-export function mountProfilePage({ profileStore }) {
+export function mountProfilePage({ profileStore, workoutSessionStore }) {
     const form = document.getElementById("profileForm");
     const recordedAtInput = document.getElementById("profileRecordedAt");
     const weightInput = document.getElementById("profileWeightKg");
@@ -142,6 +143,14 @@ export function mountProfilePage({ profileStore }) {
     const exportBtn = document.getElementById("btnExportProfile");
     const importBtn = document.getElementById("btnImportProfile");
     const importFileInput = document.getElementById("profileImportFile");
+    const calendarMount = document.getElementById("profileWorkoutCalendar");
+
+    const workoutCalendar = mountWorkoutCalendar({
+        container: calendarMount,
+        workoutSessionStore,
+        titleKey: "workoutCalendar.profileTitle",
+        mode: "rich",
+    });
 
     function resetForm() {
         form.reset();
@@ -159,6 +168,7 @@ export function mountProfilePage({ profileStore }) {
         list.innerHTML = entries.map(entryRow).join("");
         empty.style.display = entries.length === 0 ? "block" : "none";
         clearBtn.style.display = entries.length === 0 ? "none" : "inline-flex";
+        workoutCalendar.render();
     }
 
     form.addEventListener("submit", (event) => {

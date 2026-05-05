@@ -374,6 +374,7 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
     }
 
     let currentRoutineId = null;
+    let activeWorkoutSessionId = null;
     let currentSeriesIndex = 0;
     let currentRepGroupIndex = 0;
     let completedSeries = new Set();
@@ -510,6 +511,58 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
         });
     }
 
+    function upsertWorkoutSessionSnapshot({ finalize = false } = {}) {
+        if (!workoutSessionStore?.addSession) return null;
+
+        const routine = currentRoutineId ? routineStore.getById(currentRoutineId) : null;
+        if (!routine) return null;
+
+        const nowIso = new Date().toISOString();
+        const sessionStartIso = startEpochMs != null
+            ? new Date(startEpochMs).toISOString()
+            : nowIso;
+        const durationMs = startEpochMs != null
+            ? Math.max(0, Date.now() - startEpochMs)
+            : Math.max(0, elapsedMs);
+
+        const stats = computeSessionStats(routine, sessionStartIso);
+        const prDetection = computeSessionPRs(routine, sessionStartIso);
+
+        const payload = {
+            routineId: routine.id,
+            routineName: routine.name || "",
+            date: nowIso,
+            startedAt: sessionStartIso,
+            endedAt: nowIso,
+            durationMs,
+            sessionNotes: buildSessionNotesSnapshot(routine),
+            rpe: null,
+            bodyweightKg: latestBodyweightKg(),
+            totals: {
+                sets: stats.totalSets,
+                reps: stats.totalReps,
+                volume: stats.totalVolume,
+                exercises: stats.exercises.length,
+            },
+            exerciseBreakdown: stats.exercises,
+            prDetection,
+            isCompleted: Boolean(finalize),
+        };
+
+        if (!activeWorkoutSessionId) {
+            const created = workoutSessionStore.addSession(payload);
+            activeWorkoutSessionId = created?.id || null;
+            return created || null;
+        }
+
+        const updated = workoutSessionStore.updateSession(activeWorkoutSessionId, payload);
+        if (updated) return updated;
+
+        const recreated = workoutSessionStore.addSession({ ...payload, id: activeWorkoutSessionId });
+        activeWorkoutSessionId = recreated?.id || activeWorkoutSessionId;
+        return recreated || null;
+    }
+
     async function endWorkoutSession() {
         const endEpochMs = Date.now();
         const durationMs = startEpochMs != null ? endEpochMs - startEpochMs : elapsedMs;
@@ -537,27 +590,7 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
             const stats = computeSessionStats(summaryRoutine, sessionStartIso);
             const prDetection = computeSessionPRs(summaryRoutine, sessionStartIso);
 
-            if (workoutSessionStore?.addSession) {
-                workoutSessionStore.addSession({
-                    routineId: summaryRoutine.id,
-                    routineName: summaryRoutine.name || "",
-                    date: endedAtIso,
-                    startedAt: sessionStartIso,
-                    endedAt: endedAtIso,
-                    durationMs,
-                    sessionNotes: buildSessionNotesSnapshot(summaryRoutine),
-                    rpe: null,
-                    bodyweightKg: latestBodyweightKg(),
-                    totals: {
-                        sets: stats.totalSets,
-                        reps: stats.totalReps,
-                        volume: stats.totalVolume,
-                        exercises: stats.exercises.length,
-                    },
-                    exerciseBreakdown: stats.exercises,
-                    prDetection,
-                });
-            }
+            upsertWorkoutSessionSnapshot({ finalize: true });
 
             await openWorkoutSummaryModal({
                 routine: summaryRoutine,
@@ -797,34 +830,31 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
 
         const name = resolveExerciseName(s);
         const seriesDesc = s?.description != null ? String(s.description) : "";
-        const descSuffix = seriesDesc ? ` — <span class="muted">${escapeHtml(seriesDesc)}</span>` : "";
         const descEditorHtml = `
-          <span class="muted" style="display:inline-flex; align-items:center; gap:8px;">
-            <span aria-hidden="true" style="opacity:.7;">—</span>
-            <textarea
-              class="currentSeriesDescInput"
-              data-action="edit-series-desc"
-              placeholder="${escapeHtml(t("session.seriesDesc.placeholder") || "Add notes…")}"
-              aria-label="${escapeHtml(t("session.seriesDesc.aria") || "Exercise notes")}"
-              spellcheck="true"
-              rows="1"
-              style="
-                border:1px solid transparent;
-                background:transparent;
-                color:var(--muted);
-                padding:2px 6px;
-                border-radius:8px;
-                min-width: 160px;
-                max-width: 520px;
-                width: min(520px, 60vw);
-                outline:none;
-                resize:none;
-                overflow:hidden;
-                line-height:1.4;
-                font:inherit;
-                display:block;
-              ">${escapeHtml(seriesDesc)}</textarea>
-          </span>
+                    <div class="currentExerciseDescRow">
+                        <textarea
+                            class="currentSeriesDescInput"
+                            data-action="edit-series-desc"
+                            placeholder="${escapeHtml(t("session.seriesDesc.placeholder") || "Add notes…")}"
+                            aria-label="${escapeHtml(t("session.seriesDesc.aria") || "Exercise notes")}"
+                            spellcheck="true"
+                            rows="2"
+                            style="
+                                border:1px solid transparent;
+                                background:transparent;
+                                color:var(--muted);
+                                padding:4px 8px;
+                                border-radius:8px;
+                                min-width: 220px;
+                                width: min(560px, 100%);
+                                outline:none;
+                                resize:none;
+                                overflow:hidden;
+                                line-height:1.4;
+                                font:inherit;
+                                display:block;
+                            ">${escapeHtml(seriesDesc)}</textarea>
+                    </div>
         `;
 
         const groups = Array.isArray(s?.repGroups) ? s.repGroups : [];
@@ -1057,10 +1087,11 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
             <div class="currentExerciseHeader">
                 <div class="currentExerciseTitleWrap">
                 <div class="currentExerciseLabel">${escapeHtml(t("session.currentExercise") || "Current exercise")}</div>
-                <div class="currentExerciseName" style="display:flex; flex-wrap:wrap; gap:8px; align-items:baseline;">
+                <div class="currentExerciseNameLine" style="display:flex; gap:6px; align-items:baseline; min-width:0;">
                     <span>${escapeHtml(name)}</span>
-                    ${descEditorHtml}
+                    <span class="muted" aria-hidden="true">-</span>
                 </div>
+                ${descEditorHtml}
                 </div>
 
                 <div class="currentExerciseIdx">
@@ -1169,6 +1200,7 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
         }
 
         routineStore.update(routine);
+        upsertWorkoutSessionSnapshot({ finalize: false });
 
         const isLast = currentRepGroupIndex >= s.repGroups.length - 1;
         const restToRun = isLast
@@ -1555,6 +1587,7 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
             completedSeries = new Set();
             completedRepGroups = new Map();
             sessionSeriesOrder = null;
+            activeWorkoutSessionId = null;
 
             expandedSeries = new Set();
 
