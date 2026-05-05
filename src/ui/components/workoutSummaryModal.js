@@ -4,7 +4,7 @@ import { t } from "/src/internationalization/i18n.js";
 import { escapeHtml } from "/src/ui/dom.js";
 import { formatMs } from "/src/utils/numberFormat.js";
 
-// ─── helpers ──────────────────────────────────────────────────────────────────
+// --- helpers ---
 
 function toScalarReps(reps) {
     if (reps == null) return null;
@@ -26,60 +26,79 @@ function toVolumeFromEntry(entry) {
     const { reps, weight } = entry;
     if (reps == null || weight == null) return 0;
 
-    // bilateral
     if (typeof reps === "number" && typeof weight === "number") {
         return reps * weight;
     }
-    // unilateral
+
     if (typeof reps === "object" && typeof weight === "object") {
-        const lv = ((reps.left ?? 0) * (weight.left ?? 0));
-        const rv = ((reps.right ?? 0) * (weight.right ?? 0));
+        const lv = (reps.left ?? 0) * (weight.left ?? 0);
+        const rv = (reps.right ?? 0) * (weight.right ?? 0);
         return lv + rv;
     }
-    // mixed edge cases
+
     const scalar = (v) => {
         if (typeof v === "number") return v;
         if (v == null) return 0;
         return ((v.left ?? 0) + (v.right ?? 0)) / 2;
     };
+
     return scalar(reps) * scalar(weight);
 }
 
-// ─── weight comparison table (ordered lightest → heaviest) ────────────────────
+function resolveExerciseLabel(series, resolveExerciseName) {
+    if (typeof resolveExerciseName === "function") {
+        const resolved = resolveExerciseName(series);
+        if (resolved && String(resolved).trim()) return String(resolved).trim();
+    }
+
+    return (
+        series?.exerciseName ??
+        series?.exercise?.name ??
+        t("session.exercise.unknown") ??
+        "Exercise"
+    );
+}
+
+// --- weight comparison table (ordered lightest -> heaviest) ---
 
 const COMPARISONS = [
-    { key: "session.summary.compare.bowlingBall", kg: 7,    icon: "🎳" },
-    { key: "session.summary.compare.cement",      kg: 25,   icon: "🧱" },
-    { key: "session.summary.compare.labrador",    kg: 30,   icon: "🐕" },
-    { key: "session.summary.compare.person",      kg: 80,   icon: "🧍" },
-    { key: "session.summary.compare.gorilla",     kg: 180,  icon: "🦍" },
-    { key: "session.summary.compare.car",         kg: 1400, icon: "🚗" },
-    { key: "session.summary.compare.elephant",    kg: 4500, icon: "🐘" },
+    { key: "session.summary.compare.bowlingBall", kg: 7, icon: "??" },
+    { key: "session.summary.compare.cement", kg: 25, icon: "??" },
+    { key: "session.summary.compare.labrador", kg: 30, icon: "??" },
+    { key: "session.summary.compare.person", kg: 80, icon: "??" },
+    { key: "session.summary.compare.gorilla", kg: 180, icon: "??" },
+    { key: "session.summary.compare.car", kg: 1400, icon: "??" },
+    { key: "session.summary.compare.elephant", kg: 4500, icon: "??" },
 ];
 
 function pickComparison(totalKg) {
     if (!totalKg || totalKg <= 0) return null;
-    // Pick the heaviest reference object where count >= 1
+
     for (let i = COMPARISONS.length - 1; i >= 0; i--) {
-        const count = totalKg / COMPARISONS[i].kg;
-        if (count >= 1) {
-            return { ...COMPARISONS[i], count: Math.round(count) };
+        const rawCount = totalKg / COMPARISONS[i].kg;
+        if (rawCount >= 1) {
+            const count = rawCount >= 10
+                ? Math.round(rawCount)
+                : Math.round(rawCount * 10) / 10;
+            return { ...COMPARISONS[i], count };
         }
     }
-    return { ...COMPARISONS[0], count: Math.round(totalKg / COMPARISONS[0].kg) };
+
+    const smallestRawCount = totalKg / COMPARISONS[0].kg;
+    return {
+        ...COMPARISONS[0],
+        count: Math.max(0.1, Math.round(smallestRawCount * 10) / 10),
+    };
 }
 
-// ─── stats computation ────────────────────────────────────────────────────────
+// --- stats computation ---
 
-export function computeSessionPRs(routine, sessionStartIso) {
+export function computeSessionPRs(routine, sessionStartIso, { resolveExerciseName } = {}) {
     const previousByExercise = new Map();
     const currentByExercise = new Map();
 
     for (const series of routine?.series ?? []) {
-        const exName = series?.exerciseName
-            ?? series?.exercise?.name
-            ?? t("session.exercise.unknown")
-            ?? "Exercise";
+        const exName = resolveExerciseLabel(series, resolveExerciseName);
 
         for (const rg of series?.repGroups ?? []) {
             for (const entry of rg?.history ?? []) {
@@ -115,12 +134,15 @@ export function computeSessionPRs(routine, sessionStartIso) {
     }
 
     return {
-        totalPrs: byExercise.reduce((acc, item) => acc + Number(item.weightPr) + Number(item.repsPr) + Number(item.volumePr), 0),
+        totalPrs: byExercise.reduce(
+            (acc, item) => acc + Number(item.weightPr) + Number(item.repsPr) + Number(item.volumePr),
+            0
+        ),
         byExercise,
     };
 }
 
-export function computeSessionStats(routine, sessionStartIso) {
+export function computeSessionStats(routine, sessionStartIso, { resolveExerciseName } = {}) {
     let totalVolume = 0;
     let totalReps = 0;
     let totalSets = 0;
@@ -131,10 +153,7 @@ export function computeSessionStats(routine, sessionStartIso) {
         let exReps = 0;
         let exVolume = 0;
 
-        const exName = series?.exerciseName
-            ?? series?.exercise?.name
-            ?? t("session.exercise.unknown")
-            ?? "Exercise";
+        const exName = resolveExerciseLabel(series, resolveExerciseName);
 
         for (const rg of series?.repGroups ?? []) {
             for (const entry of rg?.history ?? []) {
@@ -164,26 +183,27 @@ export function computeSessionStats(routine, sessionStartIso) {
     return { totalVolume, totalReps, totalSets, exercises };
 }
 
-// ─── motivational message ─────────────────────────────────────────────────────
+// --- motivational message ---
 
 function motivationalLine(stats, durationMs) {
     const minutes = Math.round(durationMs / 60000);
     const { totalSets, totalVolume } = stats;
 
-    if (totalSets === 0) return t("session.summary.motivational.justStarted") || "Every session counts. See you next time! 🌱";
-    if (totalVolume > 5000)  return t("session.summary.motivational.beast")       || "Absolute beast mode. 🔥";
-    if (totalVolume > 2000)  return t("session.summary.motivational.strong")      || "Seriously strong effort. 💪";
-    if (minutes > 60)        return t("session.summary.motivational.endurance")   || "Over an hour of work. That's dedication. 🏆";
-    if (totalSets >= 15)     return t("session.summary.motivational.volume")      || "High-volume session. Your body will thank you. 💥";
-    return t("session.summary.motivational.done") || "Workout done. Keep showing up! 👊";
+    if (totalSets === 0) return t("session.summary.motivational.justStarted") || "Every session counts. See you next time! ??";
+    if (totalVolume > 5000) return t("session.summary.motivational.beast") || "Absolute beast mode. ??";
+    if (totalVolume > 2000) return t("session.summary.motivational.strong") || "Seriously strong effort. ??";
+    if (minutes > 60) return t("session.summary.motivational.endurance") || "Over an hour of work. That's dedication. ??";
+    if (totalSets >= 15) return t("session.summary.motivational.volume") || "High-volume session. Your body will thank you. ??";
+    return t("session.summary.motivational.done") || "Workout done. Keep showing up! ??";
 }
 
-// ─── modal ────────────────────────────────────────────────────────────────────
+// --- modal ---
 
-export function openWorkoutSummaryModal({ routine, sessionStartIso, durationMs }) {
+export function openWorkoutSummaryModal({ routine, sessionStartIso, durationMs, resolveExerciseName }) {
     return new Promise((resolve) => {
-        const stats = computeSessionStats(routine, sessionStartIso);
+        const stats = computeSessionStats(routine, sessionStartIso, { resolveExerciseName });
         const { totalVolume, totalReps, totalSets, exercises } = stats;
+        const prDetection = computeSessionPRs(routine, sessionStartIso, { resolveExerciseName });
 
         const comparison = totalVolume > 0 ? pickComparison(totalVolume) : null;
         const comparisonLabel = comparison
@@ -205,13 +225,28 @@ export function openWorkoutSummaryModal({ routine, sessionStartIso, durationMs }
                 <td>${escapeHtml(ex.name)}</td>
                 <td>${ex.sets}</td>
                 <td>${ex.reps}</td>
-                <td>${ex.volume > 0 ? (Math.round(ex.volume) + " kg") : "—"}</td>
+                <td>${ex.volume > 0 ? (Math.round(ex.volume) + " kg") : "�"}</td>
             </tr>
         `).join("");
 
+        const prRows = (prDetection?.byExercise ?? []).map((item) => {
+            const badges = [
+                item.weightPr ? (t("session.summary.pr.weight") || "Weight") : null,
+                item.repsPr ? (t("session.summary.pr.reps") || "Reps") : null,
+                item.volumePr ? (t("session.summary.pr.volume") || "Volume") : null,
+            ].filter(Boolean);
+
+            return `
+                <li class="summaryPrItem">
+                    <span class="summaryPrExercise">${escapeHtml(item.exercise)}</span>
+                    <span class="summaryPrBadges">${badges.map((label) => `<span class="summaryPrBadge">${escapeHtml(label)}</span>`).join("")}</span>
+                </li>
+            `;
+        }).join("");
+
         modal.innerHTML = `
             <div class="summaryHeader">
-                <div class="summaryIcon" aria-hidden="true">🏁</div>
+                <div class="summaryIcon" aria-hidden="true">??</div>
                 <h3>${escapeHtml(t("session.summary.title") || "Workout complete!")}</h3>
                 <p class="muted summaryMotivational">${escapeHtml(motivationalLine(stats, durationMs))}</p>
             </div>
@@ -241,12 +276,20 @@ export function openWorkoutSummaryModal({ routine, sessionStartIso, durationMs }
                 <span class="summaryComparisonText">
                     ${escapeHtml(
                         (t("session.summary.comparison") || "Like lifting {count} {thing}")
-                            .replace("{count}", comparison.count)
+                            .replace("{count}", String(comparison.count))
                             .replace("{thing}", comparisonLabel)
                     )}
                 </span>
             </div>
             ` : ""}
+
+            <div class="summaryPrs">
+                <p class="summaryBreakdownTitle muted">${escapeHtml(t("session.summary.prsTitle") || "New PRs achieved")}</p>
+                ${prRows
+                    ? `<ul class="summaryPrList">${prRows}</ul>`
+                    : `<p class="muted summaryPrNone">${escapeHtml(t("session.summary.pr.none") || "No new PRs in this session.")}</p>`
+                }
+            </div>
 
             ${exercises.length > 0 ? `
             <div class="summaryBreakdown">
@@ -287,7 +330,10 @@ export function openWorkoutSummaryModal({ routine, sessionStartIso, durationMs }
         });
 
         document.addEventListener("keydown", function onKey(e) {
-            if (e.key === "Escape") { document.removeEventListener("keydown", onKey); close(); }
+            if (e.key === "Escape") {
+                document.removeEventListener("keydown", onKey);
+                close();
+            }
         });
     });
 }

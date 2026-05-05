@@ -616,3 +616,61 @@
     padding: 10px;
     font-size: 1rem;
 }
+
+/* ── PR section ──────────────────────────────────────────── */
+.summaryPrs {
+    margin-top: 16px;
+}
+
+.summaryPrList {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.summaryPrItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border-color, #eee);
+}
+
+.summaryPrItem:last-child {
+    border-bottom: none;
+}
+
+.summaryPrExercise {
+    font-weight: 600;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.summaryPrBadges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.summaryPrBadge {
+    background: var(--accent, #f59e0b);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: var(--radius-sm, 4px);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.summaryPrNone {
+    font-size: 0.88rem;
+    margin-top: 4px;
+}

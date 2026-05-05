@@ -587,8 +587,8 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
         renderCurrent();
 
         if (summaryRoutine && sessionStartIso) {
-            const stats = computeSessionStats(summaryRoutine, sessionStartIso);
-            const prDetection = computeSessionPRs(summaryRoutine, sessionStartIso);
+            const stats = computeSessionStats(summaryRoutine, sessionStartIso, { resolveExerciseName });
+            const prDetection = computeSessionPRs(summaryRoutine, sessionStartIso, { resolveExerciseName });
 
             upsertWorkoutSessionSnapshot({ finalize: true });
 
@@ -596,6 +596,7 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
                 routine: summaryRoutine,
                 sessionStartIso,
                 durationMs,
+                resolveExerciseName,
             });
         }
     }
