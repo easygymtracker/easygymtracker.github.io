@@ -185,7 +185,6 @@ function showOrUpdateNotification({ title, body, restRunning = false, actionTitl
         requireInteraction: true,
         icon: NOTIFICATION_ICON,
         badge: NOTIFICATION_BADGE,
-        image: NOTIFICATION_IMAGE,
         color: NOTIFICATION_COLOR,
         vibrate: restRunning ? [80] : [120, 60, 120],
         timestamp: Date.now(),
