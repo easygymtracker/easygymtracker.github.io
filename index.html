@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="en">
 
 <head>
@@ -7,19 +7,20 @@
   <base href="/" />
   <meta name="robots" content="index,follow" />
   <meta name="description"
-    content="Plan routines, track workout sessions, and keep your gym data private on your own device with Easy Gym Routine Tracker." />
+    content="Free, private gym tracker that works offline. Build routines, log sets in real time, track progress with charts, and keep every byte of data on your own device — no account needed." />
+  <meta name="keywords" content="gym tracker, workout planner, routine builder, workout log, exercise tracker, offline gym app, private workout app, free gym app, PWA fitness, set tracker, rep counter, workout history, body composition tracker, local-first fitness" />
   <link rel="canonical" href="https://easygymtracker.github.io/" />
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="Easy Gym Routine Tracker | Private workout planner and session tracker" />
+  <meta property="og:title" content="Easy Gym Routine Tracker — Free, Private & Offline Workout Planner" />
   <meta property="og:description"
-    content="Plan routines, track workout sessions, and keep your gym data private on your own device with Easy Gym Routine Tracker." />
+    content="Build routines, log sets in real time, and track your gym progress with charts. 100 % free, works offline, and never sends your data anywhere." />
   <meta property="og:url" content="https://easygymtracker.github.io/" />
   <meta property="og:image" content="https://easygymtracker.github.io/icons/icon-512.png" />
   <meta property="og:site_name" content="Easy Gym Routine Tracker" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Easy Gym Routine Tracker | Private workout planner and session tracker" />
+  <meta name="twitter:title" content="Easy Gym Routine Tracker — Free, Private & Offline Workout Planner" />
   <meta name="twitter:description"
-    content="Plan routines, track workout sessions, and keep your gym data private on your own device with Easy Gym Routine Tracker." />
+    content="Build routines, log sets in real time, and track your gym progress with charts. 100 % free, works offline, and never sends your data anywhere." />
   <meta name="twitter:image" content="https://easygymtracker.github.io/icons/icon-512.png" />
   <script type="application/ld+json" data-structured="route">
     {
@@ -31,17 +32,24 @@
           "applicationCategory": "HealthApplication",
           "operatingSystem": "Web",
           "url": "https://easygymtracker.github.io/",
-          "description": "A local-first web app for planning gym routines, logging sessions, and tracking progress privately on your own device.",
+          "description": "A free, local-first progressive web app for planning gym routines, logging workout sessions in real time, and tracking strength progress with charts — all without an account or internet connection.",
           "offers": {
             "@type": "Offer",
             "price": "0",
             "priceCurrency": "USD"
           },
           "featureList": [
-            "Local-first routine storage",
-            "Workout session tracking",
-            "Unilateral and bilateral set support",
-            "Progress history charts"
+            "Routine builder with exercises, sets, reps, and rest periods",
+            "Live session tracking with timers and set-completion flow",
+            "Unilateral and bilateral set support with left/right tracking",
+            "Progress history charts for weight and rep trends",
+            "Workout calendar with monthly training overview",
+            "Post-workout summaries with volume, PRs, and fun comparisons",
+            "Body composition tracking (weight, body fat, muscle mass)",
+            "JSON import/export for portable backups",
+            "Installable PWA that works fully offline",
+            "Rest-timer notifications",
+            "100 % local storage — no server, no account, no analytics"
           ]
         },
         {
@@ -155,17 +163,16 @@
       <!-- Routes -->
       <section class="route landingRoute" data-route="home" id="route-home">
         <div class="landingHero card">
-          <p class="landingEyebrow" data-i18n="home.eyebrow">Private workout planning</p>
-          <h2 data-i18n="home.title">Track your gym routines without giving your data away.</h2>
+          <p class="landingEyebrow" data-i18n="home.eyebrow">Free &amp; private workout tracker</p>
+          <h2 data-i18n="home.title">Your gym journal that never leaves your phone.</h2>
           <p class="landingLead" data-i18n="home.lead">
-            Build routines, run workout sessions, and keep everything stored on your own device. No account, no cloud
-            lock-in, no noisy dashboard.
+            Plan routines, log sets in real time, and track your progress with charts — all stored privately on your
+            device. No sign-up, no subscription, works offline.
           </p>
 
           <nav class="landingActions" aria-label="Home links" data-i18n-aria-label="a11y.nav.homeLinks">
             <a href="/routines" class="btn primary" data-nav="/routines" data-i18n="home.cta.openApp">Open the app</a>
-            <a href="/routine/new" class="btn" data-nav="/routine/new" data-i18n="home.cta.firstRoutine">Create a first
-              routine</a>
+            <a href="/routine/new" class="btn" data-nav="/routine/new" data-i18n="home.cta.firstRoutine">Create your first routine</a>
             <a href="/features" class="btn" data-nav="/features" data-i18n="home.cta.features">Features</a>
             <a href="/about" class="btn" data-nav="/about" data-i18n="home.cta.about">How it works</a>
             <a href="/privacy" class="btn" data-nav="/privacy" data-i18n="home.cta.privacy">Privacy</a>
@@ -173,46 +180,48 @@
 
           <div class="landingStats" aria-label="Product highlights" data-i18n-aria-label="a11y.home.productHighlights">
             <div class="landingStat card">
-              <strong data-i18n="home.stat.offlineValue">100% local</strong>
-              <span data-i18n="home.stat.offlineLabel">Your routines stay on this device.</span>
+              <strong data-i18n="home.stat.freeValue">100 % free</strong>
+              <span data-i18n="home.stat.freeLabel">No subscriptions, no ads, no hidden costs.</span>
             </div>
             <div class="landingStat card">
-              <strong data-i18n="home.stat.fastValue">Touch-first</strong>
-              <span data-i18n="home.stat.fastLabel">Built for fast in-gym logging.</span>
+              <strong data-i18n="home.stat.offlineValue">Works offline</strong>
+              <span data-i18n="home.stat.offlineLabel">Install as an app and train anywhere — even without signal.</span>
             </div>
             <div class="landingStat card">
-              <strong data-i18n="home.stat.flexValue">Bilateral + unilateral</strong>
-              <span data-i18n="home.stat.flexLabel">Supports left/right work and history.</span>
+              <strong data-i18n="home.stat.privateValue">Zero data collection</strong>
+              <span data-i18n="home.stat.privateLabel">No analytics, no tracking, no cookies.</span>
             </div>
           </div>
         </div>
 
         <div class="landingGrid">
           <article class="card landingFeature">
-            <h3 data-i18n="home.feature.privacyTitle">Private by default</h3>
-            <p data-i18n="home.feature.privacyBody">Routines are stored locally, so you can use the tracker without
-              creating an account or syncing to a third-party service.</p>
+            <h3 data-i18n="home.feature.privacyTitle">Your data never leaves your device</h3>
+            <p data-i18n="home.feature.privacyBody">Every routine, session, and measurement is stored in your browser.
+              No server, no cloud sync, no account required — your training data is yours alone.</p>
           </article>
           <article class="card landingFeature">
-            <h3 data-i18n="home.feature.sessionTitle">Session-ready</h3>
-            <p data-i18n="home.feature.sessionBody">Run actual workout sessions with timers, set completion flows, rest
-              tracking, and post-workout summaries.</p>
+            <h3 data-i18n="home.feature.sessionTitle">Built for the gym floor</h3>
+            <p data-i18n="home.feature.sessionBody">Start a session, complete sets with a tap, get rest-timer
+              notifications, and review a full workout summary when you finish — all designed for one-handed use
+              between sets.</p>
           </article>
           <article class="card landingFeature">
-            <h3 data-i18n="home.feature.progressTitle">Progress visibility</h3>
-            <p data-i18n="home.feature.progressBody">Review rep and weight history over time, including unilateral work,
-              with lightweight charts designed for mobile use.</p>
+            <h3 data-i18n="home.feature.progressTitle">See your progress at a glance</h3>
+            <p data-i18n="home.feature.progressBody">Lightweight charts show weight and rep trends over time for every
+              exercise, including left/right tracking for unilateral work. Body-composition charts are just a tap
+              away.</p>
           </article>
         </div>
       </section>
 
-      <section class="route landingRoute routeHidden" data-route="features" id="route-features">
+            <section class="route landingRoute routeHidden" data-route="features" id="route-features">
         <div class="landingHero card">
-          <p class="landingEyebrow" data-i18n="features.eyebrow">Features</p>
-          <h2 data-i18n="features.title">Fast workout tracking without the usual clutter.</h2>
+          <p class="landingEyebrow" data-i18n="features.eyebrow">All features</p>
+          <h2 data-i18n="features.title">Everything you need to train smarter — nothing you don't.</h2>
           <p class="landingLead" data-i18n="features.lead">
-            Easy Gym Routine Tracker focuses on the core job: creating routines quickly, running sessions smoothly, and
-            reviewing progress without sending your data to a remote backend.
+            Easy Gym Routine Tracker gives you a fast routine builder, live session tracking, and progress charts —
+            without accounts, ads, or sending your data anywhere.
           </p>
           <nav class="landingActions" aria-label="Features links" data-i18n-aria-label="a11y.nav.featuresLinks">
             <a href="/" class="btn primary" data-nav="/" data-i18n="features.cta.home">Home</a>
@@ -224,49 +233,69 @@
         <div class="landingGrid">
           <article class="card landingFeature">
             <h3 data-i18n="features.routineBuilder.title">Routine builder</h3>
-            <p data-i18n="features.routineBuilder.body">Create exercises, add set structures, edit descriptions, and
-              configure rest flows without dealing with a complex setup wizard.</p>
+            <p data-i18n="features.routineBuilder.body">Create exercises, organise them into routines, and configure
+              target reps, weights, and rest periods — no complex wizard required.</p>
           </article>
           <article class="card landingFeature">
-            <h3 data-i18n="features.sessionMode.title">Session mode</h3>
-            <p data-i18n="features.sessionMode.body">Track live workouts with start/pause controls, set completion
-              modals, rest timers, and workout-end summaries.</p>
+            <h3 data-i18n="features.sessionMode.title">Live session tracking</h3>
+            <p data-i18n="features.sessionMode.body">Start a workout, complete sets with a single tap, and get
+              automatic rest timers. The app guides you through every exercise so you can focus on lifting.</p>
           </article>
           <article class="card landingFeature">
-            <h3 data-i18n="features.unilateral.title">Unilateral support</h3>
-            <p data-i18n="features.unilateral.body">Handle left/right reps and left/right weight when an exercise needs
-              side-specific tracking.</p>
+            <h3 data-i18n="features.unilateral.title">Unilateral &amp; bilateral sets</h3>
+            <p data-i18n="features.unilateral.body">Track left/right reps and weight independently for single-arm or
+              single-leg exercises, with full history for each side.</p>
           </article>
           <article class="card landingFeature">
-            <h3 data-i18n="features.historyCharts.title">History charts</h3>
-            <p data-i18n="features.historyCharts.body">Inspect rep and weight trends with touch-friendly charts that
-              work well on mobile devices in the gym.</p>
+            <h3 data-i18n="features.historyCharts.title">Progress charts</h3>
+            <p data-i18n="features.historyCharts.body">Visualise weight and rep trends over time with touch-friendly
+              charts. Spot plateaus, confirm PRs, and stay motivated with clear visual feedback.</p>
           </article>
           <article class="card landingFeature">
-            <h3 data-i18n="features.portableExports.title">Portable exports</h3>
-            <p data-i18n="features.portableExports.body">Download routines or body measurements in a stable JSON format
-              and import them on any device â€” no cloud account needed.</p>
+            <h3 data-i18n="features.workoutCalendar.title">Workout calendar</h3>
+            <p data-i18n="features.workoutCalendar.body">See your training frequency at a glance with a monthly
+              calendar. Tap any day to review workout details, total sets, reps, and volume.</p>
           </article>
           <article class="card landingFeature">
-            <h3 data-i18n="features.localFirst.title">Local-first</h3>
-            <p data-i18n="features.localFirst.body">All data â€” routines, sessions, and body measurements â€” stays only on
-              your device through browser storage. Nothing is ever sent to a server.</p>
+            <h3 data-i18n="features.workoutSummary.title">Post-workout summaries</h3>
+            <p data-i18n="features.workoutSummary.body">After every session, get a breakdown of sets completed, total
+              reps, volume lifted, and new personal records — plus fun comparisons like "you lifted 3 Labradors".</p>
           </article>
           <article class="card landingFeature">
-            <h3 data-i18n="features.profileTracking.title">Profile tracking</h3>
-            <p data-i18n="features.profileTracking.body">Log weight, body fat, and muscle mass over time. Charts show
-              daily peaks for each metric. All measurements remain private on your device.</p>
+            <h3 data-i18n="features.profileTracking.title">Body composition tracking</h3>
+            <p data-i18n="features.profileTracking.body">Log weight, body fat, and muscle mass over time. Daily-peak
+              charts and a full history manager help you track changes beyond the barbell.</p>
+          </article>
+          <article class="card landingFeature">
+            <h3 data-i18n="features.portableExports.title">Portable JSON exports</h3>
+            <p data-i18n="features.portableExports.body">Download your routines or body measurements in a stable JSON
+              format. Import them on any device — no cloud account needed.</p>
+          </article>
+          <article class="card landingFeature">
+            <h3 data-i18n="features.pwa.title">Works offline (PWA)</h3>
+            <p data-i18n="features.pwa.body">Install Easy Gym Routine Tracker on your home screen and use it like a
+              native app. Once loaded, it works without an internet connection.</p>
+          </article>
+          <article class="card landingFeature">
+            <h3 data-i18n="features.notifications.title">Rest-timer notifications</h3>
+            <p data-i18n="features.notifications.body">Get a push notification when your rest period ends so you can
+              focus on recovery instead of watching a clock.</p>
+          </article>
+          <article class="card landingFeature">
+            <h3 data-i18n="features.localFirst.title">100 % local-first</h3>
+            <p data-i18n="features.localFirst.body">All data — routines, sessions, and body measurements — stays only
+              on your device through browser storage. Nothing is ever sent to a server.</p>
           </article>
         </div>
       </section>
 
-      <section class="route landingRoute routeHidden" data-route="privacy" id="route-privacy">
+            <section class="route landingRoute routeHidden" data-route="privacy" id="route-privacy">
         <div class="landingHero card">
-          <p class="landingEyebrow" data-i18n="privacy.eyebrow">Privacy</p>
-          <h2 data-i18n="privacy.title">A simple privacy posture: keep workout data on your own device.</h2>
+          <p class="landingEyebrow" data-i18n="privacy.eyebrow">Your privacy</p>
+          <h2 data-i18n="privacy.title">No server, no tracking, no account — your workout data stays on your device.</h2>
           <p class="landingLead" data-i18n="privacy.lead">
-            This app is designed around local usage. Routines, sets, and session history are stored in the browser on
-            the device you use, so you can manage training data without creating an account.
+            Easy Gym Routine Tracker is built around a simple rule: nothing leaves your browser. Routines, sessions,
+            body measurements, and history are stored locally and never sent anywhere.
           </p>
           <nav class="landingActions" aria-label="Privacy links" data-i18n-aria-label="a11y.nav.privacyLinks">
             <a href="/" class="btn primary" data-nav="/" data-i18n="privacy.cta.home">Home</a>
@@ -279,23 +308,33 @@
           <article class="card landingFeature">
             <h3 data-i18n="privacy.whatStored.title">What is stored</h3>
             <p data-i18n="privacy.whatStored.body">Routine definitions, set targets, exercise descriptions, session
-              history, and body measurements (weight, body fat, and muscle) are all saved in browser storage on your
-              device. Nothing is ever sent to a server.</p>
+              history, and body measurements are all saved in browser storage on your device. Nothing is ever sent to
+              a server.</p>
           </article>
           <article class="card landingFeature">
-            <h3 data-i18n="privacy.notRequired.title">What is not required</h3>
-            <p data-i18n="privacy.notRequired.body">No user account, password, or remote profile is required to use the
-              tracker.</p>
+            <h3 data-i18n="privacy.notRequired.title">No account required</h3>
+            <p data-i18n="privacy.notRequired.body">No user account, email, password, or remote profile is needed. Open
+              the app and start training — that's it.</p>
           </article>
           <article class="card landingFeature">
-            <h3 data-i18n="privacy.notifications.title">Notifications</h3>
-            <p data-i18n="privacy.notifications.body">If you allow notifications, they are used for session-related
-              reminders and workout flow while the app is running on your device.</p>
+            <h3 data-i18n="privacy.noAnalytics.title">No analytics or tracking scripts</h3>
+            <p data-i18n="privacy.noAnalytics.body">The app loads zero third-party tracking scripts. There are no
+              analytics services, no pixel trackers, and no advertising SDKs. Your usage is completely unmonitored.</p>
+          </article>
+          <article class="card landingFeature">
+            <h3 data-i18n="privacy.noCookies.title">No cookies</h3>
+            <p data-i18n="privacy.noCookies.body">The app does not set any cookies. Your language preference and
+              workout data are stored in browser localStorage, which is never sent to a server automatically.</p>
+          </article>
+          <article class="card landingFeature">
+            <h3 data-i18n="privacy.notifications.title">Notifications stay local</h3>
+            <p data-i18n="privacy.notifications.body">If you allow notifications, they are generated entirely on your
+              device for session-related reminders. No data is sent to a push server.</p>
           </article>
           <article class="card landingFeature">
             <h3 data-i18n="privacy.exports.title">Data portability</h3>
             <p data-i18n="privacy.exports.body">Export routines or body measurements to a portable JSON file at any
-              time. Import files are processed locally â€” no data is uploaded to any server.</p>
+              time. Import files are processed locally — no data is uploaded to any server.</p>
           </article>
           <article class="card landingFeature">
             <h3 data-i18n="privacy.localOnly.title">Your data stays private</h3>
@@ -305,41 +344,46 @@
         </div>
       </section>
 
-      <section class="route landingRoute routeHidden" data-route="about" id="route-about">
+            <section class="route landingRoute routeHidden" data-route="about" id="route-about">
         <div class="landingHero card">
-          <p class="landingEyebrow" data-i18n="about.eyebrow">How it works</p>
-          <h2 data-i18n="about.title">A workout tracker built for the gym floor, not a dashboard.</h2>
+          <p class="landingEyebrow" data-i18n="about.eyebrow">Get started</p>
+          <h2 data-i18n="about.title">From first routine to personal records in four simple steps.</h2>
           <p class="landingLead" data-i18n="about.lead">
-            Easy Gym Routine Tracker keeps everything simple. Build a routine once, then run through it session by
-            session without touching complex settings.
+            Easy Gym Routine Tracker keeps the workflow minimal: build once, train repeatedly, and watch your progress
+            grow — all without leaving your phone.
           </p>
           <nav class="landingActions" aria-label="About links" data-i18n-aria-label="a11y.nav.aboutLinks">
             <a href="/" class="btn primary" data-nav="/" data-i18n="about.cta.home">Home</a>
-            <a href="/routines" class="btn" data-nav="/routines" data-i18n="about.cta.openApp">Try it</a>
-            <a href="/features" class="btn" data-nav="/features" data-i18n="about.cta.features">See features</a>
+            <a href="/routines" class="btn" data-nav="/routines" data-i18n="about.cta.openApp">Try it now</a>
+            <a href="/features" class="btn" data-nav="/features" data-i18n="about.cta.features">See all features</a>
           </nav>
         </div>
 
         <div class="landingGrid">
           <article class="card landingFeature">
-            <h3 data-i18n="about.step1.title">Build your routine</h3>
-            <p data-i18n="about.step1.body">Add exercises with target reps, weights, and rest periods. Supports
-              bilateral (two-handed) and unilateral (one-arm or one-leg) sets.</p>
+            <h3 data-i18n="about.step1.title">1. Build your routine</h3>
+            <p data-i18n="about.step1.body">Add exercises with target reps, weights, and rest periods. Supports both
+              bilateral and unilateral (left/right) sets for full flexibility.</p>
           </article>
           <article class="card landingFeature">
-            <h3 data-i18n="about.step2.title">Start a session</h3>
-            <p data-i18n="about.step2.body">Open a routine and start a session. Work through each exercise set by set,
-              logging what you actually did.</p>
+            <h3 data-i18n="about.step2.title">2. Start a session</h3>
+            <p data-i18n="about.step2.body">Tap "Start" and work through each exercise set by set. Log what you
+              actually lifted, get rest-timer alerts, and stay focused on the workout.</p>
           </article>
           <article class="card landingFeature">
-            <h3 data-i18n="about.step3.title">Track your progress</h3>
-            <p data-i18n="about.step3.body">After each session, rep and weight history is saved on your device. Review
-              trends in the history charts for each exercise.</p>
+            <h3 data-i18n="about.step3.title">3. Review your progress</h3>
+            <p data-i18n="about.step3.body">After each session, a summary shows total volume, reps, PRs, and fun
+              comparisons. History charts let you track trends over weeks and months.</p>
           </article>
           <article class="card landingFeature">
-            <h3 data-i18n="about.step4.title">Stay in control</h3>
-            <p data-i18n="about.step4.body">Export routines to a JSON file at any time. Import them back on the same or
-              a different device without needing an account.</p>
+            <h3 data-i18n="about.step4.title">4. Stay in control</h3>
+            <p data-i18n="about.step4.body">Export routines or body data to JSON at any time. Import them on another
+              device or share them with a friend — no account or cloud service needed.</p>
+          </article>
+          <article class="card landingFeature">
+            <h3 data-i18n="about.step5.title">5. Install on your phone</h3>
+            <p data-i18n="about.step5.body">Add the app to your home screen for instant access. It works offline and
+              feels like a native app — no app-store download required.</p>
           </article>
         </div>
       </section>
