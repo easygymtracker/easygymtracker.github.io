@@ -6,6 +6,7 @@ export const DICTS = {
     en: {
         "app.title": "Easy Gym Routine Tracker",
         "app.subtitle": "Minimal routine list. Create and manage training plans locally.",
+        "notif.toggle": "Toggle notifications",
 
         "common.back": "Back",
         "common.close": "Close",
@@ -379,6 +380,7 @@ export const DICTS = {
     es: {
         "app.title": "Easy Gym Routine Tracker",
         "app.subtitle": "Lista mínima de rutinas. Crea y gestiona planes de entrenamiento localmente.",
+        "notif.toggle": "Activar/desactivar notificaciones",
 
         "common.back": "Volver",
         "common.close": "Cerrar",
@@ -746,6 +748,7 @@ export const DICTS = {
     pt: {
         "app.title": "Easy Gym Routine Tracker",
         "app.subtitle": "Lista mínima de rotinas. Crie e gerencie planos de treino localmente.",
+        "notif.toggle": "Ativar/desativar notificações",
 
         "common.back": "Voltar",
         "common.close": "Fechar",
@@ -1113,6 +1116,7 @@ export const DICTS = {
     ja: {
         "app.title": "Easy Gym Routine Tracker",
         "app.subtitle": "最小限のルーティン一覧。端末内でトレーニング計画を作成・管理できます。",
+        "notif.toggle": "通知の切り替え",
 
         "common.back": "戻る",
         "common.close": "閉じる",
@@ -1480,6 +1484,7 @@ export const DICTS = {
     zh: {
         "app.title": "Easy Gym Routine Tracker",
         "app.subtitle": "极简训练计划列表。在本设备本地创建并管理训练计划。",
+        "notif.toggle": "切换通知",
 
         "common.back": "返回",
         "common.close": "关闭",
@@ -1789,6 +1794,7 @@ export const DICTS = {
     ar: {
         "app.title": "Easy Gym Routine Tracker",
         "app.subtitle": "قائمة روتينات بسيطة. أنشئ وادِر خطط التدريب محليًا.",
+        "notif.toggle": "تبديل الإشعارات",
 
         "common.back": "رجوع",
         "common.close": "إغلاق",
@@ -2098,6 +2104,7 @@ export const DICTS = {
     hi: {
         "app.title": "Easy Gym Routine Tracker",
         "app.subtitle": "सरल रूटीन सूची। स्थानीय रूप से ट्रेनिंग प्लान बनाएं और मैनेज करें।",
+        "notif.toggle": "सूचनाएं टॉगल करें",
 
         "common.back": "वापस",
         "common.close": "बंद करें",
@@ -2407,6 +2414,7 @@ export const DICTS = {
     de: {
         "app.title": "Easy Gym Routine Tracker",
         "app.subtitle": "Minimale Routinenliste. Trainingspläne lokal erstellen und verwalten.",
+        "notif.toggle": "Benachrichtigungen umschalten",
 
         "common.back": "Zurück",
         "common.close": "Schließen",
@@ -2716,6 +2724,7 @@ export const DICTS = {
     fr: {
         "app.title": "Easy Gym Routine Tracker",
         "app.subtitle": "Liste de routines minimale. Créez et gérez vos plans d'entraînement en local.",
+        "notif.toggle": "Activer/désactiver les notifications",
 
         "common.back": "Retour",
         "common.close": "Fermer",
@@ -3025,6 +3034,7 @@ export const DICTS = {
     ru: {
         "app.title": "Easy Gym Routine Tracker",
         "app.subtitle": "Минимальный список тренировок. Создавайте и управляйте планами локально.",
+        "notif.toggle": "Переключить уведомления",
 
         "common.back": "Назад",
         "common.close": "Закрыть",
@@ -3336,6 +3346,7 @@ export const DICTS = {
     it: {
         "app.title": "Easy Gym Routine Tracker",
         "app.subtitle": "Elenco routine minimale. Crea e gestisci i piani di allenamento in locale.",
+        "notif.toggle": "Attiva/disattiva notifiche",
 
         "common.back": "Indietro",
         "common.close": "Chiudi",
@@ -3645,6 +3656,7 @@ export const DICTS = {
     nl: {
         "app.title": "Easy Gym Routine Tracker",
         "app.subtitle": "Minimale routinelijst. Maak en beheer trainingsplannen lokaal.",
+        "notif.toggle": "Meldingen in-/uitschakelen",
 
         "common.back": "Terug",
         "common.close": "Sluiten",
@@ -3954,6 +3966,7 @@ export const DICTS = {
     pl: {
         "app.title": "Easy Gym Routine Tracker",
         "app.subtitle": "Minimalna lista planów. Twórz i zarządzaj treningami lokalnie.",
+        "notif.toggle": "Przełącz powiadomienia",
 
         "common.back": "Wstecz",
         "common.close": "Zamknij",
@@ -4263,6 +4276,7 @@ export const DICTS = {
     tr: {
         "app.title": "Easy Gym Routine Tracker",
         "app.subtitle": "Minimal rutin listesi. Antrenman planlarını yerel olarak oluşturun ve yönetin.",
+        "notif.toggle": "Bildirimleri aç/kapat",
 
         "common.back": "Geri",
         "common.close": "Kapat",

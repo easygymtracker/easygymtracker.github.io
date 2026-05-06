@@ -567,3 +567,34 @@ select {
 .input--error {
     border-color: var(--danger, #ef4444);
 }
+
+/* ── Floating notification toggle ──────────────────────── */
+.notifToggle {
+    position: fixed;
+    bottom: 18px;
+    right: 18px;
+    z-index: 9000;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--panel);
+    color: var(--text);
+    font-size: 1.25rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+    transition: opacity .2s, transform .15s;
+    opacity: .75;
+}
+
+.notifToggle:hover {
+    opacity: 1;
+    transform: scale(1.08);
+}
+
+.notifToggle[data-enabled="false"] {
+    opacity: .45;
+}

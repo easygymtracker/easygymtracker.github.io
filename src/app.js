@@ -18,8 +18,30 @@ import { mountProfileHistoryPage } from "./pages/profilePage/profileHistoryPage.
 import { mountExerciseHistoryPage } from "./pages/exerciseHistoryPage/exerciseHistoryPage.js";
 
 import { setLocale, getLocale, getLocaleFromUrl, translateDocument, t } from "./internationalization/i18n.js";
+import { areNotificationsEnabled, setNotificationsEnabled } from "./services/notificationPreference.js";
 
 registerServiceWorker();
+
+// -----------------------------------------------------------------------------
+// Notification toggle (floating button)
+// -----------------------------------------------------------------------------
+const btnNotifToggle = document.getElementById("btnNotifToggle");
+const notifToggleIcon = document.getElementById("notifToggleIcon");
+
+function syncNotifButton() {
+    const on = areNotificationsEnabled();
+    if (btnNotifToggle) btnNotifToggle.dataset.enabled = String(on);
+    if (notifToggleIcon) notifToggleIcon.textContent = on ? "\uD83D\uDD14" : "\uD83D\uDD15";
+}
+
+syncNotifButton();
+
+if (btnNotifToggle) {
+    btnNotifToggle.addEventListener("click", () => {
+        setNotificationsEnabled(!areNotificationsEnabled());
+        syncNotifButton();
+    });
+}
 
 // -----------------------------------------------------------------------------
 // Stores

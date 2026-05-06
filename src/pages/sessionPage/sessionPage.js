@@ -10,6 +10,7 @@ import { RepGroup, Laterality } from "/src/models/repGroup.js";
 import { setLeaveGuard, clearLeaveGuard } from "/src/router.js";
 import { mountRepGroupHistoryCharts } from "/src/ui/components/repGroupHistoryChart.js";
 import { openWorkoutSummaryModal, computeSessionStats, computeSessionPRs } from "/src/ui/components/workoutSummaryModal.js";
+import { areNotificationsEnabled } from "/src/services/notificationPreference.js";
 import {
     formatSideValue as formatSideValueValue,
     isSameWeight as isSameWeightValue,
@@ -165,6 +166,7 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
     });
 
     async function ensureNotificationPermission() {
+        if (!areNotificationsEnabled()) return false;
         if (!("Notification" in window)) return false;
         if (Notification.permission === "granted") return true;
         if (Notification.permission === "denied") return false;
@@ -257,6 +259,7 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
         debounce(persistCurrentSeriesDescription, 500);
 
     function notifySessionState() {
+        if (!areNotificationsEnabled()) return;
         if (!hasInitiated) return;
         if (!navigator.serviceWorker?.controller) return;
         if (Notification.permission !== "granted") return;

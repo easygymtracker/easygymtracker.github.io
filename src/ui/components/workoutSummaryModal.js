@@ -285,7 +285,7 @@ export function openWorkoutSummaryModal({ routine, sessionStartIso, durationMs, 
 
             <div class="summaryPrs">
                 ${prRows ? `
-                <details class="summaryPrDetails" open>
+                <details class="summaryPrDetails">
                     <summary class="summaryPrSummary">
                         <span class="summaryPrIcon" aria-hidden="true">\uD83C\uDFC6</span>
                         <span>${escapeHtml(
