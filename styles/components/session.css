@@ -183,35 +183,44 @@
     margin-bottom: 6px;
 }
 
+.currentExerciseNameLine {
+    line-height: 1.45;
+}
+
 .currentExerciseName {
     font-size: 15px;
     font-weight: 800;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
-.currentExerciseNameLine {
-    display: flex;
-    align-items: baseline;
-    gap: 6px;
-    min-width: 0;
-    line-height: 1.35;
+.currentSeriesDescText {
+    font-size: 14px;
+    color: var(--muted);
+    cursor: text;
+    word-break: break-word;
 }
 
-.currentExerciseDescRow {
-    margin-top: 6px;
-    max-width: 560px;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    background: rgba(255, 255, 255, 0.02);
-    padding: 4px;
+.currentSeriesDescText--empty {
+    opacity: .5;
+    font-style: italic;
 }
 
 .currentSeriesDescInput {
     width: 100%;
-    line-height: 1.45;
-    min-height: 48px;
+    box-sizing: border-box;
+    font: inherit;
+    font-size: 14px;
+    line-height: 1.4;
+    color: var(--text);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 4px 8px;
+    margin-top: 4px;
+    outline: none;
+    resize: none;
+    overflow: hidden;
+    min-height: 0;
 }
 
 .currentExerciseIdx {
@@ -622,10 +631,49 @@
     margin-top: 16px;
 }
 
+.summaryPrDetails {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.summaryPrSummary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: .95rem;
+    list-style: none;
+    user-select: none;
+    background: rgba(245, 158, 11, 0.06);
+}
+
+.summaryPrSummary::-webkit-details-marker {
+    display: none;
+}
+
+.summaryPrSummary::after {
+    content: "\25B6";
+    margin-left: auto;
+    font-size: .65rem;
+    transition: transform .2s;
+    color: var(--muted);
+}
+
+.summaryPrDetails[open] > .summaryPrSummary::after {
+    transform: rotate(90deg);
+}
+
+.summaryPrIcon {
+    font-size: 1.1rem;
+}
+
 .summaryPrList {
     list-style: none;
     margin: 0;
-    padding: 0;
+    padding: 4px 14px 10px;
     display: flex;
     flex-direction: column;
     gap: 6px;

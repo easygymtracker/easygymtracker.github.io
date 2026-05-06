@@ -95,30 +95,41 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
         const inp = currentSectionEl?.querySelector('[data-action="edit-series-desc"]');
         if (!inp) return;
         inp.dataset.original = inp.value ?? "";
-        // Initial auto-resize for pre-filled content
-        inp.style.height = "auto";
-        inp.style.height = inp.scrollHeight + "px";
     }
+
+    // Click inline text → open full-width textarea
+    currentSectionEl?.addEventListener("click", (e) => {
+        const textEl = e.target.closest('[data-action="start-edit-desc"]');
+        if (!textEl) return;
+        const textarea = currentSectionEl.querySelector('[data-action="edit-series-desc"]');
+        if (!textarea) return;
+        textEl.style.display = "none";
+        textarea.style.display = "";
+        textarea.offsetHeight; // force reflow
+        textarea.style.height = "0";
+        textarea.style.height = textarea.scrollHeight + "px";
+        textarea.focus();
+    });
 
     currentSectionEl?.addEventListener("focusin", (e) => {
         const inp = e.target.closest('[data-action="edit-series-desc"]');
         if (!inp) return;
-
-        // On first focus, remember original for Escape
         if (inp.dataset.original == null) inp.dataset.original = inp.value ?? "";
-
-        // Visual focus style (optional)
-        inp.style.borderColor = "var(--border)";
-        inp.style.color = "var(--text)";
     });
 
     currentSectionEl?.addEventListener("focusout", (e) => {
         const inp = e.target.closest('[data-action="edit-series-desc"]');
         if (!inp) return;
 
-        // Restore muted style
-        inp.style.borderColor = "transparent";
-        inp.style.color = "var(--muted)";
+        // Hide textarea, restore inline text
+        inp.style.display = "none";
+        const textEl = currentSectionEl.querySelector('[data-action="start-edit-desc"]');
+        if (textEl) {
+            const placeholder = t("session.seriesDesc.placeholder") || "Add notes…";
+            textEl.textContent = inp.value || placeholder;
+            textEl.classList.toggle("currentSeriesDescText--empty", !inp.value);
+            textEl.style.display = "";
+        }
 
         // Commit on blur (immediate)
         persistCurrentSeriesDescription(inp.value);
@@ -131,7 +142,7 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
         if (!inp) return;
 
         // Auto-resize textarea
-        inp.style.height = "auto";
+        inp.style.height = "0";
         inp.style.height = inp.scrollHeight + "px";
 
         // Debounced persistence while typing
@@ -148,8 +159,6 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
             e.preventDefault();
             const original = inp.dataset.original ?? "";
             inp.value = original;
-            inp.style.height = "auto";
-            inp.style.height = inp.scrollHeight + "px";
             persistCurrentSeriesDescription(original);
             inp.blur();
         }
@@ -834,32 +843,19 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
 
         const name = resolveExerciseName(s);
         const seriesDesc = s?.description != null ? String(s.description) : "";
-        const descEditorHtml = `
-                    <div class="currentExerciseDescRow">
-                        <textarea
+        const descPlaceholder = t("session.seriesDesc.placeholder") || "Add notes…";
+        const descDisplayText = seriesDesc || descPlaceholder;
+        const descEmptyClass = seriesDesc ? "" : " currentSeriesDescText--empty";
+        const descTextHtml = `<span class="currentSeriesDescText${descEmptyClass}" data-action="start-edit-desc">${escapeHtml(descDisplayText)}</span>`;
+        const descTextareaHtml = `<textarea
                             class="currentSeriesDescInput"
                             data-action="edit-series-desc"
-                            placeholder="${escapeHtml(t("session.seriesDesc.placeholder") || "Add notes…")}"
+                            placeholder="${escapeHtml(descPlaceholder)}"
                             aria-label="${escapeHtml(t("session.seriesDesc.aria") || "Exercise notes")}"
                             spellcheck="true"
-                            rows="2"
-                            style="
-                                border:1px solid transparent;
-                                background:transparent;
-                                color:var(--muted);
-                                padding:4px 8px;
-                                border-radius:8px;
-                                min-width: 220px;
-                                width: min(560px, 100%);
-                                outline:none;
-                                resize:none;
-                                overflow:hidden;
-                                line-height:1.4;
-                                font:inherit;
-                                display:block;
-                            ">${escapeHtml(seriesDesc)}</textarea>
-                    </div>
-        `;
+                            rows="1"
+                            style="display:none"
+                            >${escapeHtml(seriesDesc)}</textarea>`;
 
         const groups = Array.isArray(s?.repGroups) ? s.repGroups : [];
         const rg = groups[currentRepGroupIndex] || null;
@@ -1091,17 +1087,16 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
             <div class="currentExerciseHeader">
                 <div class="currentExerciseTitleWrap">
                 <div class="currentExerciseLabel">${escapeHtml(t("session.currentExercise") || "Current exercise")}</div>
-                <div class="currentExerciseNameLine" style="display:flex; gap:6px; align-items:baseline; min-width:0;">
-                    <span>${escapeHtml(name)}</span>
-                    <span class="muted" aria-hidden="true">-</span>
+                <div class="currentExerciseNameLine">
+                    <span class="currentExerciseName">${escapeHtml(name)}</span> ${descTextHtml}
                 </div>
-                ${descEditorHtml}
                 </div>
 
                 <div class="currentExerciseIdx">
                 ${escapeHtml((t("session.exercise") || "Exercise"))} ${currentSeriesIndex + 1}/${series.length}
                 </div>
             </div>
+            ${descTextareaHtml}
 
             ${currentSetHtml}
 

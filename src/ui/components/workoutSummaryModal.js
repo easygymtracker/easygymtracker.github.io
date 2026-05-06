@@ -62,13 +62,13 @@ function resolveExerciseLabel(series, resolveExerciseName) {
 // --- weight comparison table (ordered lightest -> heaviest) ---
 
 const COMPARISONS = [
-    { key: "session.summary.compare.bowlingBall", kg: 7, icon: "??" },
-    { key: "session.summary.compare.cement", kg: 25, icon: "??" },
-    { key: "session.summary.compare.labrador", kg: 30, icon: "??" },
-    { key: "session.summary.compare.person", kg: 80, icon: "??" },
-    { key: "session.summary.compare.gorilla", kg: 180, icon: "??" },
-    { key: "session.summary.compare.car", kg: 1400, icon: "??" },
-    { key: "session.summary.compare.elephant", kg: 4500, icon: "??" },
+    { key: "session.summary.compare.bowlingBall", kg: 7, icon: "\uD83C\uDFB3" },
+    { key: "session.summary.compare.cement", kg: 25, icon: "\uD83E\uDDF1" },
+    { key: "session.summary.compare.labrador", kg: 30, icon: "\uD83D\uDC36" },
+    { key: "session.summary.compare.person", kg: 80, icon: "\uD83E\uDDD1" },
+    { key: "session.summary.compare.gorilla", kg: 180, icon: "\uD83E\uDD8D" },
+    { key: "session.summary.compare.car", kg: 1400, icon: "\uD83D\uDE97" },
+    { key: "session.summary.compare.elephant", kg: 4500, icon: "\uD83D\uDC18" },
 ];
 
 function pickComparison(totalKg) {
@@ -189,12 +189,12 @@ function motivationalLine(stats, durationMs) {
     const minutes = Math.round(durationMs / 60000);
     const { totalSets, totalVolume } = stats;
 
-    if (totalSets === 0) return t("session.summary.motivational.justStarted") || "Every session counts. See you next time! ??";
-    if (totalVolume > 5000) return t("session.summary.motivational.beast") || "Absolute beast mode. ??";
-    if (totalVolume > 2000) return t("session.summary.motivational.strong") || "Seriously strong effort. ??";
-    if (minutes > 60) return t("session.summary.motivational.endurance") || "Over an hour of work. That's dedication. ??";
-    if (totalSets >= 15) return t("session.summary.motivational.volume") || "High-volume session. Your body will thank you. ??";
-    return t("session.summary.motivational.done") || "Workout done. Keep showing up! ??";
+    if (totalSets === 0) return t("session.summary.motivational.justStarted") || "Every session counts. See you next time! \uD83D\uDCAA";
+    if (totalVolume > 5000) return t("session.summary.motivational.beast") || "Absolute beast mode. \uD83D\uDD25";
+    if (totalVolume > 2000) return t("session.summary.motivational.strong") || "Seriously strong effort. \uD83D\uDCAA";
+    if (minutes > 60) return t("session.summary.motivational.endurance") || "Over an hour of work. That's dedication. \u23F1\uFE0F";
+    if (totalSets >= 15) return t("session.summary.motivational.volume") || "High-volume session. Your body will thank you. \uD83D\uDCAF";
+    return t("session.summary.motivational.done") || "Workout done. Keep showing up! \uD83D\uDC4A";
 }
 
 // --- modal ---
@@ -225,7 +225,7 @@ export function openWorkoutSummaryModal({ routine, sessionStartIso, durationMs, 
                 <td>${escapeHtml(ex.name)}</td>
                 <td>${ex.sets}</td>
                 <td>${ex.reps}</td>
-                <td>${ex.volume > 0 ? (Math.round(ex.volume) + " kg") : "�"}</td>
+                <td>${ex.volume > 0 ? (Math.round(ex.volume) + " kg") : "\u2014"}</td>
             </tr>
         `).join("");
 
@@ -246,7 +246,7 @@ export function openWorkoutSummaryModal({ routine, sessionStartIso, durationMs, 
 
         modal.innerHTML = `
             <div class="summaryHeader">
-                <div class="summaryIcon" aria-hidden="true">??</div>
+                <div class="summaryIcon" aria-hidden="true">\u2705</div>
                 <h3>${escapeHtml(t("session.summary.title") || "Workout complete!")}</h3>
                 <p class="muted summaryMotivational">${escapeHtml(motivationalLine(stats, durationMs))}</p>
             </div>
@@ -284,11 +284,18 @@ export function openWorkoutSummaryModal({ routine, sessionStartIso, durationMs, 
             ` : ""}
 
             <div class="summaryPrs">
-                <p class="summaryBreakdownTitle muted">${escapeHtml(t("session.summary.prsTitle") || "New PRs achieved")}</p>
-                ${prRows
-                    ? `<ul class="summaryPrList">${prRows}</ul>`
-                    : `<p class="muted summaryPrNone">${escapeHtml(t("session.summary.pr.none") || "No new PRs in this session.")}</p>`
-                }
+                ${prRows ? `
+                <details class="summaryPrDetails" open>
+                    <summary class="summaryPrSummary">
+                        <span class="summaryPrIcon" aria-hidden="true">\uD83C\uDFC6</span>
+                        <span>${escapeHtml(
+                            (t("session.summary.prsSummary") || "{count} new PR(s)")
+                                .replace("{count}", String(prDetection.totalPrs))
+                        )}</span>
+                    </summary>
+                    <ul class="summaryPrList">${prRows}</ul>
+                </details>
+                ` : `<p class="muted summaryPrNone">${escapeHtml(t("session.summary.pr.none") || "No new PRs in this session.")}</p>`}
             </div>
 
             ${exercises.length > 0 ? `
