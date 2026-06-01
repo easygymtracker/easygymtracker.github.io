@@ -1,4 +1,5 @@
-import { importRoutineFromExport } from "../import/routineImport.js";
+import { importRoutineFromExport, parseRoutineExport } from "../import/routineImport.js";
+import { t } from "../internationalization/i18n.js";
 
 export function setupRoutineImport({ triggerEl, routineStore, exerciseStore, navigate }) {
     if (!triggerEl) return () => {};
@@ -32,7 +33,16 @@ export function setupRoutineImport({ triggerEl, routineStore, exerciseStore, nav
         try {
             const text = await file.text();
 
-            const routine = importRoutineFromExport({
+            // Check if this would update an existing routine
+            const { existingRoutine } = parseRoutineExport({ rawText: text, routineStore });
+
+            if (existingRoutine) {
+                const msg = (t("routines.import.confirmUpdate") || "This will update the existing routine \"{name}\". History will be preserved. Continue?")
+                    .replace("{name}", existingRoutine.name);
+                if (!confirm(msg)) return;
+            }
+
+            const { routine } = importRoutineFromExport({
                 rawText: text,
                 routineStore,
                 exerciseStore,

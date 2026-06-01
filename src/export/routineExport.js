@@ -19,12 +19,14 @@ export function buildRoutineExportV1({ routine, exerciseStore }) {
         const exerciseDescription = exDesc || "(unknown exercise)";
 
         return {
+            id: ss.id,
             description: String(ss.description ?? ""),
             restSecondsAfter: Number(ss.restSecondsAfter ?? 0),
 
             exercise: { description: exerciseDescription },
 
             repGroups: (ss.repGroups ?? []).map((rg) => ({
+                id: rg.id,
                 laterality: rg.laterality,
                 targetReps: rg.targetReps ?? null,
                 targetWeight: rg.targetWeight ?? null,
@@ -43,6 +45,7 @@ export function buildRoutineExportV1({ routine, exerciseStore }) {
             storageNamespace: "routinetracker_v1",
         },
         routine: {
+            id: routine.id,
             name: String(routine.name ?? "").trim(),
             description: String(routine.description ?? ""),
             series,

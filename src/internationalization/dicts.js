@@ -191,6 +191,7 @@ export const DICTS = {
         "routine.session.startHelp": "Start a workout session using this routine",
         "routines.upload": "Upload routine",
         "routines.uploadHelp": "Upload a routine file to import it",
+        "routines.import.confirmUpdate": "This will update the existing routine \"{name}\". History will be preserved. Continue?",
 
         "profile.nav": "Profile",
         "profile.title": "Profile tracking",
@@ -476,6 +477,7 @@ export const DICTS = {
         "routine.session.startHelp": "Iniciar una sesión de entrenamiento con esta rutina",
         "routines.upload": "Subir rutina",
         "routines.uploadHelp": "Sube un archivo de rutina para importarlo",
+        "routines.import.confirmUpdate": "Esto actualizará la rutina existente \"{name}\". El historial se conservará. ¿Continuar?",
 
         "profile.nav": "Perfil",
         "profile.title": "Seguimiento corporal",
@@ -846,6 +848,7 @@ export const DICTS = {
         "routine.session.startHelp": "Iniciar uma sessão de treino com esta rotina",
         "routines.upload": "Enviar rotina",
         "routines.uploadHelp": "Envie um arquivo de rotina para importá-lo",
+        "routines.import.confirmUpdate": "Isto atualizará a rotina existente \"{name}\". O histórico será preservado. Continuar?",
 
         "profile.nav": "Perfil",
         "profile.title": "Acompanhamento corporal",
@@ -1216,6 +1219,7 @@ export const DICTS = {
         "routine.session.startHelp": "このルーティンでトレーニングセッションを開始する",
         "routines.upload": "ルーティンをアップロード",
         "routines.uploadHelp": "ルーティンファイルをアップロードしてインポートします",
+        "routines.import.confirmUpdate": "既存のルーティン「{name}」を更新します。履歴は保持されます。続行しますか？",
 
         "profile.nav": "プロフィール",
         "profile.title": "体組成トラッキング",
@@ -1586,6 +1590,7 @@ export const DICTS = {
         "routine.session.startHelp": "使用此计划开始一次训练",
         "routines.upload": "上传训练计划",
         "routines.uploadHelp": "上传训练计划文件以导入",
+        "routines.import.confirmUpdate": "这将更新现有计划「{name}」。历史记录将被保留。是否继续？",
 
         "profile.nav": "档案",
         "profile.title": "身体数据追踪",
@@ -1920,6 +1925,7 @@ export const DICTS = {
         "routine.session.startHelp": "بدء جلسة تمرين باستخدام هذا البرنامج",
         "routines.upload": "رفع روتين",
         "routines.uploadHelp": "ارفع ملف روتين لاستيراده",
+        "routines.import.confirmUpdate": "سيتم تحديث البرنامج الحالي \"{name}\". سيتم الحفاظ على السجل. هل تريد المتابعة؟",
 
         "profile.nav": "الملف الشخصي",
         "profile.title": "تتبع القياسات",
@@ -2254,6 +2260,7 @@ export const DICTS = {
         "routine.session.startHelp": "इस रूटीन से वर्कआउट सत्र शुरू करें",
         "routines.upload": "रूटीन अपलोड करें",
         "routines.uploadHelp": "रूटीन फ़ाइल अपलोड करके इम्पोर्ट करें",
+        "routines.import.confirmUpdate": "यह मौजूदा रूटीन \"{name}\" को अपडेट करेगा। इतिहास सुरक्षित रहेगा। जारी रखें?",
 
         "profile.nav": "प्रोफ़ाइल",
         "profile.title": "बॉडी ट्रैकिंग",
@@ -2588,6 +2595,7 @@ export const DICTS = {
         "routine.session.startHelp": "Ein Training mit dieser Routine starten",
         "routines.upload": "Routine hochladen",
         "routines.uploadHelp": "Eine Routinedatei zum Import hochladen",
+        "routines.import.confirmUpdate": "Die bestehende Routine \"{name}\" wird aktualisiert. Der Verlauf bleibt erhalten. Fortfahren?",
 
         "profile.nav": "Profil",
         "profile.title": "Körpertracking",
@@ -2922,6 +2930,7 @@ export const DICTS = {
         "routine.session.startHelp": "Démarrer une séance d'entraînement avec cette routine",
         "routines.upload": "Téléverser une routine",
         "routines.uploadHelp": "Téléversez un fichier de routine pour l'importer",
+        "routines.import.confirmUpdate": "Cela mettra à jour la routine existante \"{name}\". L'historique sera préservé. Continuer ?",
 
         "profile.nav": "Profil",
         "profile.title": "Suivi corporel",
@@ -3256,6 +3265,7 @@ export const DICTS = {
         "routine.session.startHelp": "Начать тренировку по этой программе",
         "routines.upload": "Загрузить тренировку",
         "routines.uploadHelp": "Загрузите файл программы, чтобы импортировать его",
+        "routines.import.confirmUpdate": "Существующая программа «{name}» будет обновлена. История сохранится. Продолжить?",
 
         "profile.nav": "Профиль",
         "profile.title": "Отслеживание показателей тела",
@@ -3592,6 +3602,7 @@ export const DICTS = {
         "routine.session.startHelp": "Inizia una sessione di allenamento con questa routine",
         "routines.upload": "Carica routine",
         "routines.uploadHelp": "Carica un file routine per importarlo",
+        "routines.import.confirmUpdate": "La routine esistente \"{name}\" verrà aggiornata. Lo storico sarà preservato. Continuare?",
 
         "profile.nav": "Profilo",
         "profile.title": "Monitoraggio corporeo",
@@ -3926,6 +3937,7 @@ export const DICTS = {
         "routine.session.startHelp": "Start een trainingssessie met deze routine",
         "routines.upload": "Upload routine",
         "routines.uploadHelp": "Upload een routinesbestand om het te importeren",
+        "routines.import.confirmUpdate": "De bestaande routine \"{name}\" wordt bijgewerkt. De geschiedenis blijft behouden. Doorgaan?",
 
         "profile.nav": "Profiel",
         "profile.title": "Lichaamstracking",
@@ -4260,6 +4272,7 @@ export const DICTS = {
         "routine.session.startHelp": "Rozpocznij sesję treningową z tym planem",
         "routines.upload": "Prześlij plan",
         "routines.uploadHelp": "Prześlij plik planu, aby go zaimportować",
+        "routines.import.confirmUpdate": "Plan \"{name}\" zostanie zaktualizowany. Historia zostanie zachowana. Kontynuować?",
 
         "profile.nav": "Profil",
         "profile.title": "Śledzenie sylwetki",
@@ -4594,6 +4607,7 @@ export const DICTS = {
         "routine.session.startHelp": "Bu rutinle bir antrenman oturumu başlat",
         "routines.upload": "Rutin yükle",
         "routines.uploadHelp": "İçe aktarmak için bir rutin dosyası yükleyin",
+        "routines.import.confirmUpdate": "Mevcut rutin \"{name}\" güncellenecek. Geçmiş korunacak. Devam edilsin mi?",
 
         "profile.nav": "Profil",
         "profile.title": "Vücut takibi",
