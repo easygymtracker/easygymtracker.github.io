@@ -37,7 +37,7 @@ export function mountRoutineDetailPage({ routineStore, exerciseStore }) {
     function setMetaEditorOpen(open, routine) {
         editingMeta = !!open;
 
-        if (routineMetaEditor) routineMetaEditor.style.display = open ? "" : "none";
+        if (routineMetaEditor) routineMetaEditor.classList.toggle("uHidden", !open);
         if (btnEditRoutine) btnEditRoutine.disabled = open; // prevent double-open
 
         if (open && routine) {
