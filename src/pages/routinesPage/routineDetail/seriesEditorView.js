@@ -532,10 +532,11 @@ export function createSeriesEditorView({
             row.style.cursor = "grab";
 
             row.innerHTML = `
-                <div class="routineMeta">
-                    <h3>${escapeHtml(repGroupTitleLabel(i + 1))}</h3>
-                    <p>
-                        ${escapeHtml(
+                <div class="routineRowBody">
+                    <div class="routineMeta">
+                        <h3>${escapeHtml(repGroupTitleLabel(i + 1))}</h3>
+                        <p>
+                            ${escapeHtml(
                 repGroupSummaryLabel({
                     laterality: g.laterality,
                     reps,
@@ -543,21 +544,22 @@ export function createSeriesEditorView({
                     restSeconds,
                 })
             )}
-                    </p>
-                </div>
-                <div class="rowActions">
-                    <button class="btn" data-action="edit-repGroup" data-index="${i}">
-                        ${escapeHtml(t("common.edit"))}
-                    </button>
-                    <button class="btn" data-action="move-up" data-index="${i}" ${i === 0 ? "disabled" : ""}>
-                        ↑
-                    </button>
-                    <button class="btn" data-action="move-down" data-index="${i}" ${i === items.length - 1 ? "disabled" : ""}>
-                        ↓
-                    </button>
-                    <button class="btn danger" data-action="remove-repGroup" data-index="${i}">
-                        ${escapeHtml(t("common.remove"))}
-                    </button>
+                        </p>
+                    </div>
+                    <div class="rowActions">
+                        <button class="btn" data-action="edit-repGroup" data-index="${i}">
+                            ${escapeHtml(t("common.edit"))}
+                        </button>
+                        <button class="btn" data-action="move-up" data-index="${i}" ${i === 0 ? "disabled" : ""}>
+                            ↑
+                        </button>
+                        <button class="btn" data-action="move-down" data-index="${i}" ${i === items.length - 1 ? "disabled" : ""}>
+                            ↓
+                        </button>
+                        <button class="btn danger" data-action="remove-repGroup" data-index="${i}">
+                            ${escapeHtml(t("common.remove"))}
+                        </button>
+                    </div>
                 </div>
             `;
             repGroupList.appendChild(row);
