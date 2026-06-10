@@ -177,15 +177,15 @@ export function createSeriesEditorView({
         const lat = String(rgLaterality.value);
 
         if (lat === Laterality.UNILATERAL) {
-            if (rgRepsSingleWrap) rgRepsSingleWrap.style.display = "none";
-            if (rgRepsTupleWrap) rgRepsTupleWrap.style.display = "";
-            rgWeightSingleWrap.style.display = "none";
-            rgWeightTupleWrap.style.display = "";
+            if (rgRepsSingleWrap) rgRepsSingleWrap.classList.add("uHidden");
+            if (rgRepsTupleWrap) rgRepsTupleWrap.classList.remove("uHidden");
+            rgWeightSingleWrap.classList.add("uHidden");
+            rgWeightTupleWrap.classList.remove("uHidden");
         } else {
-            if (rgRepsSingleWrap) rgRepsSingleWrap.style.display = "";
-            if (rgRepsTupleWrap) rgRepsTupleWrap.style.display = "none";
-            rgWeightSingleWrap.style.display = "";
-            rgWeightTupleWrap.style.display = "none";
+            if (rgRepsSingleWrap) rgRepsSingleWrap.classList.remove("uHidden");
+            if (rgRepsTupleWrap) rgRepsTupleWrap.classList.add("uHidden");
+            rgWeightSingleWrap.classList.remove("uHidden");
+            rgWeightTupleWrap.classList.add("uHidden");
         }
     }
 
@@ -219,7 +219,7 @@ export function createSeriesEditorView({
         rgLaterality.disabled = true;
 
         btnAddRepGroup.textContent = escapeHtml(t("common.save"));
-        if (btnCancelRepGroupEdit) btnCancelRepGroupEdit.style.display = "";
+        if (btnCancelRepGroupEdit) btnCancelRepGroupEdit.classList.remove("uHidden");
     }
 
     function exitRepGroupEditMode() {
@@ -227,7 +227,7 @@ export function createSeriesEditorView({
         rgLaterality.disabled = false;
 
         btnAddRepGroup.textContent = defaultAddRepGroupBtnLabel;
-        if (btnCancelRepGroupEdit) btnCancelRepGroupEdit.style.display = "none";
+        if (btnCancelRepGroupEdit) btnCancelRepGroupEdit.classList.add("uHidden");
 
         if (rgTargetReps) rgTargetReps.value = "";
         if (rgRepsLeft) rgRepsLeft.value = "";
@@ -258,7 +258,7 @@ export function createSeriesEditorView({
         editSeriesDescription.value = s.description ?? "";
         editSeriesRest.value = String(Number(s.restSecondsAfter ?? 0));
 
-        seriesEditor.style.display = "";
+        seriesEditor.classList.remove("uHidden");
         renderRepGroups(s);
         syncLateralityUI();
         exitRepGroupEditMode();
@@ -266,9 +266,9 @@ export function createSeriesEditorView({
 
     function close() {
         editingSeriesIndex = null;
-        seriesEditor.style.display = "none";
+        seriesEditor.classList.add("uHidden");
         repGroupList.innerHTML = "";
-        repGroupEmpty.style.display = "none";
+        repGroupEmpty.classList.add("uHidden");
         exitRepGroupEditMode();
     }
 
@@ -507,10 +507,10 @@ export function createSeriesEditorView({
         repGroupList.innerHTML = "";
 
         if (items.length === 0) {
-            repGroupEmpty.style.display = "block";
+            repGroupEmpty.classList.remove("uHidden");
             return;
         }
-        repGroupEmpty.style.display = "none";
+        repGroupEmpty.classList.add("uHidden");
 
         for (let i = 0; i < items.length; i++) {
             const g = items[i];

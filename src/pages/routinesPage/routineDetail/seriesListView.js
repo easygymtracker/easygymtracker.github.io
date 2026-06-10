@@ -57,27 +57,29 @@ export function createSeriesListView({
             row.style.cursor = "grab";
 
             row.innerHTML = `
-                <div class="routineMeta">
-                    <h3>${escapeHtml(`#${i + 1} ${exName}`)}</h3>
-                    <p>${escapeHtml(desc)} · ${escapeHtml(restAfterLabel(rest))}</p>
-                </div>
-                <div class="rowActions">
-                    <span class="chip">${escapeHtml(repGroupCountLabel(repGroupCount))}</span>
-                    <button class="btn" data-action="view-history" data-index="${i}" title="${escapeHtml(t('exerciseHistory.viewHistory') || 'History')}">
-                        ${escapeHtml(t('exerciseHistory.viewHistory') || 'History')}
-                    </button>
-                    <button class="btn" data-action="edit-series" data-index="${i}">
-                        ${escapeHtml(t("common.edit"))}
-                    </button>
-                    <button class="btn" data-action="move-up" data-index="${i}" ${i === 0 ? "disabled" : ""}>
-                        ↑
-                    </button>
-                    <button class="btn" data-action="move-down" data-index="${i}" ${i === items.length - 1 ? "disabled" : ""}>
-                        ↓
-                    </button>
-                    <button class="btn danger" data-action="remove-series" data-index="${i}">
-                        ${escapeHtml(t("common.remove"))}
-                    </button>
+                <div class="routineRowBody">
+                    <div class="routineMeta">
+                        <h3>${escapeHtml(`#${i + 1} ${exName}`)}</h3>
+                        <p>${escapeHtml(desc)} · ${escapeHtml(restAfterLabel(rest))}</p>
+                    </div>
+                    <div class="rowActions">
+                        <span class="chip">${escapeHtml(repGroupCountLabel(repGroupCount))}</span>
+                        <button class="btn" data-action="view-history" data-index="${i}" title="${escapeHtml(t('exerciseHistory.viewHistory') || 'History')}">
+                            ${escapeHtml(t('exerciseHistory.viewHistory') || 'History')}
+                        </button>
+                        <button class="btn" data-action="edit-series" data-index="${i}">
+                            ${escapeHtml(t("common.edit"))}
+                        </button>
+                        <button class="btn" data-action="move-up" data-index="${i}" ${i === 0 ? "disabled" : ""}>
+                            ↑
+                        </button>
+                        <button class="btn" data-action="move-down" data-index="${i}" ${i === items.length - 1 ? "disabled" : ""}>
+                            ↓
+                        </button>
+                        <button class="btn danger" data-action="remove-series" data-index="${i}">
+                            ${escapeHtml(t("common.remove"))}
+                        </button>
+                    </div>
                 </div>
             `;
             seriesListEl.appendChild(row);
