@@ -7,6 +7,7 @@ import { formatMs } from "/src/utils/numberFormat.js";
 import { attachDragReorder, moveItem } from "/src/ui/common/reorderUtils.js";
 import { openSessionSetModal } from "/src/ui/components/sessionSetModal.js";
 import { RepGroup, Laterality } from "/src/models/repGroup.js";
+import { SetSeries } from "/src/models/setSeries.js";
 import { setLeaveGuard, clearLeaveGuard, navigate } from "/src/router.js";
 import { mountRepGroupHistoryCharts } from "/src/ui/components/repGroupHistoryChart.js";
 import { openWorkoutSummaryModal, computeSessionStats, computeSessionPRs } from "/src/ui/components/workoutSummaryModal.js";
@@ -33,6 +34,7 @@ import {
 } from "./sessionProgress.js";
 import {
     buildResumeSnapshot,
+    deserializeAddedSeries,
     deserializeCompletedRepGroups,
     deserializeIdSet,
     isResumableFor,
@@ -51,6 +53,10 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
     const listEl = document.getElementById("sessionSeriesList");
     const emptyEl = document.getElementById("sessionEmpty");
     const notFoundEl = document.getElementById("sessionNotFound");
+
+    const addExerciseInput = document.getElementById("sessionAddExerciseInput");
+    const addExerciseOptionsEl = document.getElementById("sessionExerciseOptions");
+    const btnAddExercise = document.getElementById("btnSessionAddExercise");
 
     const sessionFormEl = timerEl?.closest(".form");
     const timerRowEl = sessionFormEl ? sessionFormEl.querySelector(":scope > div") : null;
@@ -247,6 +253,32 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
         return currentRoutineId ? routineStore.getById(currentRoutineId) : null;
     }
 
+    // Real routine + this session's added exercises, as a read-only view. Used for
+    // rendering, navigation and stats so those code paths don't need to know which
+    // series are real (persisted) vs session-only. Never pass this into
+    // routineStore.update() — that would bake the added series into storage.
+    function getSessionRoutine() {
+        const routine = getCurrentRoutine();
+        if (!routine) return null;
+        if (!addedSeries.length) return routine;
+        return { ...routine, series: [...routine.series, ...addedSeries] };
+    }
+
+    // These three take the REAL (persisted) routine, never the combined view from
+    // getSessionRoutine() — otherwise the "real" boundary they compute would already
+    // include the added series and every index would look real.
+    function realSeriesCount(routine) {
+        return Array.isArray(routine?.series) ? routine.series.length : 0;
+    }
+
+    function isAddedSeriesIndex(routine, seriesIdx) {
+        return seriesIdx >= realSeriesCount(routine);
+    }
+
+    function getAddedSeriesByIndex(routine, seriesIdx) {
+        return addedSeries[seriesIdx - realSeriesCount(routine)] ?? null;
+    }
+
     function getCurrentSeries(routine) {
         return routine?.series?.[currentSeriesIndex] ?? null;
     }
@@ -255,7 +287,8 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
         const routine = getCurrentRoutine();
         if (!routine) return;
 
-        const s = getCurrentSeries(routine);
+        const addedIdx = isAddedSeriesIndex(routine, currentSeriesIndex);
+        const s = addedIdx ? getAddedSeriesByIndex(routine, currentSeriesIndex) : getCurrentSeries(routine);
         if (!s) return;
 
         const next = (nextDescRaw ?? "").trim();
@@ -264,7 +297,9 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
         if (next === prev) return;
 
         s.description = next;
-        routineStore.update(routine);
+
+        if (addedIdx) persistActiveSessionState();
+        else routineStore.update(routine);
     }
 
     const persistCurrentSeriesDescriptionDebounced =
@@ -296,9 +331,7 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
             lastNotifyTs = now;
         }
 
-        const routine = currentRoutineId
-            ? routineStore.getById(currentRoutineId)
-            : null;
+        const routine = getSessionRoutine();
         if (!routine) return;
 
         const series = routine.series?.[currentSeriesIndex];
@@ -416,6 +449,12 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
     let removedSeriesIds = new Set();
     let removedRepGroupIds = new Set();
 
+    // Exercises added to *this* session only — real SetSeries/RepGroup instances,
+    // never written to the stored Routine. Always appended after the routine's own
+    // series; getSessionRoutine() below is the one place that stitches them in so
+    // rendering/nav/stats code can treat them exactly like real series.
+    let addedSeries = [];
+
     let expandedSeries = new Set();
 
     function stopTick() {
@@ -469,6 +508,7 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
             completedRepGroups,
             removedSeriesIds,
             removedRepGroupIds,
+            addedSeries,
         }, { nowMs, nowIso: new Date(nowMs).toISOString() }));
     }
 
@@ -486,19 +526,23 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
         return isResumableFor(state, routineId) ? state : null;
     }
 
-    function restoreSessionState(state, routine) {
+    function restoreSessionState(state) {
         activeWorkoutSessionId = state.sessionId ?? null;
         sessionStartedAtIso = state.startedAtIso ?? null;
         completedRepGroups = deserializeCompletedRepGroups(state.completedRepGroups);
         sessionSeriesOrder = Array.isArray(state.sessionSeriesOrder) ? state.sessionSeriesOrder.slice() : null;
         removedSeriesIds = deserializeIdSet(state.removedSeriesIds);
         removedRepGroupIds = deserializeIdSet(state.removedRepGroupIds);
+        addedSeries = deserializeAddedSeries(state.addedSeries);
 
         elapsedMs = Math.max(0, Number(state.elapsedMs) || 0);
         startEpochMs = Date.now() - elapsedMs;
         running = false;
         hasInitiated = true;
 
+        // addedSeries must be restored above before building this view, or the
+        // resumed cursor/order would be computed against the wrong series count.
+        const routine = getSessionRoutine();
         ensureSessionSeriesOrder(routine);
         recomputeCompletedSeries(routine);
 
@@ -629,7 +673,7 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
     function upsertWorkoutSessionSnapshot({ finalize = false } = {}) {
         if (!workoutSessionStore?.addSession) return null;
 
-        const routine = currentRoutineId ? routineStore.getById(currentRoutineId) : null;
+        const routine = getSessionRoutine();
         if (!routine) return null;
 
         const nowIso = new Date().toISOString();
@@ -682,7 +726,7 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
         const durationMs = running && startEpochMs != null ? endEpochMs - startEpochMs : elapsedMs;
         const sessionStartIso = sessionStartedAtIso
             ?? (startEpochMs != null ? new Date(startEpochMs).toISOString() : null);
-        const summaryRoutine = currentRoutineId ? routineStore.getById(currentRoutineId) : null;
+        const summaryRoutine = getSessionRoutine();
         const endedAtIso = new Date(endEpochMs).toISOString();
 
         cleanupCharts?.();
@@ -872,7 +916,7 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
     btnFinish?.addEventListener("click", async () => {
         if (!hasInitiated) return;
 
-        const routine = getCurrentRoutine();
+        const routine = getSessionRoutine();
         if (routine && !isWorkoutComplete(routine)) {
             const msg = t("confirm.finishIncompleteSession")
                 || "Finish this workout now? Pending sets will be left undone.";
@@ -975,7 +1019,7 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
     }
 
     function removeSeriesFromSession(seriesIdx) {
-        const routine = getCurrentRoutine();
+        const routine = getSessionRoutine();
         const s = routine?.series?.[seriesIdx];
         if (!s || isSeriesRemoved(s.id)) return;
 
@@ -1005,7 +1049,7 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
     }
 
     function removeRepGroupFromSession(seriesIdx, repIdx) {
-        const routine = getCurrentRoutine();
+        const routine = getSessionRoutine();
         const rg = routine?.series?.[seriesIdx]?.repGroups?.[repIdx];
         if (!rg || isRepGroupRemoved(rg.id)) return;
 
@@ -1027,6 +1071,87 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
         persistActiveSessionState();
         renderCurrent();
     }
+
+    function renderExerciseOptions() {
+        if (!addExerciseOptionsEl) return;
+
+        const exercises = exerciseStore
+            .list()
+            .slice()
+            .sort((a, b) => String(a.description).localeCompare(String(b.description)));
+
+        addExerciseOptionsEl.innerHTML = exercises
+            .map((ex) => `<option value="${escapeHtml(ex.description)}"></option>`)
+            .join("");
+    }
+
+    function flashInvalidAddExerciseInput() {
+        if (!addExerciseInput) return;
+        addExerciseInput.focus();
+        const prev = addExerciseInput.style.borderColor;
+        addExerciseInput.style.borderColor = "rgba(248, 113, 113, 0.7)";
+        setTimeout(() => {
+            addExerciseInput.style.borderColor = prev;
+        }, 700);
+    }
+
+    // Adds a brand-new exercise (with one empty set) to *this* session only. It
+    // lives in `addedSeries`, is appended after the routine's own series wherever
+    // getSessionRoutine() is used, and is never written to the stored Routine.
+    function addExerciseToSession() {
+        const persistedRoutine = getCurrentRoutine();
+        if (!persistedRoutine) return;
+
+        const typed = String(addExerciseInput?.value ?? "").trim();
+        if (!typed) {
+            flashInvalidAddExerciseInput();
+            return;
+        }
+
+        const exercise = exerciseStore.getOrCreateByDescription(typed);
+
+        const newSeries = new SetSeries({
+            exerciseId: exercise.id,
+            description: "",
+            restSecondsAfter: 0,
+            repGroups: [
+                new RepGroup({
+                    exerciseId: exercise.id,
+                    laterality: Laterality.BILATERAL,
+                    targetReps: null,
+                    targetWeight: null,
+                    restSecondsAfter: 0,
+                    history: [],
+                }),
+            ],
+        });
+
+        // Adding to the session is itself "starting" it — same reasoning as removal,
+        // so this persists and shows Finish/Stop even before the timer is started.
+        hasInitiated = true;
+        syncSessionActionButtons();
+
+        addedSeries.push(newSeries);
+        const newIndex = realSeriesCount(persistedRoutine) + addedSeries.length - 1;
+        if (Array.isArray(sessionSeriesOrder)) sessionSeriesOrder.push(newIndex);
+
+        currentSeriesIndex = newIndex;
+        currentRepGroupIndex = 0;
+        expandedSeries.add(newIndex);
+
+        if (addExerciseInput) addExerciseInput.value = "";
+        renderExerciseOptions();
+
+        persistActiveSessionState();
+        renderCurrent();
+    }
+
+    btnAddExercise?.addEventListener("click", () => addExerciseToSession());
+    addExerciseInput?.addEventListener("keydown", (e) => {
+        if (e.key !== "Enter") return;
+        e.preventDefault();
+        addExerciseToSession();
+    });
 
     function resolveExerciseName(seriesItem) {
         return resolveExerciseNameValue(seriesItem, exerciseStore, t("session.exercise.unknown"));
@@ -1390,12 +1515,13 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
         saveHistory = true,
         updateRepGroupFields = false,
     }) {
-        const routine = currentRoutineId
-            ? routineStore.getById(currentRoutineId)
-            : null;
-        if (!routine) return;
+        const persistedRoutine = getCurrentRoutine();
+        if (!persistedRoutine) return;
 
-        const s = routine.series?.[currentSeriesIndex];
+        const addedIdx = isAddedSeriesIndex(persistedRoutine, currentSeriesIndex);
+        const s = addedIdx
+            ? getAddedSeriesByIndex(persistedRoutine, currentSeriesIndex)
+            : persistedRoutine.series?.[currentSeriesIndex];
         if (!s) return;
 
         const rg = s.repGroups?.[currentRepGroupIndex];
@@ -1422,8 +1548,12 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
             });
         }
 
-        routineStore.update(routine);
+        // Added exercises are session-only: their history lives in memory + the
+        // resumable snapshot, never in the stored Routine.
+        if (!addedIdx) routineStore.update(persistedRoutine);
         upsertWorkoutSessionSnapshot({ finalize: false });
+
+        const routine = getSessionRoutine();
 
         const isLast = currentRepGroupIndex >= s.repGroups.length - 1;
         const restToRun = isLast
@@ -1452,9 +1582,7 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
         if (restRunning) return;
         if (!setRunning) return;
 
-        const routine = currentRoutineId
-            ? routineStore.getById(currentRoutineId)
-            : null;
+        const routine = getSessionRoutine();
         if (!routine) return;
 
         const s = routine.series?.[currentSeriesIndex];
@@ -1482,10 +1610,13 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
     }
 
     currentSectionEl?.addEventListener("click", async (e) => {
-        const routine = currentRoutineId ? routineStore.getById(currentRoutineId) : null;
-        if (!routine) return;
+        const persistedRoutine = getCurrentRoutine();
+        if (!persistedRoutine) return;
 
-        const s = routine.series?.[currentSeriesIndex];
+        const addedIdx = isAddedSeriesIndex(persistedRoutine, currentSeriesIndex);
+        const s = addedIdx
+            ? getAddedSeriesByIndex(persistedRoutine, currentSeriesIndex)
+            : persistedRoutine.series?.[currentSeriesIndex];
         if (!s) return;
 
         const skipRestBtn = e.target.closest('[data-action="skip-rest"]');
@@ -1541,7 +1672,8 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
 
             shiftCompletedAfterInsert(currentSeriesIndex, insertIdx);
 
-            routineStore.update(routine);
+            if (addedIdx) persistActiveSessionState();
+            else routineStore.update(persistedRoutine);
 
             if (insertIdx <= currentRepGroupIndex) {
                 currentRepGroupIndex = insertIdx;
@@ -1714,7 +1846,7 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
     });
 
     function reorderSeriesAndSave(fromIdx, toIdx) {
-        const routine = currentRoutineId ? routineStore.getById(currentRoutineId) : null;
+        const routine = getSessionRoutine();
         if (!routine) return;
 
         ensureSessionSeriesOrder(routine);
@@ -1836,7 +1968,7 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
     }
 
     function renderCurrent() {
-        const routine = currentRoutineId ? routineStore.getById(currentRoutineId) : null;
+        const routine = getSessionRoutine();
         if (!routine) return;
         renderSeriesList(routine);
     }
@@ -1861,6 +1993,7 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
             sessionStartedAtIso = null;
             removedSeriesIds = new Set();
             removedRepGroupIds = new Set();
+            addedSeries = [];
 
             expandedSeries = new Set();
 
@@ -1874,15 +2007,18 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
                 const msg = t("confirm.resumeSession")
                     || "Resume your unfinished workout for this routine?";
                 if (confirm(msg)) {
-                    restoreSessionState(resumable, routine);
+                    restoreSessionState(resumable);
                 } else {
                     clearActiveSessionState();
                 }
             }
 
+            // Combined view: empty addedSeries on a fresh start, restored ones after resume.
+            const sessionRoutine = getSessionRoutine();
+
             if (!hasInitiated) {
-                ensureSessionSeriesOrder(routine);
-                const pick = pickTopMostIncomplete(routine);
+                ensureSessionSeriesOrder(sessionRoutine);
+                const pick = pickTopMostIncomplete(sessionRoutine);
                 if (pick) {
                     currentSeriesIndex = pick.seriesIdx;
                     currentRepGroupIndex = pick.repIdx;
@@ -1891,7 +2027,8 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
 
             expandedSeries.add(currentSeriesIndex);
 
-            renderSeriesList(routine);
+            renderExerciseOptions();
+            renderSeriesList(sessionRoutine);
         },
     };
 }

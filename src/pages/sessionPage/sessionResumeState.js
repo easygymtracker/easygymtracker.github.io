@@ -4,6 +4,7 @@
 // "workoutSessions:active". Kept DOM-free so it can be unit tested.
 
 import { isRepDone, pickTopMostIncomplete } from "./sessionProgress.js";
+import { SetSeries } from "../../models/setSeries.js";
 
 /** Map<seriesIdx, Set<repIdx>> -> [[seriesIdx, [repIdx, ...]], ...] */
 export function serializeCompletedRepGroups(map) {
@@ -37,6 +38,26 @@ export function deserializeIdSet(raw) {
     return new Set((Array.isArray(raw) ? raw : []).filter((id) => typeof id === "string" && id.length > 0));
 }
 
+/** SetSeries[] -> plain JSON objects, ready for storage. */
+export function serializeAddedSeries(list) {
+    if (!Array.isArray(list)) return [];
+    return list.map((s) => (typeof s?.toJSON === "function" ? s.toJSON() : s));
+}
+
+/** Plain JSON objects -> real SetSeries/RepGroup instances (invalid entries dropped). */
+export function deserializeAddedSeries(raw) {
+    if (!Array.isArray(raw)) return [];
+    return raw
+        .map((obj) => {
+            try {
+                return SetSeries.fromJSON(obj);
+            } catch {
+                return null;
+            }
+        })
+        .filter(Boolean);
+}
+
 /**
  * Snapshot of the live session. `nowMs`/`nowIso` are injected so callers stay
  * testable; `elapsedMs` is recomputed from the clock only while running.
@@ -55,6 +76,7 @@ export function buildResumeSnapshot(session, { nowMs, nowIso }) {
         completedRepGroups,
         removedSeriesIds,
         removedRepGroupIds,
+        addedSeries,
     } = session ?? {};
 
     return {
@@ -68,6 +90,7 @@ export function buildResumeSnapshot(session, { nowMs, nowIso }) {
         completedRepGroups: serializeCompletedRepGroups(completedRepGroups),
         removedSeriesIds: serializeIdSet(removedSeriesIds),
         removedRepGroupIds: serializeIdSet(removedRepGroupIds),
+        addedSeries: serializeAddedSeries(addedSeries),
         updatedAt: nowIso,
     };
 }
@@ -77,7 +100,13 @@ export function isResumableFor(state, routineId) {
     if (!state || typeof state !== "object") return false;
     if (!routineId || state.routineId !== routineId) return false;
 
-    return (state.completedRepGroups?.length ?? 0) > 0 || Number(state.elapsedMs) > 0;
+    return (
+        (state.completedRepGroups?.length ?? 0) > 0 ||
+        Number(state.elapsedMs) > 0 ||
+        (state.removedSeriesIds?.length ?? 0) > 0 ||
+        (state.removedRepGroupIds?.length ?? 0) > 0 ||
+        (state.addedSeries?.length ?? 0) > 0
+    );
 }
 
 /**

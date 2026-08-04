@@ -646,6 +646,20 @@
 
             <div id="sessionSeriesList"></div>
 
+            <div class="uFlexRowWrap uGap10" style="align-items:flex-end; margin-top:10px;">
+              <div class="field" style="flex:1; min-width:180px; margin-bottom:0;">
+                <label for="sessionAddExerciseInput" data-i18n="session.addExercise.label">Add exercise</label>
+                <input id="sessionAddExerciseInput" list="sessionExerciseOptions"
+                  data-i18n="session.addExercise.placeholder" data-i18n-attr="placeholder"
+                  placeholder="Type or pick an exercise..." />
+                <datalist id="sessionExerciseOptions"></datalist>
+              </div>
+
+              <button class="btn" id="btnSessionAddExercise" type="button" data-i18n="session.addExercise.button">
+                + Add exercise
+              </button>
+            </div>
+
             <p class="note uHidden" id="sessionEmpty" data-i18n="session.series.empty">
               This routine has no exercises yet.
             </p>
