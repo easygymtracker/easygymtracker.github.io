@@ -277,6 +277,8 @@ export const DICTS = {
         "session.timer.start": "Start",
         "session.timer.pause": "Pause",
         "session.timer.reset": "Reset",
+        "session.timer.finish": "Finish",
+        "session.timer.stop": "Stop",
         "session.series.title": "Exercises",
         "session.series.empty": "This routine has no exercises yet.",
         "session.seriesDesc.placeholder": "Exercise description",
@@ -355,6 +357,9 @@ export const DICTS = {
         "session.summary.motivational.done": "Workout done. Keep showing up! 👊",
 
         "confirm.leaveSession": "Leave workout session? Your current session will be interrupted.",
+        "confirm.resumeSession": "Resume your unfinished workout for this routine?",
+        "confirm.stopSession": "Stop this workout? It will stay unfinished and you can resume it later.",
+        "confirm.finishIncompleteSession": "Finish this workout now? Pending sets will be left undone.",
 
         "exerciseHistory.title": "Exercise History",
         "exerciseHistory.subtitle": "Review and manage all logged entries for this exercise.",
@@ -563,6 +568,8 @@ export const DICTS = {
         "session.timer.start": "Iniciar",
         "session.timer.pause": "Pausar",
         "session.timer.reset": "Reiniciar",
+        "session.timer.finish": "Finalizar",
+        "session.timer.stop": "Detener",
         "session.series.title": "Ejercicios",
         "session.series.empty": "Esta rutina no tiene ejercicios todavía.",
         "session.seriesDesc.placeholder": "Descripción del ejercicio",
@@ -726,6 +733,9 @@ export const DICTS = {
         "about.step5.body": "Añade la app a tu pantalla de inicio para acceso instantáneo. Funciona sin conexión y se siente como una app nativa — sin descargas de tiendas de apps.",
 
         "confirm.leaveSession": "¿Salir de la sesión de entrenamiento? Tu sesión actual se interrumpirá.",
+        "confirm.resumeSession": "¿Reanudar tu entrenamiento sin terminar de esta rutina?",
+        "confirm.stopSession": "¿Detener este entrenamiento? Quedará sin terminar y podrás reanudarlo más tarde.",
+        "confirm.finishIncompleteSession": "¿Finalizar este entrenamiento ahora? Las series pendientes quedarán sin hacer.",
 
         "exerciseHistory.title": "Historial de ejercicio",
         "exerciseHistory.subtitle": "Revisa y gestiona todos los registros de este ejercicio.",
@@ -934,6 +944,8 @@ export const DICTS = {
         "session.timer.start": "Iniciar",
         "session.timer.pause": "Pausar",
         "session.timer.reset": "Reiniciar",
+        "session.timer.finish": "Finalizar",
+        "session.timer.stop": "Parar",
         "session.series.title": "Exercícios",
         "session.series.empty": "Esta rotina ainda não tem exercícios.",
         "session.seriesDesc.placeholder": "Descrição do exercício",
@@ -1097,6 +1109,9 @@ export const DICTS = {
         "about.step5.body": "Adiciona a app ao teu ecrã inicial para acesso instantâneo. Funciona offline e parece uma app nativa — sem descarregar de lojas de apps.",
 
         "confirm.leaveSession": "Sair da sessão de treino? Sua sessão atual será interrompida.",
+        "confirm.resumeSession": "Retomar seu treino não finalizado desta rotina?",
+        "confirm.stopSession": "Parar este treino? Ele ficará não finalizado e você poderá retomá-lo depois.",
+        "confirm.finishIncompleteSession": "Finalizar este treino agora? As séries pendentes ficarão sem fazer.",
 
         "exerciseHistory.title": "Histórico do exercício",
         "exerciseHistory.subtitle": "Revise e gerencie todos os registros deste exercício.",
@@ -1305,6 +1320,8 @@ export const DICTS = {
         "session.timer.start": "開始",
         "session.timer.pause": "一時停止",
         "session.timer.reset": "リセット",
+        "session.timer.finish": "終了",
+        "session.timer.stop": "停止",
         "session.series.title": "エクササイズ",
         "session.series.empty": "このルーティンにはまだエクササイズがありません。",
         "session.seriesDesc.placeholder": "エクササイズの説明",
@@ -1468,6 +1485,9 @@ export const DICTS = {
         "about.step5.body": "ホーム画面に追加すればすぐにアクセス可能。オフラインで動作し、ネイティブアプリのような使い心地 — アプリストアからのダウンロード不要。",
 
         "confirm.leaveSession": "トレーニングセッションを終了しますか？現在のセッションは中断されます。",
+        "confirm.resumeSession": "このルーティンの未完了のワークアウトを再開しますか？",
+        "confirm.stopSession": "このワークアウトを停止しますか？未完了として保存され、後で再開できます。",
+        "confirm.finishIncompleteSession": "今すぐこのワークアウトを終了しますか？未実施のセットは残ります。",
 
         "exerciseHistory.title": "エクササイズ履歴",
         "exerciseHistory.subtitle": "このエクササイズの全ログを確認・管理します。",
@@ -1618,6 +1638,8 @@ export const DICTS = {
         "session.timer.start": "开始",
         "session.timer.pause": "暂停",
         "session.timer.reset": "重置",
+        "session.timer.finish": "结束",
+        "session.timer.stop": "停止",
         "session.series.title": "动作",
         "session.series.empty": "该训练计划尚无练习。",
         "session.seriesDesc.placeholder": "动作描述",
@@ -1781,6 +1803,9 @@ export const DICTS = {
         "about.step5.body": "添加到主屏幕即可即时访问。离线可用，体验如原生应用 — 无需从应用商店下载。",
 
         "confirm.leaveSession": "离开训练会话？你当前的会话将被中断。",
+        "confirm.resumeSession": "恢复该训练计划未完成的训练？",
+        "confirm.stopSession": "停止这次训练？它将保持未完成，你可以稍后恢复。",
+        "confirm.finishIncompleteSession": "现在结束这次训练？未完成的组将保持未做。",
 
         "exerciseHistory.title": "训练历史",
         "exerciseHistory.subtitle": "查看和管理该动作的所有记录。",
@@ -1953,6 +1978,8 @@ export const DICTS = {
         "session.timer.start": "ابدأ",
         "session.timer.pause": "إيقاف مؤقت",
         "session.timer.reset": "إعادة ضبط",
+        "session.timer.finish": "إنهاء",
+        "session.timer.stop": "إيقاف",
         "session.series.title": "التمارين",
         "session.series.empty": "لا تحتوي هذه الخطة على تمارين بعد.",
         "session.seriesDesc.placeholder": "وصف التمرين",
@@ -2116,6 +2143,9 @@ export const DICTS = {
         "about.step5.body": "أضف التطبيق إلى شاشتك الرئيسية للوصول الفوري. يعمل بدون إنترنت ويبدو كتطبيق أصلي — بدون تحميل من متجر التطبيقات.",
 
         "confirm.leaveSession": "هل تريد مغادرة جلسة التمرين؟ سيتم إيقاف جلستك الحالية.",
+        "confirm.resumeSession": "هل تريد استئناف تمرينك غير المكتمل لهذا الروتين؟",
+        "confirm.stopSession": "هل تريد إيقاف هذا التمرين؟ سيبقى غير مكتمل ويمكنك استئنافه لاحقًا.",
+        "confirm.finishIncompleteSession": "هل تريد إنهاء هذا التمرين الآن؟ ستبقى المجموعات المتبقية غير منجزة.",
 
         "exerciseHistory.title": "سجل التمرين",
         "exerciseHistory.subtitle": "راجع وأدر جميع الإدخالات المسجلة لهذا التمرين.",
@@ -2288,6 +2318,8 @@ export const DICTS = {
         "session.timer.start": "शुरू करें",
         "session.timer.pause": "रोकें",
         "session.timer.reset": "रीसेट",
+        "session.timer.finish": "समाप्त करें",
+        "session.timer.stop": "बंद करें",
         "session.series.title": "एक्सरसाइज़",
         "session.series.empty": "इस रूटीन में अभी कोई अभ्यास नहीं है।",
         "session.seriesDesc.placeholder": "एक्सरसाइज़ विवरण",
@@ -2451,6 +2483,9 @@ export const DICTS = {
         "about.step5.body": "तुरंत एक्सेस के लिए ऐप को अपनी होम स्क्रीन पर जोड़ें। यह ऑफ़लाइन काम करता है और नेटिव ऐप जैसा लगता है — ऐप स्टोर डाउनलोड की ज़रूरत नहीं।",
 
         "confirm.leaveSession": "वर्कआउट सत्र छोड़ें? आपका वर्तमान सत्र बाधित हो जाएगा।",
+        "confirm.resumeSession": "इस रूटीन का आपका अपूर्ण वर्कआउट फिर से शुरू करें?",
+        "confirm.stopSession": "यह वर्कआउट बंद करें? यह अपूर्ण रहेगा और आप बाद में फिर शुरू कर सकते हैं।",
+        "confirm.finishIncompleteSession": "अब यह वर्कआउट समाप्त करें? बाकी सेट अपूर्ण रह जाएंगे।",
 
         "exerciseHistory.title": "व्यायाम इतिहास",
         "exerciseHistory.subtitle": "इस व्यायाम की सभी लॉग की गई प्रविष्टियाँ देखें और प्रबंधित करें।",
@@ -2623,6 +2658,8 @@ export const DICTS = {
         "session.timer.start": "Start",
         "session.timer.pause": "Pause",
         "session.timer.reset": "Zurücksetzen",
+        "session.timer.finish": "Beenden",
+        "session.timer.stop": "Stopp",
         "session.series.title": "Übungen",
         "session.series.empty": "Diese Routine enthält noch keine Übungen.",
         "session.seriesDesc.placeholder": "Übungsbeschreibung",
@@ -2786,6 +2823,9 @@ export const DICTS = {
         "about.step5.body": "Füge die App deinem Startbildschirm hinzu für sofortigen Zugriff. Sie funktioniert offline und fühlt sich an wie eine native App — kein App-Store-Download nötig.",
 
         "confirm.leaveSession": "Trainingseinheit verlassen? Deine aktuelle Sitzung wird unterbrochen.",
+        "confirm.resumeSession": "Unfertiges Workout für diese Routine fortsetzen?",
+        "confirm.stopSession": "Dieses Workout stoppen? Es bleibt unfertig und du kannst es später fortsetzen.",
+        "confirm.finishIncompleteSession": "Dieses Workout jetzt beenden? Ausstehende Sätze bleiben offen.",
 
         "exerciseHistory.title": "Übungsverlauf",
         "exerciseHistory.subtitle": "Alle protokollierten Einträge für diese Übung anzeigen und verwalten.",
@@ -2958,6 +2998,8 @@ export const DICTS = {
         "session.timer.start": "Démarrer",
         "session.timer.pause": "Pause",
         "session.timer.reset": "Réinitialiser",
+        "session.timer.finish": "Terminer",
+        "session.timer.stop": "Arrêter",
         "session.series.title": "Exercices",
         "session.series.empty": "Cette routine ne contient pas encore d'exercices.",
         "session.seriesDesc.placeholder": "Description de l’exercice",
@@ -3121,6 +3163,9 @@ export const DICTS = {
         "about.step5.body": "Ajoute l'appli à ton écran d'accueil pour un accès instantané. Elle fonctionne hors ligne et se comporte comme une appli native — sans téléchargement depuis un store.",
 
         "confirm.leaveSession": "Quitter la séance d'entraînement ? Votre session actuelle sera interrompue.",
+        "confirm.resumeSession": "Reprendre votre séance non terminée pour cette routine ?",
+        "confirm.stopSession": "Arrêter cette séance ? Elle restera non terminée et vous pourrez la reprendre plus tard.",
+        "confirm.finishIncompleteSession": "Terminer cette séance maintenant ? Les séries restantes ne seront pas faites.",
 
         "exerciseHistory.title": "Historique de l'exercice",
         "exerciseHistory.subtitle": "Consultez et gérez toutes les entrées enregistrées pour cet exercice.",
@@ -3295,6 +3340,8 @@ export const DICTS = {
         "session.timer.start": "Старт",
         "session.timer.pause": "Пауза",
         "session.timer.reset": "Сброс",
+        "session.timer.finish": "Завершить",
+        "session.timer.stop": "Остановить",
         "session.series.title": "Упражнения",
         "session.series.empty": "В этой тренировке пока нет упражнений.",
         "session.seriesDesc.placeholder": "Описание упражнения",
@@ -3458,6 +3505,9 @@ export const DICTS = {
         "about.step5.body": "Добавьте приложение на домашний экран для мгновенного доступа. Оно работает офлайн и выглядит как обычное приложение — скачивание из магазина не требуется.",
 
         "confirm.leaveSession": "Покинуть тренировочную сессию? Ваша текущая сессия будет прервана.",
+        "confirm.resumeSession": "Возобновить незавершённую тренировку для этой программы?",
+        "confirm.stopSession": "Остановить эту тренировку? Она останется незавершённой, и вы сможете продолжить позже.",
+        "confirm.finishIncompleteSession": "Завершить тренировку сейчас? Оставшиеся подходы останутся невыполненными.",
 
         "exerciseHistory.title": "История упражнения",
         "exerciseHistory.subtitle": "Просматривайте и управляйте всеми записями этого упражнения.",
@@ -3630,6 +3680,8 @@ export const DICTS = {
         "session.timer.start": "Avvia",
         "session.timer.pause": "Pausa",
         "session.timer.reset": "Reimposta",
+        "session.timer.finish": "Termina",
+        "session.timer.stop": "Ferma",
         "session.series.title": "Esercizi",
         "session.series.empty": "Questa routine non ha ancora esercizi.",
         "session.seriesDesc.placeholder": "Descrizione dell’esercizio",
@@ -3793,6 +3845,9 @@ export const DICTS = {
         "about.step5.body": "Aggiungi l'app alla schermata Home per un accesso immediato. Funziona offline e si comporta come un'app nativa — nessun download dall'app store richiesto.",
 
         "confirm.leaveSession": "Lasciare la sessione di allenamento? La tua sessione attuale sarà interrotta.",
+        "confirm.resumeSession": "Riprendere l'allenamento non terminato di questa routine?",
+        "confirm.stopSession": "Fermare questo allenamento? Resterà non terminato e potrai riprenderlo più tardi.",
+        "confirm.finishIncompleteSession": "Terminare ora questo allenamento? Le serie rimanenti resteranno da fare.",
 
         "exerciseHistory.title": "Cronologia esercizio",
         "exerciseHistory.subtitle": "Rivedi e gestisci tutte le voci registrate per questo esercizio.",
@@ -3965,6 +4020,8 @@ export const DICTS = {
         "session.timer.start": "Start",
         "session.timer.pause": "Pauze",
         "session.timer.reset": "Reset",
+        "session.timer.finish": "Beëindigen",
+        "session.timer.stop": "Stoppen",
         "session.series.title": "Oefeningen",
         "session.series.empty": "Deze routine heeft nog geen oefeningen.",
         "session.seriesDesc.placeholder": "Beschrijving van de oefening",
@@ -4128,6 +4185,9 @@ export const DICTS = {
         "about.step5.body": "Voeg de app toe aan je startscherm voor directe toegang. Hij werkt offline en voelt als een native app — geen download uit de app store nodig.",
 
         "confirm.leaveSession": "Sessie verlaten? Je huidige sessie wordt onderbroken.",
+        "confirm.resumeSession": "Onafgemaakte training voor deze routine hervatten?",
+        "confirm.stopSession": "Deze training stoppen? Hij blijft onafgemaakt en je kunt hem later hervatten.",
+        "confirm.finishIncompleteSession": "Deze training nu beëindigen? Openstaande sets blijven ongedaan.",
 
         "exerciseHistory.title": "Oefengeschiedenis",
         "exerciseHistory.subtitle": "Bekijk en beheer alle geregistreerde vermeldingen voor deze oefening.",
@@ -4300,6 +4360,8 @@ export const DICTS = {
         "session.timer.start": "Start",
         "session.timer.pause": "Pauza",
         "session.timer.reset": "Resetuj",
+        "session.timer.finish": "Zakończ",
+        "session.timer.stop": "Zatrzymaj",
         "session.series.title": "Ćwiczenia",
         "session.series.empty": "Ta rutyna nie zawiera jeszcze ćwiczeń.",
         "session.seriesDesc.placeholder": "Opis ćwiczenia",
@@ -4463,6 +4525,9 @@ export const DICTS = {
         "about.step5.body": "Dodaj aplikację do ekranu głównego, by mieć natychmiastowy dostęp. Działa offline i wygląda jak natywna aplikacja — bez pobierania ze sklepu z aplikacjami.",
 
         "confirm.leaveSession": "Opuszczać sesję treningową? Twoja obecna sesja zostanie przerwana.",
+        "confirm.resumeSession": "Wznowić niezakończony trening dla tej rutyny?",
+        "confirm.stopSession": "Zatrzymać ten trening? Pozostanie niezakończony i możesz go wznowić później.",
+        "confirm.finishIncompleteSession": "Zakończyć ten trening teraz? Pozostałe serie zostaną niewykonane.",
 
         "exerciseHistory.title": "Historia ćwiczenia",
         "exerciseHistory.subtitle": "Przeglądaj i zarządzaj wszystkimi wpisami dla tego ćwiczenia.",
@@ -4635,6 +4700,8 @@ export const DICTS = {
         "session.timer.start": "Başlat",
         "session.timer.pause": "Duraklat",
         "session.timer.reset": "Sıfırla",
+        "session.timer.finish": "Bitir",
+        "session.timer.stop": "Durdur",
         "session.series.title": "Egzersizler",
         "session.series.empty": "Bu rutin henüz egzersiz içermiyor.",
         "session.seriesDesc.placeholder": "Egzersiz açıklaması",
@@ -4798,6 +4865,9 @@ export const DICTS = {
         "about.step5.body": "Anında erişim için uygulamayı ana ekranınıza ekleyin. Çevrimdışı çalışır ve yerel bir uygulama gibi hissettirir — uygulama mağazasından indirmeye gerek yok.",
 
         "confirm.leaveSession": "Antrenman oturumundan ayrılmak istiyor musunuz? Mevcut oturumunuz kesintiye uğrayacak.",
+        "confirm.resumeSession": "Bu rutin için tamamlanmamış antrenmanına devam edilsin mi?",
+        "confirm.stopSession": "Bu antrenman durdurulsun mu? Tamamlanmamış kalacak ve daha sonra devam edebilirsin.",
+        "confirm.finishIncompleteSession": "Bu antrenman şimdi bitirilsin mi? Bekleyen setler yapılmamış kalacak.",
 
         "exerciseHistory.title": "Egzersiz Geçmişi",
         "exerciseHistory.subtitle": "Bu egzersizin tüm kayıtlı girişlerini inceleyin ve yönetin.",

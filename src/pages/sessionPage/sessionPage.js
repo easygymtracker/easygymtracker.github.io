@@ -7,7 +7,7 @@ import { formatMs } from "/src/utils/numberFormat.js";
 import { attachDragReorder, moveItem } from "/src/ui/common/reorderUtils.js";
 import { openSessionSetModal } from "/src/ui/components/sessionSetModal.js";
 import { RepGroup, Laterality } from "/src/models/repGroup.js";
-import { setLeaveGuard, clearLeaveGuard } from "/src/router.js";
+import { setLeaveGuard, clearLeaveGuard, navigate } from "/src/router.js";
 import { mountRepGroupHistoryCharts } from "/src/ui/components/repGroupHistoryChart.js";
 import { openWorkoutSummaryModal, computeSessionStats, computeSessionPRs } from "/src/ui/components/workoutSummaryModal.js";
 import { areNotificationsEnabled } from "/src/services/notificationPreference.js";
@@ -31,6 +31,12 @@ import {
     statusForRep as statusForRepProgress,
     statusForSeries as statusForSeriesProgress,
 } from "./sessionProgress.js";
+import {
+    buildResumeSnapshot,
+    deserializeCompletedRepGroups,
+    isResumableFor,
+    resolveResumePosition,
+} from "./sessionResumeState.js";
 
 export function mountSessionPage({ routineStore, exerciseStore, profileStore, workoutSessionStore }) {
     const titleEl = document.getElementById("sessionTitle");
@@ -38,6 +44,8 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
 
     const timerEl = document.getElementById("sessionTimer");
     const btnStartPause = document.getElementById("btnSessionStartPause");
+    const btnFinish = document.getElementById("btnSessionFinish");
+    const btnStop = document.getElementById("btnSessionStop");
 
     const listEl = document.getElementById("sessionSeriesList");
     const emptyEl = document.getElementById("sessionEmpty");
@@ -79,6 +87,7 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
 
     let lastNotifyTs = 0;
     let lastNotifiedRestSecond = null;
+    let lastActivePersistTs = 0;
 
     let cleanupCharts = null;
 
@@ -217,6 +226,8 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
     function onBeforeUnload(e) {
         if (!isOnSessionRoute()) return;
         if (!shouldBlockLeaving()) return;
+
+        persistActiveSessionState();
 
         e.preventDefault();
         e.returnValue = "";
@@ -390,6 +401,7 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
 
     let currentRoutineId = null;
     let activeWorkoutSessionId = null;
+    let sessionStartedAtIso = null;
     let currentSeriesIndex = 0;
     let currentRepGroupIndex = 0;
     let completedSeries = new Set();
@@ -413,6 +425,77 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
         btnStartPause.innerHTML = `<span aria-hidden="true" style="margin-right:8px;">${icon}</span>${escapeHtml(label)}`;
         btnStartPause.title = label;
         btnStartPause.setAttribute("aria-label", label);
+        syncSessionActionButtons();
+    }
+
+    function syncSessionActionButtons() {
+        // .btn sets `display`, which beats the UA rule for [hidden] — set both.
+        const display = hasInitiated ? "" : "none";
+        for (const btn of [btnFinish, btnStop]) {
+            if (!btn) continue;
+            btn.hidden = !hasInitiated;
+            btn.style.display = display;
+        }
+    }
+
+    syncSessionActionButtons();
+
+    // --- Resumable session state -------------------------------------------
+
+    function persistActiveSessionState() {
+        if (!workoutSessionStore?.setActiveState) return;
+        if (!hasInitiated || !currentRoutineId) return;
+
+        const nowMs = Date.now();
+        lastActivePersistTs = nowMs;
+        workoutSessionStore.setActiveState(buildResumeSnapshot({
+            sessionId: activeWorkoutSessionId,
+            routineId: currentRoutineId,
+            startedAtIso: sessionStartedAtIso,
+            running,
+            startEpochMs,
+            elapsedMs,
+            currentSeriesIndex,
+            currentRepGroupIndex,
+            sessionSeriesOrder,
+            completedRepGroups,
+        }, { nowMs, nowIso: new Date(nowMs).toISOString() }));
+    }
+
+    function persistActiveSessionStateThrottled() {
+        if (Date.now() - lastActivePersistTs < 5000) return;
+        persistActiveSessionState();
+    }
+
+    function clearActiveSessionState() {
+        workoutSessionStore?.clearActiveState?.();
+    }
+
+    function readResumableState(routineId) {
+        const state = workoutSessionStore?.getActiveState?.() ?? null;
+        return isResumableFor(state, routineId) ? state : null;
+    }
+
+    function restoreSessionState(state, routine) {
+        activeWorkoutSessionId = state.sessionId ?? null;
+        sessionStartedAtIso = state.startedAtIso ?? null;
+        completedRepGroups = deserializeCompletedRepGroups(state.completedRepGroups);
+        sessionSeriesOrder = Array.isArray(state.sessionSeriesOrder) ? state.sessionSeriesOrder.slice() : null;
+
+        elapsedMs = Math.max(0, Number(state.elapsedMs) || 0);
+        startEpochMs = Date.now() - elapsedMs;
+        running = false;
+        hasInitiated = true;
+
+        ensureSessionSeriesOrder(routine);
+        recomputeCompletedSeries(routine);
+
+        const position = resolveResumePosition(state, routine, completedRepGroups);
+        currentSeriesIndex = position.seriesIdx;
+        currentRepGroupIndex = position.repIdx;
+        if (position.sessionSeriesOrder) sessionSeriesOrder = position.sessionSeriesOrder;
+
+        updateTimerUI();
     }
 
     function updateTimerUI() {
@@ -429,6 +512,8 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
             ensureNotificationPermission();
         }
 
+        if (!sessionStartedAtIso) sessionStartedAtIso = new Date().toISOString();
+
         running = true;
 
         if (restRunning && restPaused) resumeRestTimer();
@@ -441,11 +526,13 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
             if (!running) return;
             elapsedMs = Date.now() - startEpochMs;
             updateTimerUI();
+            persistActiveSessionStateThrottled();
         }, 250);
 
         updateTimerUI();
         renderCurrent();
         syncCurrentSetControls();
+        persistActiveSessionState();
     }
 
     function pauseTimer() {
@@ -457,6 +544,7 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
         if (!restRunning) pauseSetTimer();
         if (restRunning && !restPaused) pauseRestTimer();
         syncCurrentSetControls();
+        persistActiveSessionState();
     }
 
     function resetTimer() {
@@ -533,10 +621,9 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
         if (!routine) return null;
 
         const nowIso = new Date().toISOString();
-        const sessionStartIso = startEpochMs != null
-            ? new Date(startEpochMs).toISOString()
-            : nowIso;
-        const durationMs = startEpochMs != null
+        const sessionStartIso = sessionStartedAtIso
+            ?? (startEpochMs != null ? new Date(startEpochMs).toISOString() : nowIso);
+        const durationMs = running && startEpochMs != null
             ? Math.max(0, Date.now() - startEpochMs)
             : Math.max(0, elapsedMs);
 
@@ -580,8 +667,9 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
 
     async function endWorkoutSession() {
         const endEpochMs = Date.now();
-        const durationMs = startEpochMs != null ? endEpochMs - startEpochMs : elapsedMs;
-        const sessionStartIso = startEpochMs != null ? new Date(startEpochMs).toISOString() : null;
+        const durationMs = running && startEpochMs != null ? endEpochMs - startEpochMs : elapsedMs;
+        const sessionStartIso = sessionStartedAtIso
+            ?? (startEpochMs != null ? new Date(startEpochMs).toISOString() : null);
         const summaryRoutine = currentRoutineId ? routineStore.getById(currentRoutineId) : null;
         const endedAtIso = new Date(endEpochMs).toISOString();
 
@@ -599,6 +687,8 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
 
         clearSessionNotification();
         hasInitiated = false;
+        clearActiveSessionState();
+        syncStartPauseLabel();
         renderCurrent();
 
         if (summaryRoutine && sessionStartIso) {
@@ -614,6 +704,9 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
                 resolveExerciseName,
             });
         }
+
+        // Cleared last: the snapshot above still needs the real session start.
+        sessionStartedAtIso = null;
     }
 
     function hasCompletedAnyRep(seriesIdx) {
@@ -761,6 +854,51 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
     btnStartPause.addEventListener("click", () => {
         if (running) pauseTimer();
         else startTimer();
+    });
+
+    // Finish: close the session as completed even if some sets are pending.
+    btnFinish?.addEventListener("click", async () => {
+        if (!hasInitiated) return;
+
+        const routine = getCurrentRoutine();
+        if (routine && !isWorkoutComplete(routine)) {
+            const msg = t("confirm.finishIncompleteSession")
+                || "Finish this workout now? Pending sets will be left undone.";
+            if (!confirm(msg)) return;
+        }
+
+        clearActiveSessionState();
+        await endWorkoutSession();
+    });
+
+    // Stop: leave the session unfinished, keeping progress so it can be resumed.
+    btnStop?.addEventListener("click", () => {
+        if (!hasInitiated) return;
+
+        const msg = t("confirm.stopSession")
+            || "Stop this workout? It will stay unfinished and you can resume it later.";
+        if (!confirm(msg)) return;
+
+        if (running) pauseTimer();
+
+        upsertWorkoutSessionSnapshot({ finalize: false });
+        persistActiveSessionState();
+
+        running = false;
+        stopTick();
+        stopSetTick();
+        stopRestTick();
+        resetRestTimer();
+        resetSetTimer();
+        clearSessionNotification();
+        cleanupCharts?.();
+        cleanupCharts = null;
+
+        hasInitiated = false;
+        sessionStartedAtIso = null;
+        syncStartPauseLabel();
+
+        navigate("/routines");
     });
 
     function isRepDone(seriesIdx, repIdx) {
@@ -1218,6 +1356,7 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
         }
 
         advanceToNext(routine);
+        persistActiveSessionState();
 
         resetSetTimer();
         startRest(restToRun);
@@ -1590,6 +1729,7 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
             completedRepGroups = new Map();
             sessionSeriesOrder = null;
             activeWorkoutSessionId = null;
+            sessionStartedAtIso = null;
 
             expandedSeries = new Set();
 
@@ -1598,11 +1738,24 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
 
             metaEl.textContent = routine.description || "—";
 
-            ensureSessionSeriesOrder(routine);
-            const pick = pickTopMostIncomplete(routine);
-            if (pick) {
-                currentSeriesIndex = pick.seriesIdx;
-                currentRepGroupIndex = pick.repIdx;
+            const resumable = readResumableState(routineId);
+            if (resumable) {
+                const msg = t("confirm.resumeSession")
+                    || "Resume your unfinished workout for this routine?";
+                if (confirm(msg)) {
+                    restoreSessionState(resumable, routine);
+                } else {
+                    clearActiveSessionState();
+                }
+            }
+
+            if (!hasInitiated) {
+                ensureSessionSeriesOrder(routine);
+                const pick = pickTopMostIncomplete(routine);
+                if (pick) {
+                    currentSeriesIndex = pick.seriesIdx;
+                    currentRepGroupIndex = pick.repIdx;
+                }
             }
 
             expandedSeries.add(currentSeriesIndex);

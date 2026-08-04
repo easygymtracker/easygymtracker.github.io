@@ -2,6 +2,7 @@ import { storage } from "../services/services.js";
 import { WorkoutSession } from "../models/workoutSession.js";
 
 const ENTRIES_KEY = "workoutSessions:entries";
+const ACTIVE_KEY = "workoutSessions:active";
 
 function readEntries() {
     const entries = storage.get(ENTRIES_KEY);
@@ -58,7 +59,33 @@ export function createWorkoutSessionStore() {
 
     function clearAll() {
         writeEntries([]);
+        clearActiveState();
     }
 
-    return { listSessions, addSession, getById, updateSession, removeSession, clearAll };
+    /** Live state of the in-progress session (progress + total elapsed), for resuming. */
+    function getActiveState() {
+        const state = storage.get(ACTIVE_KEY);
+        return state && typeof state === "object" ? state : null;
+    }
+
+    function setActiveState(state) {
+        if (!state || typeof state !== "object") return;
+        storage.set(ACTIVE_KEY, state);
+    }
+
+    function clearActiveState() {
+        storage.remove(ACTIVE_KEY);
+    }
+
+    return {
+        listSessions,
+        addSession,
+        getById,
+        updateSession,
+        removeSession,
+        clearAll,
+        getActiveState,
+        setActiveState,
+        clearActiveState,
+    };
 }

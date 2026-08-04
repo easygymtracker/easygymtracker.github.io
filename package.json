@@ -1,0 +1,11 @@
+{
+  "name": "gym-tracker",
+  "private": true,
+  "type": "module",
+  "description": "Local-first gym routine tracker (static PWA). No runtime dependencies.",
+  "scripts": {
+    "test": "node --test \"tests/unit/*.test.mjs\"",
+    "test:e2e": "node tests/e2e/sessionResume.e2e.mjs",
+    "prerender": "node scripts/prerender.js"
+  }
+}
