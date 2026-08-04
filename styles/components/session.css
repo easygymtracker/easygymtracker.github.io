@@ -75,6 +75,29 @@
     align-items: center;
 }
 
+/* Session-only "remove from today" control (exercise or set row). */
+.removeFromSessionBtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.removeFromSessionBtn:hover {
+    border-color: rgba(239, 68, 68, 0.55);
+    background: rgba(239, 68, 68, 0.12);
+    color: rgb(248, 113, 113);
+}
+
 /* =========================
    Rep group (set) rows
    ========================= */

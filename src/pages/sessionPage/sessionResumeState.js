@@ -26,6 +26,17 @@ export function deserializeCompletedRepGroups(raw) {
     return map;
 }
 
+/** Set<id> -> [id, ...] (stable order not required, ids are opaque strings) */
+export function serializeIdSet(set) {
+    if (!(set instanceof Set)) return [];
+    return Array.from(set);
+}
+
+/** [id, ...] -> Set<id> (non-string entries dropped) */
+export function deserializeIdSet(raw) {
+    return new Set((Array.isArray(raw) ? raw : []).filter((id) => typeof id === "string" && id.length > 0));
+}
+
 /**
  * Snapshot of the live session. `nowMs`/`nowIso` are injected so callers stay
  * testable; `elapsedMs` is recomputed from the clock only while running.
@@ -42,6 +53,8 @@ export function buildResumeSnapshot(session, { nowMs, nowIso }) {
         currentRepGroupIndex = 0,
         sessionSeriesOrder = null,
         completedRepGroups,
+        removedSeriesIds,
+        removedRepGroupIds,
     } = session ?? {};
 
     return {
@@ -53,6 +66,8 @@ export function buildResumeSnapshot(session, { nowMs, nowIso }) {
         currentRepGroupIndex,
         sessionSeriesOrder: Array.isArray(sessionSeriesOrder) ? sessionSeriesOrder.slice() : null,
         completedRepGroups: serializeCompletedRepGroups(completedRepGroups),
+        removedSeriesIds: serializeIdSet(removedSeriesIds),
+        removedRepGroupIds: serializeIdSet(removedRepGroupIds),
         updatedAt: nowIso,
     };
 }

@@ -34,6 +34,7 @@ import {
 import {
     buildResumeSnapshot,
     deserializeCompletedRepGroups,
+    deserializeIdSet,
     isResumableFor,
     resolveResumePosition,
 } from "./sessionResumeState.js";
@@ -408,6 +409,13 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
     let completedRepGroups = new Map();
     let sessionSeriesOrder = null;
 
+    // Exercises/sets removed from *this* session only — never written back to the
+    // stored Routine. Removed items are also marked done in completedRepGroups so
+    // existing nav/completion logic (advanceToNext, isWorkoutComplete, ...) skips
+    // them for free; these two sets exist purely to hide them from the UI.
+    let removedSeriesIds = new Set();
+    let removedRepGroupIds = new Set();
+
     let expandedSeries = new Set();
 
     function stopTick() {
@@ -459,6 +467,8 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
             currentRepGroupIndex,
             sessionSeriesOrder,
             completedRepGroups,
+            removedSeriesIds,
+            removedRepGroupIds,
         }, { nowMs, nowIso: new Date(nowMs).toISOString() }));
     }
 
@@ -481,6 +491,8 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
         sessionStartedAtIso = state.startedAtIso ?? null;
         completedRepGroups = deserializeCompletedRepGroups(state.completedRepGroups);
         sessionSeriesOrder = Array.isArray(state.sessionSeriesOrder) ? state.sessionSeriesOrder.slice() : null;
+        removedSeriesIds = deserializeIdSet(state.removedSeriesIds);
+        removedRepGroupIds = deserializeIdSet(state.removedRepGroupIds);
 
         elapsedMs = Math.max(0, Number(state.elapsedMs) || 0);
         startEpochMs = Date.now() - elapsedMs;
@@ -952,6 +964,70 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
         sessionSeriesOrder = next.sessionSeriesOrder ?? sessionSeriesOrder;
     }
 
+    // --- Session-only removal (exercise/set skipped today, routine unchanged) ---
+
+    function isSeriesRemoved(seriesId) {
+        return Boolean(seriesId) && removedSeriesIds.has(seriesId);
+    }
+
+    function isRepGroupRemoved(repGroupId) {
+        return Boolean(repGroupId) && removedRepGroupIds.has(repGroupId);
+    }
+
+    function removeSeriesFromSession(seriesIdx) {
+        const routine = getCurrentRoutine();
+        const s = routine?.series?.[seriesIdx];
+        if (!s || isSeriesRemoved(s.id)) return;
+
+        const msg = t("confirm.removeSeriesFromSession", { name: resolveExerciseName(s) })
+            || `Remove "${resolveExerciseName(s)}" from today's session? The routine itself won't change.`;
+        if (!confirm(msg)) return;
+
+        // Curating the session is itself "starting" it: without this, a removal made
+        // before pressing Start wouldn't persist (persistActiveSessionState requires
+        // hasInitiated) and would be silently lost on reload.
+        hasInitiated = true;
+        syncSessionActionButtons();
+
+        removedSeriesIds.add(s.id);
+        (s.repGroups ?? []).forEach((rg, repIdx) => {
+            removedRepGroupIds.add(rg.id);
+            markRepDone(seriesIdx, repIdx);
+        });
+
+        expandedSeries.delete(seriesIdx);
+        recomputeCompletedSeries(routine);
+
+        if (currentSeriesIndex === seriesIdx) advanceToNext(routine);
+
+        persistActiveSessionState();
+        renderCurrent();
+    }
+
+    function removeRepGroupFromSession(seriesIdx, repIdx) {
+        const routine = getCurrentRoutine();
+        const rg = routine?.series?.[seriesIdx]?.repGroups?.[repIdx];
+        if (!rg || isRepGroupRemoved(rg.id)) return;
+
+        const msg = t("confirm.removeSetFromSession")
+            || "Remove this set from today's session? The routine itself won't change.";
+        if (!confirm(msg)) return;
+
+        hasInitiated = true;
+        syncSessionActionButtons();
+
+        removedRepGroupIds.add(rg.id);
+        markRepDone(seriesIdx, repIdx);
+        recomputeCompletedSeries(routine);
+
+        if (currentSeriesIndex === seriesIdx && currentRepGroupIndex === repIdx) {
+            advanceToNext(routine);
+        }
+
+        persistActiveSessionState();
+        renderCurrent();
+    }
+
     function resolveExerciseName(seriesItem) {
         return resolveExerciseNameValue(seriesItem, exerciseStore, t("session.exercise.unknown"));
     }
@@ -976,7 +1052,7 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
         const series = Array.isArray(routine?.series) ? routine.series : [];
         const s = series[currentSeriesIndex] || null;
 
-        if (!s) {
+        if (!s || isSeriesRemoved(s.id)) {
             currentSectionEl.style.display = "none";
             currentSectionEl.innerHTML = "";
             return;
@@ -999,7 +1075,8 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
                             >${escapeHtml(seriesDesc)}</textarea>`;
 
         const groups = Array.isArray(s?.repGroups) ? s.repGroups : [];
-        const rg = groups[currentRepGroupIndex] || null;
+        let rg = groups[currentRepGroupIndex] || null;
+        if (rg && isRepGroupRemoved(rg.id)) rg = null;
 
         const weightLabel = t("session.weight") || "Weight";
         const repsLabel = t("session.reps") || "Reps";
@@ -1085,8 +1162,14 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
             `;
         }
 
-        const flow = groups
-            .map((rg2, repIdx) => {
+        // Removed sets stay in the real array (so add-set indices/history stay
+        // correct) but are skipped here so they never render in the session UI.
+        const visibleGroups = groups
+            .map((rg2, repIdx) => ({ rg2, repIdx }))
+            .filter(({ rg2 }) => !isRepGroupRemoved(rg2?.id));
+
+        const flow = visibleGroups
+            .map(({ rg2, repIdx }, visIdx) => {
                 const st = statusForRep(currentSeriesIndex, repIdx);
 
                 const weight = resolveRepValue(rg2, "targetWeight");
@@ -1171,7 +1254,7 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
                     typeof rg2?.restSecondsAfter === "number" ? rg2.restSecondsAfter : 0;
 
                 const between =
-                    repIdx < groups.length - 1
+                    visIdx < visibleGroups.length - 1
                         ? `
                         <div
                             aria-hidden="true"
@@ -1510,25 +1593,26 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
 
         const weightLabel = t("session.weight") || "Weight";
         const repsLabel = t("session.reps") || "Reps";
+        const removeSetLabel = t("session.removeSet") || "Remove set from today's session";
 
-        return `
-      <div class="repGroupList" role="list">
-        ${groups
-                .map((rg, repIdx) => {
-                    const weight = resolveRepValue(rg, "targetWeight");
-                    const reps = resolveRepValue(rg, "targetReps");
+        const itemsHtml = groups
+            .map((rg, repIdx) => {
+                if (isRepGroupRemoved(rg?.id)) return "";
 
-                    const weightTxt = formatSideValue(weight);
-                    const repsTxt = formatSideValue(reps);
+                const weight = resolveRepValue(rg, "targetWeight");
+                const reps = resolveRepValue(rg, "targetReps");
 
-                    const rest = typeof rg?.restSecondsAfter === "number" && rg.restSecondsAfter > 0
-                        ? `<span class="chip">${escapeHtml(t("session.rest"))} ${rg.restSecondsAfter}s</span>`
-                        : "";
+                const weightTxt = formatSideValue(weight);
+                const repsTxt = formatSideValue(reps);
 
-                    const st = statusForRep(seriesIdx, repIdx);
-                    const icon = st === "done" ? "✓" : st === "active" ? "▶" : "•";
+                const rest = typeof rg?.restSecondsAfter === "number" && rg.restSecondsAfter > 0
+                    ? `<span class="chip">${escapeHtml(t("session.rest"))} ${rg.restSecondsAfter}s</span>`
+                    : "";
 
-                    return `
+                const st = statusForRep(seriesIdx, repIdx);
+                const icon = st === "done" ? "✓" : st === "active" ? "▶" : "•";
+
+                return `
               <div class="repGroupItem repGroupItem--${st}"
                    role="listitem"
                    data-series-idx="${seriesIdx}"
@@ -1550,17 +1634,47 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
                 </div>
 
                 <div class="repGroupActions">
+                  <button
+                    type="button"
+                    class="removeFromSessionBtn"
+                    data-action="remove-rep-group"
+                    data-series-idx="${seriesIdx}"
+                    data-rep-idx="${repIdx}"
+                    title="${escapeHtml(removeSetLabel)}"
+                    aria-label="${escapeHtml(removeSetLabel)}"
+                  >✕</button>
                   <span class="seriesStatus" aria-hidden="true">${icon}</span>
                 </div>
               </div>
             `;
-                })
-                .join("")}
+            })
+            .join("");
+
+        return `
+      <div class="repGroupList" role="list">
+        ${itemsHtml || `<p class="muted" style="margin:6px 0 0;">${escapeHtml(t("session.noSets") || "No sets")}</p>`}
       </div>
     `;
     }
 
     listEl.addEventListener("click", (e) => {
+        // Checked first: these buttons live inside .seriesItem/.repGroupItem, so
+        // the generic row handlers below would otherwise also fire on this click.
+        const removeSeriesBtn = e.target.closest('[data-action="remove-series"]');
+        if (removeSeriesBtn) {
+            const sIdx = Number(removeSeriesBtn.dataset.seriesIdx);
+            if (Number.isFinite(sIdx)) removeSeriesFromSession(sIdx);
+            return;
+        }
+
+        const removeRepGroupBtn = e.target.closest('[data-action="remove-rep-group"]');
+        if (removeRepGroupBtn) {
+            const sIdx = Number(removeRepGroupBtn.dataset.seriesIdx);
+            const rIdx = Number(removeRepGroupBtn.dataset.repIdx);
+            if (Number.isFinite(sIdx) && Number.isFinite(rIdx)) removeRepGroupFromSession(sIdx, rIdx);
+            return;
+        }
+
         const repItem = e.target.closest(".repGroupItem");
         const seriesItem = e.target.closest(".seriesItem");
 
@@ -1654,14 +1768,19 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
                 const s = series[origIdx];
                 const idx = origIdx;
 
+                // Removed for this session only: keep its slot in sessionSeriesOrder
+                // (so drag-reorder indices stay valid) but render nothing for it.
+                if (isSeriesRemoved(s?.id)) return "";
+
                 const name = resolveExerciseName(s);
                 const desc = s.description
                     ? ` — <span class="muted">${escapeHtml(s.description)}</span>`
                     : "";
 
-                const repCount = Array.isArray(s?.repGroups) ? s.repGroups.length : 0;
-                const countChip = repCount > 0
-                    ? `<span class="chip">${repCount} ${escapeHtml(t("session.sets") || "sets")}</span>`
+                const visibleRepCount = (Array.isArray(s?.repGroups) ? s.repGroups : [])
+                    .filter((g) => !isRepGroupRemoved(g?.id)).length;
+                const countChip = visibleRepCount > 0
+                    ? `<span class="chip">${visibleRepCount} ${escapeHtml(t("session.sets") || "sets")}</span>`
                     : "";
 
                 const seriesRestAfter =
@@ -1676,6 +1795,8 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
 
                 const isExpanded = expandedSeries.has(idx);
 
+                const removeSeriesLabel = t("session.removeSeries") || "Remove exercise from today's session";
+
                 return `
         <div class="seriesBlock" data-index="${displayIdx}" data-series-idx="${idx}" draggable="true" style="cursor:grab;">
           <div class="seriesItem seriesItem--${status}" data-series-idx="${idx}">
@@ -1685,6 +1806,14 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
             </div>
 
             <div class="seriesItemActions">
+              <button
+                type="button"
+                class="removeFromSessionBtn"
+                data-action="remove-series"
+                data-series-idx="${idx}"
+                title="${escapeHtml(removeSeriesLabel)}"
+                aria-label="${escapeHtml(removeSeriesLabel)}"
+              >✕</button>
               <span class="seriesStatus" aria-hidden="true">${statusIcon}</span>
             </div>
           </div>
@@ -1730,6 +1859,8 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
             sessionSeriesOrder = null;
             activeWorkoutSessionId = null;
             sessionStartedAtIso = null;
+            removedSeriesIds = new Set();
+            removedRepGroupIds = new Set();
 
             expandedSeries = new Set();
 

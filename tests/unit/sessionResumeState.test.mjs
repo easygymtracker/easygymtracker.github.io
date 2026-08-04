@@ -4,9 +4,11 @@ import assert from "node:assert/strict";
 import {
     buildResumeSnapshot,
     deserializeCompletedRepGroups,
+    deserializeIdSet,
     isResumableFor,
     resolveResumePosition,
     serializeCompletedRepGroups,
+    serializeIdSet,
 } from "../../src/pages/sessionPage/sessionResumeState.js";
 
 function routine(seriesSizes) {
@@ -39,6 +41,19 @@ test("serialize tolerates a missing map, deserialize tolerates garbage", () => {
     assert.deepEqual([...restored.get(2)], [0, 3]);
 });
 
+test("id sets survive a serialize/deserialize round trip", () => {
+    const set = new Set(["ss_1", "ss_2"]);
+    assert.deepEqual(serializeIdSet(set), ["ss_1", "ss_2"]);
+    assert.deepEqual(deserializeIdSet(serializeIdSet(set)), set);
+});
+
+test("id set helpers tolerate missing or garbage input", () => {
+    assert.deepEqual(serializeIdSet(null), []);
+    assert.deepEqual(serializeIdSet(undefined), []);
+    assert.deepEqual(deserializeIdSet(null), new Set());
+    assert.deepEqual(deserializeIdSet(["a", "", 1, null, "b"]), new Set(["a", "b"]));
+});
+
 test("snapshot keeps the paused elapsed time as-is", () => {
     const snap = buildResumeSnapshot({
         sessionId: "ws_1",
@@ -60,7 +75,21 @@ test("snapshot keeps the paused elapsed time as-is", () => {
     assert.equal(snap.currentRepGroupIndex, 2);
     assert.deepEqual(snap.sessionSeriesOrder, [1, 0]);
     assert.deepEqual(snap.completedRepGroups, [[0, [0, 1]]]);
+    assert.deepEqual(snap.removedSeriesIds, []);
+    assert.deepEqual(snap.removedRepGroupIds, []);
     assert.equal(snap.updatedAt, "2026-08-04T10:05:00.000Z");
+});
+
+test("snapshot carries removed series/repGroup ids", () => {
+    const snap = buildResumeSnapshot({
+        routineId: "rt_1",
+        completedRepGroups: new Map(),
+        removedSeriesIds: new Set(["ss_2"]),
+        removedRepGroupIds: new Set(["rg_3", "rg_4"]),
+    }, { nowMs: 0, nowIso: "x" });
+
+    assert.deepEqual(snap.removedSeriesIds, ["ss_2"]);
+    assert.deepEqual(snap.removedRepGroupIds, ["rg_3", "rg_4"]);
 });
 
 test("snapshot recomputes elapsed time from the clock while running", () => {
