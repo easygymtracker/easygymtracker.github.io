@@ -19,6 +19,8 @@ import { mountExerciseHistoryPage } from "./pages/exerciseHistoryPage/exerciseHi
 
 import { setLocale, getLocale, getLocaleFromUrl, translateDocument, t } from "./internationalization/i18n.js";
 import { areNotificationsEnabled, setNotificationsEnabled } from "./services/notificationPreference.js";
+import { hasSeenOnboardingTour, markOnboardingTourSeen } from "./services/onboardingTour.js";
+import { openOnboardingTour } from "./ui/components/onboardingTourModal.js";
 
 registerServiceWorker();
 
@@ -42,6 +44,15 @@ if (btnNotifToggle) {
         syncNotifButton();
     });
 }
+
+// -----------------------------------------------------------------------------
+// Guided tour (first-time onboarding, replayable from the floating "?" button)
+// -----------------------------------------------------------------------------
+const btnTourHelp = document.getElementById("btnTourHelp");
+
+btnTourHelp?.addEventListener("click", () => {
+    openOnboardingTour().then(markOnboardingTourSeen);
+});
 
 // -----------------------------------------------------------------------------
 // Stores
@@ -345,6 +356,12 @@ startRouter({
         const page = pages[name];
         if (page?.render) {
             page.render(params);
+        }
+
+        // First time reaching the actual app (not the marketing pages): show the
+        // guided tour once. Skipping/finishing/closing it all mark it seen.
+        if (name === "routines" && !hasSeenOnboardingTour()) {
+            openOnboardingTour().then(markOnboardingTourSeen);
         }
     },
 });

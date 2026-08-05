@@ -598,3 +598,65 @@ select {
 .notifToggle[data-enabled="false"] {
     opacity: .45;
 }
+
+.tourHelpToggle {
+    right: auto;
+    left: 18px;
+    font-weight: 800;
+}
+
+/* ── Guided tour modal ─────────────────────────────────── */
+.onboardingTourModal {
+    text-align: center;
+    position: relative;
+}
+
+.tourSkipBtn {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 13px;
+    cursor: pointer;
+    padding: 4px 6px;
+}
+
+.tourSkipBtn:hover {
+    color: var(--text);
+}
+
+.tourIcon {
+    font-size: 40px;
+    line-height: 1;
+    margin-top: 6px;
+}
+
+.tourTitle {
+    margin: 12px 0 6px;
+    font-size: 16px;
+}
+
+.tourBody {
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.tourDots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 18px;
+}
+
+.tourDot {
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+    background: var(--border);
+}
+
+.tourDot--active {
+    background: rgba(96, 165, 250, 0.85);
+}
