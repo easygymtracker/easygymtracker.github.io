@@ -123,11 +123,11 @@
   <link rel="manifest" href="./manifest.json" />
   <link rel="icon" type="image/png" href="/assets/favicon.png" />
   <link rel="apple-touch-icon" href="/assets/favicon.png" />
-  <link rel="stylesheet" href="./styles/base.css?v=20260505e" />
-  <link rel="stylesheet" href="./styles/components/routines.css?v=20260505e" data-style-router="true" />
-  <link rel="stylesheet" href="./styles/components/workoutCalendar.css?v=20260505e" data-style-router="true" />
+  <link rel="stylesheet" href="./styles/base.css?v=20260805a" />
+  <link rel="stylesheet" href="./styles/components/routines.css?v=20260805a" data-style-router="true" />
+  <link rel="stylesheet" href="./styles/components/workoutCalendar.css?v=20260805a" data-style-router="true" />
   <!-- Preload critical JS modules to reduce the ES-module waterfall -->
-  <link rel="modulepreload" href="./src/app.js?v=20260505e" />
+  <link rel="modulepreload" href="./src/app.js?v=20260805a" />
   <link rel="modulepreload" href="./src/router.js" />
   <link rel="modulepreload" href="./src/internationalization/i18n.js" />
   <link rel="modulepreload" href="./src/internationalization/dicts.js" />
@@ -1077,16 +1077,31 @@
   <button id="btnNotifToggle" class="notifToggle" type="button"
     data-i18n-aria-label="notif.toggle"
     aria-label="Toggle notifications">
-    <span id="notifToggleIcon" aria-hidden="true"></span>
+    <svg class="icon notifToggleIconOn" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path>
+      <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+    </svg>
+    <svg class="icon notifToggleIconOff" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path>
+      <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+      <path d="M3 3l18 18"></path>
+    </svg>
   </button>
 
   <button id="btnTourHelp" class="notifToggle tourHelpToggle" type="button"
     data-i18n-title="tour.replay" data-i18n-aria-label="tour.replay"
     title="Show guided tour" aria-label="Show guided tour">
-    <span aria-hidden="true">?</span>
+    <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+      stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="10"></circle>
+      <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+      <path d="M12 17h.01"></path>
+    </svg>
   </button>
 
-  <script type="module" src="./src/app.js?v=20260505e"></script>
+  <script type="module" src="./src/app.js?v=20260805a"></script>
 </body>
 
 </html>

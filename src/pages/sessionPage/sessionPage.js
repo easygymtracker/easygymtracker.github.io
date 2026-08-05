@@ -12,6 +12,7 @@ import { setLeaveGuard, clearLeaveGuard, navigate } from "/src/router.js";
 import { mountRepGroupHistoryCharts } from "/src/ui/components/repGroupHistoryChart.js";
 import { openWorkoutSummaryModal, computeSessionStats, computeSessionPRs } from "/src/ui/components/workoutSummaryModal.js";
 import { areNotificationsEnabled } from "/src/services/notificationPreference.js";
+import { clearSessionNotification } from "/src/services/sessionNotifications.js";
 import {
     formatSideValue as formatSideValueValue,
     isSameWeight as isSameWeightValue,
@@ -384,11 +385,6 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
                 actionTitle,
             }
         });
-    }
-
-    function clearSessionNotification() {
-        if (!navigator.serviceWorker?.controller) return;
-        navigator.serviceWorker.controller.postMessage({ type: "SESSION_END" });
     }
 
     function stopSetTick() {

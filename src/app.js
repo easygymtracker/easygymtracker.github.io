@@ -7,7 +7,7 @@ import { createProfileStore } from "./store/profileStore.js";
 import { createWorkoutSessionStore } from "./store/workoutSessionStore.js";
 import { registerServiceWorker } from "./app/serviceWorkerBootstrap.js";
 import { setupRoutineImport } from "./app/routineImportBootstrap.js";
-import { createStyleRouter } from "./app/styleRouter.js?v=20260505e";
+import { createStyleRouter } from "./app/styleRouter.js?v=20260805a";
 
 import { mountSessionPage } from "./pages/sessionPage/sessionPage.js";
 import { mountRoutinesPage } from "./pages/routinesPage/routinesPage.js";
@@ -19,6 +19,7 @@ import { mountExerciseHistoryPage } from "./pages/exerciseHistoryPage/exerciseHi
 
 import { setLocale, getLocale, getLocaleFromUrl, translateDocument, t } from "./internationalization/i18n.js";
 import { areNotificationsEnabled, setNotificationsEnabled } from "./services/notificationPreference.js";
+import { clearSessionNotification } from "./services/sessionNotifications.js";
 import { hasSeenOnboardingTour, markOnboardingTourSeen } from "./services/onboardingTour.js";
 import { openOnboardingTour } from "./ui/components/onboardingTourModal.js";
 import { isGoogleDriveConfigured } from "./config/googleDrive.js";
@@ -29,19 +30,25 @@ registerServiceWorker();
 // Notification toggle (floating button)
 // -----------------------------------------------------------------------------
 const btnNotifToggle = document.getElementById("btnNotifToggle");
-const notifToggleIcon = document.getElementById("notifToggleIcon");
 
 function syncNotifButton() {
-    const on = areNotificationsEnabled();
-    if (btnNotifToggle) btnNotifToggle.dataset.enabled = String(on);
-    if (notifToggleIcon) notifToggleIcon.textContent = on ? "\uD83D\uDD14" : "\uD83D\uDD15";
+    // Which of the two inline icons shows is driven by [data-enabled] in CSS.
+    if (btnNotifToggle) btnNotifToggle.dataset.enabled = String(areNotificationsEnabled());
 }
 
 syncNotifButton();
 
 if (btnNotifToggle) {
     btnNotifToggle.addEventListener("click", () => {
-        setNotificationsEnabled(!areNotificationsEnabled());
+        const next = !areNotificationsEnabled();
+        setNotificationsEnabled(next);
+
+        // Turning the bell off has to close the notification that is already on
+        // screen. It is shown with requireInteraction, so it would otherwise sit
+        // there until the user dismissed it by hand — looking like the toggle
+        // did nothing.
+        if (!next) clearSessionNotification();
+
         syncNotifButton();
     });
 }
@@ -112,7 +119,7 @@ const pages = {
 
 const PUBLIC_ROUTES = new Set(["home", "features", "privacy", "terms", "about"]);
 const SITE_URL = "https://easygymtracker.github.io";
-const STYLE_VERSION = "20260505e";
+const STYLE_VERSION = "20260805a";
 const styleRouter = createStyleRouter({
     routeToStyles: {
         // Every marketing route uses the .landingHero/.landingGrid layout, so they

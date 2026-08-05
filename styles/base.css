@@ -48,7 +48,9 @@ body {
 .app {
     max-width: 720px;
     margin: 0 auto;
-    padding: 18px 14px calc(40px + env(safe-area-inset-bottom));
+    /* Bottom gap clears the floating toggles (44px tall, 18px from the edge),
+       which otherwise sit on top of the last row of content when scrolled down. */
+    padding: 18px 14px calc(80px + env(safe-area-inset-bottom));
 }
 
 header {
@@ -577,26 +579,47 @@ select {
     width: 44px;
     height: 44px;
     border-radius: 50%;
-    border: 1px solid var(--border);
-    background: var(--panel);
+    /* var(--panel) is only a shade off var(--bg), which left the button almost
+       invisible against the page. A translucent white lift reads as a control
+       on any dark surface it happens to float over. */
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    background: rgba(255, 255, 255, 0.10);
     color: var(--text);
     font-size: 1.25rem;
+    line-height: 1;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
-    transition: opacity .2s, transform .15s;
-    opacity: .75;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+    transition: background .2s, filter .2s, transform .15s;
 }
 
 .notifToggle:hover {
-    opacity: 1;
+    background: rgba(255, 255, 255, 0.18);
     transform: scale(1.08);
 }
 
+/* Stroke icons instead of emoji: emoji ignore `color`, so the old 🔕 rendered as
+   a dark glyph on a near-black circle and effectively vanished. These follow
+   currentColor like every other icon in the app. */
+.notifToggle .icon {
+    display: block;
+}
+
+.notifToggle .notifToggleIconOff,
+.notifToggle[data-enabled="false"] .notifToggleIconOn {
+    display: none;
+}
+
+.notifToggle[data-enabled="false"] .notifToggleIconOff {
+    display: block;
+}
+
 .notifToggle[data-enabled="false"] {
-    opacity: .45;
+    color: var(--muted);
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.14);
 }
 
 .tourHelpToggle {
