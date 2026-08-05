@@ -3,6 +3,7 @@ import { buildProfileExportV1, downloadProfileJson } from "../../export/profileE
 import { importProfileFromExport } from "../../import/profileImport.js";
 import { t } from "../../internationalization/i18n.js";
 import { mountWorkoutCalendar } from "../../ui/components/workoutCalendar.js";
+import { mountBackupSection } from "./backupSection.js";
 
 function toInputDateTimeValue(date = new Date()) {
     const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
@@ -152,6 +153,8 @@ export function mountProfilePage({ profileStore, workoutSessionStore }) {
         mode: "rich",
     });
 
+    const backupSection = mountBackupSection();
+
     function resetForm() {
         form.reset();
         recordedAtInput.value = toInputDateTimeValue();
@@ -169,6 +172,7 @@ export function mountProfilePage({ profileStore, workoutSessionStore }) {
         empty.style.display = entries.length === 0 ? "block" : "none";
         clearBtn.style.display = entries.length === 0 ? "none" : "inline-flex";
         workoutCalendar.render();
+        backupSection.render();
     }
 
     form.addEventListener("submit", (event) => {

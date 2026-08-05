@@ -49,4 +49,42 @@ export class StorageService {
         // entries: Array<[key, value]>
         for (const [k, v] of entries) this.set(k, v);
     }
+
+    /**
+     * Raw snapshot of everything in this namespace: { key: rawJsonString }.
+     * Deliberately un-deserialized so a backup round-trips byte-for-byte and
+     * stays valid even if model shapes change later.
+     */
+    snapshot(prefix = "") {
+        const out = {};
+        for (const key of this.adapter.keys(prefix)) {
+            const raw = this.adapter.get(key);
+            if (raw != null) out[key] = raw;
+        }
+        return out;
+    }
+
+    /**
+     * Writes a snapshot back. With `clear`, keys currently in the namespace that
+     * are absent from the snapshot are removed first, so the result is an exact
+     * restore rather than a merge.
+     */
+    restoreSnapshot(entries, { clear = false } = {}) {
+        if (!entries || typeof entries !== "object") {
+            throw new Error("StorageService.restoreSnapshot: entries object is required");
+        }
+
+        if (clear) {
+            // keys() materialises an array, so removing while iterating is safe.
+            for (const key of this.adapter.keys("")) this.adapter.remove(key);
+        }
+
+        let written = 0;
+        for (const [key, raw] of Object.entries(entries)) {
+            if (typeof raw !== "string") continue;
+            this.adapter.set(key, raw);
+            written += 1;
+        }
+        return written;
+    }
 }

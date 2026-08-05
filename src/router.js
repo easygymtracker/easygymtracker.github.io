@@ -1,6 +1,6 @@
 // router.js - tiny history router + simple event emitter
 
-const ROUTE_HEADS = new Set(["features", "privacy", "about", "routines", "routine", "session", "profile", "profile-history", "exercise"]);
+const ROUTE_HEADS = new Set(["features", "privacy", "terms", "about", "routines", "routine", "session", "profile", "profile-history", "exercise"]);
 
 function normalizePath(path) {
     if (!path) return "/routines";
@@ -63,6 +63,8 @@ function parseCurrentRoute() {
     if (parts[0] === "features") return { name: "features", params: {} };
 
     if (parts[0] === "privacy") return { name: "privacy", params: {} };
+
+    if (parts[0] === "terms") return { name: "terms", params: {} };
 
     if (parts[0] === "about") return { name: "about", params: {} };
 

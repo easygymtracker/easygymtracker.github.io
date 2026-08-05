@@ -21,6 +21,7 @@ import { setLocale, getLocale, getLocaleFromUrl, translateDocument, t } from "./
 import { areNotificationsEnabled, setNotificationsEnabled } from "./services/notificationPreference.js";
 import { hasSeenOnboardingTour, markOnboardingTourSeen } from "./services/onboardingTour.js";
 import { openOnboardingTour } from "./ui/components/onboardingTourModal.js";
+import { isGoogleDriveConfigured } from "./config/googleDrive.js";
 
 registerServiceWorker();
 
@@ -53,6 +54,14 @@ const btnTourHelp = document.getElementById("btnTourHelp");
 btnTourHelp?.addEventListener("click", () => {
     openOnboardingTour().then(markOnboardingTourSeen);
 });
+
+// -----------------------------------------------------------------------------
+// Keep the privacy page honest: only describe Drive backup when the build
+// actually offers it. The card ships hidden, so a JS failure never over-promises.
+// -----------------------------------------------------------------------------
+if (isGoogleDriveConfigured()) {
+    document.getElementById("privacyCloudBackupCard")?.classList.remove("uHidden");
+}
 
 // -----------------------------------------------------------------------------
 // Stores
@@ -90,6 +99,7 @@ const pages = {
     home: { render() {} },
     features: { render() {} },
     privacy: { render() {} },
+    terms: { render() {} },
     about: { render() {} },
     routines: mountRoutinesPage({ routineStore, exerciseStore, workoutSessionStore }),
     "routine-new": mountRoutineNewPage({ routineStore }),
@@ -100,12 +110,18 @@ const pages = {
     "exercise-history": mountExerciseHistoryPage({ routineStore, exerciseStore }),
 };
 
-const PUBLIC_ROUTES = new Set(["home", "features", "privacy", "about"]);
+const PUBLIC_ROUTES = new Set(["home", "features", "privacy", "terms", "about"]);
 const SITE_URL = "https://easygymtracker.github.io";
 const STYLE_VERSION = "20260505e";
 const styleRouter = createStyleRouter({
     routeToStyles: {
+        // Every marketing route uses the .landingHero/.landingGrid layout, so they
+        // all need landing.css — not just home, or they render as bare cards.
         home: [`../styles/components/landing.css?v=${STYLE_VERSION}`],
+        features: [`../styles/components/landing.css?v=${STYLE_VERSION}`],
+        privacy: [`../styles/components/landing.css?v=${STYLE_VERSION}`],
+        terms: [`../styles/components/landing.css?v=${STYLE_VERSION}`],
+        about: [`../styles/components/landing.css?v=${STYLE_VERSION}`],
         session: [`../styles/components/session.css?v=${STYLE_VERSION}`],
         routines: [`../styles/components/routines.css?v=${STYLE_VERSION}`, `../styles/components/workoutCalendar.css?v=${STYLE_VERSION}`],
         "routine-new": [`../styles/components/routines.css?v=${STYLE_VERSION}`],
@@ -207,6 +223,27 @@ const ROUTE_SEO = {
                 breadcrumbStructuredData([
                     { name: "Home", url: `${SITE_URL}/` },
                     { name: "Privacy", url: `${SITE_URL}/privacy` },
+                ]),
+            ]
+        },
+    },
+    terms: {
+        robots: "index,follow",
+        title: "Terms of Service | Easy Gym Routine Tracker",
+        description: "The terms for using Easy Gym Routine Tracker: free, no account, provided as-is, and your workout data stays yours.",
+        canonical: `${SITE_URL}/terms`,
+        structuredData: {
+            "@context": "https://schema.org",
+            "@graph": [
+                {
+                    "@type": "WebPage",
+                    name: "Terms of Service | Easy Gym Routine Tracker",
+                    url: `${SITE_URL}/terms`,
+                    description: "Terms of service for Easy Gym Routine Tracker."
+                },
+                breadcrumbStructuredData([
+                    { name: "Home", url: `${SITE_URL}/` },
+                    { name: "Terms", url: `${SITE_URL}/terms` },
                 ]),
             ]
         },

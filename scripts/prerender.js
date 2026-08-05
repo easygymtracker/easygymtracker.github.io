@@ -76,6 +76,29 @@ const ROUTES = [
         },
     },
     {
+        name: "terms",
+        outDir: "terms",
+        title: "Terms of Service | Easy Gym Routine Tracker",
+        description:
+            "The terms for using Easy Gym Routine Tracker: free, no account, provided as-is, and your workout data stays yours.",
+        canonical: `${SITE_URL}/terms`,
+        structuredData: {
+            "@context": "https://schema.org",
+            "@graph": [
+                {
+                    "@type": "WebPage",
+                    name: "Terms of Service | Easy Gym Routine Tracker",
+                    url: `${SITE_URL}/terms`,
+                    description: "Terms of service for Easy Gym Routine Tracker.",
+                },
+                breadcrumbStructuredData([
+                    { name: "Home", url: `${SITE_URL}/` },
+                    { name: "Terms", url: `${SITE_URL}/terms` },
+                ]),
+            ],
+        },
+    },
+    {
         name: "about",
         outDir: "about",
         title: "How It Works | Easy Gym Routine Tracker",

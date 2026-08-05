@@ -122,6 +122,7 @@
             <a href="/features" class="btn" data-nav="/features" data-i18n="home.cta.features">Features</a>
             <a href="/about" class="btn" data-nav="/about" data-i18n="home.cta.about">How it works</a>
             <a href="/privacy" class="btn" data-nav="/privacy" data-i18n="home.cta.privacy">Privacy</a>
+            <a href="/terms" class="btn" data-nav="/terms" data-i18n="home.cta.terms">Terms</a>
           </nav>
 
           <div class="landingStats" aria-label="Product highlights" data-i18n-aria-label="a11y.home.productHighlights">
@@ -246,6 +247,7 @@
           <nav class="landingActions" aria-label="Privacy links" data-i18n-aria-label="a11y.nav.privacyLinks">
             <a href="/" class="btn primary" data-nav="/" data-i18n="privacy.cta.home">Home</a>
             <a href="/features" class="btn" data-nav="/features" data-i18n="privacy.cta.features">Features</a>
+            <a href="/terms" class="btn" data-nav="/terms" data-i18n="privacy.cta.terms">Terms</a>
             <a href="/routines" class="btn" data-nav="/routines" data-i18n="privacy.cta.openApp">Open the app</a>
           </nav>
         </div>
@@ -286,6 +288,74 @@
             <h3 data-i18n="privacy.localOnly.title">Your data stays private</h3>
             <p data-i18n="privacy.localOnly.body">The app has no backend, no sync service, and no user accounts. Every
               byte of your workout and body data remains only in your own browser storage.</p>
+          </article>
+          <article class="card landingFeature uHidden" id="privacyCloudBackupCard">
+            <h3 data-i18n="privacy.cloudBackup.title">Optional Google Drive backup</h3>
+            <p data-i18n="privacy.cloudBackup.body">Off by default. If you choose to connect Google Drive, the app
+              writes a single backup file to your own Drive and can only ever see that one file — never the rest of
+              your Drive. Nothing is uploaded until you tap "Back up now", and you can disconnect at any time.</p>
+          </article>
+        </div>
+      </section>
+
+            <section class="route landingRoute routeHidden" data-route="terms" id="route-terms" style="display:none;">
+        <div class="landingHero card">
+          <p class="landingEyebrow" data-i18n="terms.eyebrow">Terms of service</p>
+          <h2 data-i18n="terms.title">Free to use, provided as-is, and your data is yours.</h2>
+          <p class="landingLead" data-i18n="terms.lead">
+            Easy Gym Routine Tracker is a free tool with no account and no subscription. By using it you accept the
+            terms below. They are deliberately short, because the app does very little on your behalf: it stores your
+            training data in your own browser.
+          </p>
+          <p class="note uM0" data-i18n="terms.lastUpdated">Last updated: 5 August 2026</p>
+
+          <nav class="landingActions" aria-label="Terms links" data-i18n-aria-label="a11y.nav.termsLinks">
+            <a href="/" class="btn primary" data-nav="/" data-i18n="terms.cta.home">Home</a>
+            <a href="/privacy" class="btn" data-nav="/privacy" data-i18n="terms.cta.privacy">Privacy</a>
+            <a href="/routines" class="btn" data-nav="/routines" data-i18n="terms.cta.openApp">Open the app</a>
+          </nav>
+        </div>
+
+        <div class="landingGrid">
+          <article class="card landingFeature">
+            <h3 data-i18n="terms.free.title">Free, no account</h3>
+            <p data-i18n="terms.free.body">The app costs nothing, shows no ads, and requires no registration. There is
+              no paid tier and nothing to cancel. You may use it for personal training as much as you like.</p>
+          </article>
+          <article class="card landingFeature">
+            <h3 data-i18n="terms.asIs.title">Provided as-is</h3>
+            <p data-i18n="terms.asIs.body">The app is provided without warranty of any kind. It may contain bugs, and
+              features may change or be removed. To the extent permitted by law, the author is not liable for any loss
+              or damage arising from its use.</p>
+          </article>
+          <article class="card landingFeature">
+            <h3 data-i18n="terms.yourData.title">Your data is your responsibility</h3>
+            <p data-i18n="terms.yourData.body">Your training data lives in your browser's storage, not on a server. It
+              can be erased by clearing browser data, uninstalling, or losing your device. Keep your own backups — the
+              app cannot recover data for you.</p>
+          </article>
+          <article class="card landingFeature">
+            <h3 data-i18n="terms.notMedical.title">Not medical advice</h3>
+            <p data-i18n="terms.notMedical.body">This is a logbook, not a coach. Nothing in the app is medical, health,
+              or fitness advice. Consult a qualified professional before starting or changing a training programme, and
+              train within your own limits.</p>
+          </article>
+          <article class="card landingFeature">
+            <h3 data-i18n="terms.thirdParty.title">Optional third-party services</h3>
+            <p data-i18n="terms.thirdParty.body">If you choose to connect Google Drive for backups, your use of Drive is
+              also governed by Google's own terms and privacy policy. That feature is off by default and can be
+              disconnected at any time.</p>
+          </article>
+          <article class="card landingFeature">
+            <h3 data-i18n="terms.acceptableUse.title">Acceptable use</h3>
+            <p data-i18n="terms.acceptableUse.body">Please do not attempt to break, overload, or misuse the app or the
+              site that serves it, and do not use it for anything unlawful. Since the app runs entirely in your browser,
+              you are responsible for how you use it.</p>
+          </article>
+          <article class="card landingFeature">
+            <h3 data-i18n="terms.changes.title">Changes to these terms</h3>
+            <p data-i18n="terms.changes.body">These terms may be updated as the app evolves. The date above shows the
+              last revision, and continuing to use the app after a change means you accept the updated terms.</p>
           </article>
         </div>
       </section>
@@ -734,6 +804,69 @@
             <div id="profileEntryList" class="uGridGap10"></div>
             <p class="note uHidden" id="profileEmpty" data-i18n="profile.empty">No measurements yet. Add your first
               entry above.</p>
+          </div>
+
+          <div class="divider"></div>
+
+          <div id="backupSection">
+            <h3 class="sectionSubheading" data-i18n="backup.title">Backup &amp; storage</h3>
+            <p class="note uM0" id="backupWhereIntro" data-i18n="backup.where.title">Your workout data can live in two
+              places:</p>
+
+            <div class="storageOptions">
+              <div class="storageOption storageOption--active">
+                <div class="storageOptionHead">
+                  <span class="storageOptionIcon" aria-hidden="true">📱</span>
+                  <strong data-i18n="backup.local.title">On this device</strong>
+                  <span class="storageBadge" data-i18n="backup.local.badge">Always on</span>
+                </div>
+                <p class="muted storageOptionBody" data-i18n="backup.local.body">
+                  Everything is stored in this browser and never sent anywhere. Completely private — but it is lost if
+                  you clear browser data, switch device, or lose your phone.
+                </p>
+                <div class="storageOptionActions">
+                  <button class="btn" id="btnExportFullBackup" type="button" data-i18n="backup.action.exportFile">
+                    Download backup file
+                  </button>
+                  <button class="btn" id="btnImportFullBackup" type="button" data-i18n="backup.action.importFile">
+                    Restore from file
+                  </button>
+                  <input type="file" id="fullBackupFile" accept=".json,.gymbackup.json" class="uHidden">
+                </div>
+              </div>
+
+              <div class="storageOption uHidden" id="storageOptionDrive">
+                <div class="storageOptionHead">
+                  <span class="storageOptionIcon" aria-hidden="true">☁️</span>
+                  <strong data-i18n="backup.cloud.title">Google Drive</strong>
+                  <span class="storageBadge storageBadge--optional" data-i18n="backup.cloud.badge">Optional</span>
+                </div>
+                <p class="muted storageOptionBody" data-i18n="backup.cloud.body">
+                  Keeps a copy of that same backup file in your own Google Drive, so you can restore it on another
+                  device. The app can only see the single file it creates — never the rest of your Drive. Off until you
+                  connect it.
+                </p>
+
+                <div id="backupDriveControls">
+                  <p class="note uM0" id="backupDriveStatus" data-i18n="backup.status.notConnected">Not connected</p>
+                  <div class="storageOptionActions">
+                    <button class="btn primary" id="btnDriveConnect" type="button" data-i18n="backup.action.connect">
+                      Connect Google Drive
+                    </button>
+                    <button class="btn" id="btnDriveSave" type="button" data-i18n="backup.action.saveNow">
+                      Back up now
+                    </button>
+                    <button class="btn" id="btnDriveRestore" type="button" data-i18n="backup.action.restoreDrive">
+                      Restore from Drive
+                    </button>
+                    <button class="btn danger" id="btnDriveDisconnect" type="button"
+                      data-i18n="backup.action.disconnect">
+                      Disconnect
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
