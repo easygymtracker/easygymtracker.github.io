@@ -9,6 +9,7 @@ import { storage } from "../../services/services.js";
 import {
     buildFullBackupV1,
     downloadFullBackup,
+    parseFullBackup,
     restoreFullBackup,
 } from "../../export/fullBackup.js";
 import { isGoogleDriveConfigured } from "../../config/googleDrive.js";
@@ -23,7 +24,10 @@ import {
 } from "../../services/googleDriveBackup.js";
 import {
     getLastDriveBackupAt,
+    getUnsyncedChangeAt,
     isDriveBackupEnabled,
+    isRemoteRevisionUnknown,
+    markDriveSynced,
     setDriveBackupEnabled,
     setLastDriveBackupAt,
 } from "../../services/cloudBackupPreference.js";
@@ -58,8 +62,14 @@ export function mountBackupSection() {
     const driveAvailable = isGoogleDriveConfigured();
     let busy = false;
 
-    function setStatus(text) {
-        if (driveStatusEl) driveStatusEl.textContent = text;
+    // The status line is partly dynamic (it interpolates a date), which data-i18n
+    // cannot express — so drop the attribute when it is, or a locale switch would
+    // silently revert the line to "Not connected".
+    function setStatus(text, i18nKey = null) {
+        if (!driveStatusEl) return;
+        driveStatusEl.textContent = text;
+        if (i18nKey) driveStatusEl.setAttribute("data-i18n", i18nKey);
+        else driveStatusEl.removeAttribute("data-i18n");
     }
 
     function syncDriveUi() {
@@ -93,27 +103,30 @@ export function mountBackupSection() {
         if (busy) return;
 
         if (!enabled) {
-            setStatus(t("backup.status.notConnected") || "Not connected");
+            setStatus(t("backup.status.notConnected"), "backup.status.notConnected");
             return;
         }
 
         const when = formatWhen(getLastDriveBackupAt());
-        setStatus(when
-            ? (t("backup.status.lastBackup") || "Last backup: {when}").replace("{when}", when)
-            : (t("backup.status.never") || "Connected — no backup yet"));
+        if (!when) {
+            setStatus(t("backup.status.never"), "backup.status.never");
+            return;
+        }
+
+        const key = getUnsyncedChangeAt() ? "backup.status.pendingChanges" : "backup.status.lastBackup";
+        setStatus(t(key, { when }));
     }
 
     function withBusy(fn) {
         return async () => {
             if (busy) return;
             busy = true;
-            setStatus(t("backup.busy") || "Working…");
+            setStatus(t("backup.busy"), "backup.busy");
             syncDriveUi();
             try {
                 await fn();
             } catch (err) {
-                alert((t("backup.msg.error") || "Google Drive error: {message}")
-                    .replace("{message}", String(err?.message ?? err)));
+                alert(t("backup.msg.error", { message: String(err?.message ?? err) }));
             } finally {
                 busy = false;
                 syncDriveUi();
@@ -121,9 +134,30 @@ export function mountBackupSection() {
         };
     }
 
-    function restoreFromParsed(parsed) {
+    /**
+     * Asks before destroying local data, naming the backup's own date so an older
+     * copy is recognisable, and calling out work that would be lost with it.
+     */
+    function confirmRestore(backupIso) {
+        const backupWhen = formatWhen(backupIso);
+        const lines = [backupWhen
+            ? t("backup.confirm.restoreDated", { when: backupWhen })
+            : t("backup.confirm.restore")];
+
+        const localWhen = formatWhen(getUnsyncedChangeAt());
+        if (localWhen) lines.push(t("backup.warn.localNewer", { when: localWhen }));
+
+        return confirm(lines.join("\n\n"));
+    }
+
+    function restoreFromParsed(parsed, { driveModifiedTime = null } = {}) {
         restoreFullBackup({ parsed, storage });
-        alert(t("backup.msg.restored") || "Backup restored. Reloading the app…");
+
+        // After the restore, not before: restoring writes to storage, which stamps
+        // a fresh "changed at". Marking synced last leaves the device clean.
+        if (driveModifiedTime) markDriveSynced(driveModifiedTime);
+
+        alert(t("backup.msg.restored"));
         // Every store cached data in memory; a reload is the only honest way to
         // show the restored state consistently.
         location.reload();
@@ -148,12 +182,16 @@ export function mountBackupSection() {
         const reader = new FileReader();
         reader.onload = (event) => {
             try {
-                if (!confirm(t("backup.confirm.restore")
-                    || "Replace ALL data on this device with this backup? This cannot be undone.")) return;
-                restoreFromParsed(String(event.target?.result ?? ""));
+                const raw = String(event.target?.result ?? "");
+                // Read the stamp the file carries so the prompt can date it too.
+                const exportedAt = parseFullBackup(raw).exportedAt;
+                if (!confirmRestore(exportedAt)) return;
+
+                // Deliberately not marked as synced: a file restore has nothing to
+                // do with whatever is currently sitting in Drive.
+                restoreFromParsed(raw);
             } catch (err) {
-                alert((t("backup.msg.error") || "Error: {message}")
-                    .replace("{message}", String(err?.message ?? err)));
+                alert(t("backup.msg.error", { message: String(err?.message ?? err) }));
             }
         };
         reader.readAsText(file);
@@ -172,27 +210,37 @@ export function mountBackupSection() {
     }));
 
     saveBtn?.addEventListener("click", withBusy(async () => {
+        // One file per account and a blind PATCH, so a stale device would otherwise
+        // wipe a newer backup without a word. Check the revision before writing.
+        const remote = await getDriveBackupMeta();
+        if (isRemoteRevisionUnknown(remote?.modifiedTime)) {
+            const when = formatWhen(remote.modifiedTime) ?? remote.modifiedTime;
+            if (!confirm(t("backup.confirm.overwriteRemote", { when }))) return;
+        }
+
+        // Stamped before the snapshot: an edit made mid-upload is then correctly
+        // reported as still unsynced rather than swallowed by the save.
+        const startedAt = new Date();
         const { modifiedTime } = await saveBackupToDrive(buildFullBackupV1({ storage }));
-        setLastDriveBackupAt(modifiedTime);
-        alert(t("backup.msg.saved") || "Backup saved to Google Drive.");
+        markDriveSynced(modifiedTime, startedAt);
+
+        alert(t("backup.msg.saved"));
     }));
 
     restoreBtn?.addEventListener("click", withBusy(async () => {
         const result = await loadBackupFromDrive();
         if (!result) {
-            alert(t("backup.msg.noBackup") || "No backup found in your Google Drive.");
+            alert(t("backup.msg.noBackup"));
             return;
         }
 
-        if (!confirm(t("backup.confirm.restore")
-            || "Replace ALL data on this device with this backup? This cannot be undone.")) return;
+        if (!confirmRestore(result.modifiedTime ?? result.parsed?.exportedAt)) return;
 
-        restoreFromParsed(result.parsed);
+        restoreFromParsed(result.parsed, { driveModifiedTime: result.modifiedTime });
     }));
 
     disconnectBtn?.addEventListener("click", () => {
-        if (!confirm(t("backup.confirm.disconnect")
-            || "Disconnect Google Drive? The backup already in your Drive is kept.")) return;
+        if (!confirm(t("backup.confirm.disconnect"))) return;
 
         disconnectDrive();
         setDriveBackupEnabled(false);

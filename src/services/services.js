@@ -10,6 +10,9 @@ import { SetSeries } from "../models/setSeries.js";
 import { RepGroup } from "../models/repGroup.js";
 import { WorkoutSession } from "../models/workoutSession.js";
 
+import { isGoogleDriveConfigured } from "../config/googleDrive.js";
+import { markLocalDataChanged } from "./cloudBackupPreference.js";
+
 const adapter = new LocalStorageAdapter("gymapp_v1");
 
 const serializer = new JsonSerializer({
@@ -24,4 +27,11 @@ const serializer = new JsonSerializer({
     // migrate: (payload, fromV, toV) => payload, // add when needed
 });
 
-export const storage = new StorageService(adapter, serializer);
+// onWrite stamps "this device changed at ..." so the backup UI can warn before a
+// restore silently discards work that never reached Drive.
+//
+// Left unset in a build without a Drive client ID: the hook is Drive-only
+// bookkeeping, and a local-only deployment should not carry it on every write.
+export const storage = new StorageService(adapter, serializer, {
+    onWrite: isGoogleDriveConfigured() ? markLocalDataChanged : undefined,
+});

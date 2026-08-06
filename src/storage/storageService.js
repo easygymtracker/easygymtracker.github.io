@@ -7,13 +7,27 @@ export class StorageService {
     /**
      * @param {object} adapter  Must implement: get(key)->string|null, set(key,string), remove(key), keys(prefix)->string[]
      * @param {object} serializer Must implement: serialize(value)->string, deserialize(raw)->any
+     * @param {object} [options]
+     * @param {Function} [options.onWrite] Called after any mutation. Lets callers
+     *        track "this device has unsaved changes" without every store knowing about backups.
      */
-    constructor(adapter, serializer) {
+    constructor(adapter, serializer, { onWrite } = {}) {
         if (!adapter) throw new Error("StorageService: adapter is required");
         if (!serializer) throw new Error("StorageService: serializer is required");
 
         this.adapter = adapter;
         this.serializer = serializer;
+        this.onWrite = typeof onWrite === "function" ? onWrite : null;
+    }
+
+    /** Notify the write observer. A failing observer must never break a write. */
+    _touch() {
+        if (!this.onWrite) return;
+        try {
+            this.onWrite();
+        } catch {
+            // Bookkeeping only; the data is already stored.
+        }
     }
 
     /** Read a value (revived model or plain object, depending on serializer). */
@@ -27,11 +41,13 @@ export class StorageService {
     set(key, value) {
         const raw = this.serializer.serialize(value);
         this.adapter.set(key, raw);
+        this._touch();
     }
 
     /** Delete a key. */
     remove(key) {
         this.adapter.remove(key);
+        this._touch();
     }
 
     /** List keys (within adapter namespace), optionally filtered by prefix. */
@@ -85,6 +101,9 @@ export class StorageService {
             this.adapter.set(key, raw);
             written += 1;
         }
+
+        // Bypasses set(), so signal the observer once for the whole restore.
+        this._touch();
         return written;
     }
 }
