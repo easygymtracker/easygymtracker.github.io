@@ -15,13 +15,13 @@ export function routineListItem(routine) {
     const desc = escapeHtml(routine.description || "");
     const seriesCount = Array.isArray(routine.series) ? routine.series.length : 0;
 
-    const startSessionLabel = escapeHtml(t("routine.session.start") || "Start session");
+    const startSessionLabel = escapeHtml(t("routine.session.start"));
     const startSessionHelp = escapeHtml(
-        t("routine.session.startHelp") || "Start a session using this routine"
+        t("routine.session.startHelp")
     );
 
     const downloadHelp = escapeHtml(
-        t("routines.downloadHelp") || "Download this routine in a format you can import later"
+        t("routines.downloadHelp")
     );
 
     return `

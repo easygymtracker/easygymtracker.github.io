@@ -1,10 +1,11 @@
 import { t } from "/src/internationalization/i18n.js";
 import { escapeHtml } from "../dom.js";
+import { formatDate, formatMonthYear, formatTime, toDayKey, weekdayLabels } from "/src/ui/format.js";
 import { formatMs } from "/src/utils/numberFormat.js";
 
-function toDayKey(value) {
-    return String(value || "").slice(0, 10);
-}
+// The calendar wants its own empty-state wording rather than a bare dash.
+const formatCalendarDay = (dayKey) =>
+    dayKey ? formatDate(dayKey, dayKey) : t("workoutCalendar.noDaySelected");
 
 function monthStart(date) {
     return new Date(date.getFullYear(), date.getMonth(), 1);
@@ -22,27 +23,8 @@ function dayKeyFromParts(year, month0, day) {
     return `${year}-${pad2(month0 + 1)}-${pad2(day)}`;
 }
 
-function fmtMonthYear(date) {
-    return new Intl.DateTimeFormat(undefined, { month: "long", year: "numeric" }).format(date);
-}
 
-function fmtDayLabel(dayKey) {
-    if (!dayKey) return t("workoutCalendar.noDaySelected");
-    const date = new Date(dayKey);
-    if (Number.isNaN(date.getTime())) return dayKey;
-    return new Intl.DateTimeFormat(undefined, { year: "numeric", month: "short", day: "numeric" }).format(date);
-}
 
-function weekdayLabels() {
-    const base = new Date(Date.UTC(2026, 0, 4)); // Sunday reference
-    const labels = [];
-    for (let i = 0; i < 7; i++) {
-        const d = new Date(base);
-        d.setUTCDate(base.getUTCDate() + i);
-        labels.push(new Intl.DateTimeFormat(undefined, { weekday: "short" }).format(d));
-    }
-    return labels;
-}
 
 function aggregateDay(sessions) {
     const stats = {
@@ -77,12 +59,6 @@ function sessionsByDay(sessions) {
     return map;
 }
 
-function formatSessionTime(iso) {
-    if (!iso) return t("common.dash");
-    const date = new Date(iso);
-    if (Number.isNaN(date.getTime())) return t("common.dash");
-    return new Intl.DateTimeFormat(undefined, { hour: "2-digit", minute: "2-digit" }).format(date);
-}
 
 function formatVolume(volume) {
     const v = Number(volume);
@@ -167,7 +143,7 @@ export function mountWorkoutCalendar({
             const summary = hasWorkouts
                 ? t("workoutCalendar.daySummary", { count: String(stats.count), sets: String(stats.sets) })
                 : t("workoutCalendar.noWorkoutsThisDay");
-            const dayLabel = fmtDayLabel(key);
+            const dayLabel = formatCalendarDay(key);
 
             dayCells.push(`
                 <button type="button"
@@ -194,7 +170,7 @@ export function mountWorkoutCalendar({
         const details = selectedSessions.length
             ? selectedSessions.map((session) => {
                 const routineName = escapeHtml(session?.routineName || t("workoutCalendar.untitledRoutine"));
-                const startedAt = formatSessionTime(session?.startedAt || session?.date);
+                const startedAt = formatTime(session?.startedAt || session?.date);
                 const duration = formatMs(Number(session?.durationMs ?? 0) || 0);
                 const sets = Number(session?.totals?.sets ?? 0) || 0;
                 const reps = Number(session?.totals?.reps ?? 0) || 0;
@@ -228,7 +204,7 @@ export function mountWorkoutCalendar({
                     <h3>${escapeHtml(t(titleKey))}</h3>
                     <div class="workoutCalendarNav">
                         <button class="btn" type="button" data-action="prev-month" aria-label="${escapeHtml(t("workoutCalendar.prevMonth"))}">‹</button>
-                        <strong class="workoutCalendarMonthLabel">${escapeHtml(fmtMonthYear(viewDate))}</strong>
+                        <strong class="workoutCalendarMonthLabel">${escapeHtml(formatMonthYear(viewDate))}</strong>
                         <button class="btn" type="button" data-action="next-month" aria-label="${escapeHtml(t("workoutCalendar.nextMonth"))}">›</button>
                     </div>
                 </header>
@@ -253,7 +229,7 @@ export function mountWorkoutCalendar({
 
                 <div class="workoutCalendarDetails card${isCompact ? " workoutCalendarDetails--compact" : ""}">
                     <div class="workoutCalendarDetailsHeader">
-                        <strong>${escapeHtml(fmtDayLabel(selectedDayKey))}</strong>
+                        <strong>${escapeHtml(formatCalendarDay(selectedDayKey))}</strong>
                         ${selectedDayKey ? `<span class="note">${escapeHtml(selectedSummary)}</span>` : ""}
                     </div>
                     ${isCompact

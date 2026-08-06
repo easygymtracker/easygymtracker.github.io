@@ -2,12 +2,8 @@
 
 import { t } from "/src/internationalization/i18n.js";
 import { escapeHtml } from "/src/ui/dom.js";
-
-function normalizeTuple(v) {
-  if (v == null) return { left: null, right: null };
-  if (typeof v === "number") return { left: v, right: v };
-  return { left: v.left ?? null, right: v.right ?? null };
-}
+import { openModal } from "/src/ui/modal.js";
+import { toSided as normalizeTuple } from "/src/ui/sidedValue.js";
 
 function parseIntOrNull(s) {
   if (s === "" || s == null) return null;
@@ -29,14 +25,9 @@ export function openSessionSetModal({
   initialRestSeconds,
   mode = "edit",
 }) {
-  return new Promise((resolve) => {
+  // Backing out (Escape, backdrop, Cancel) resolves null: "no set recorded".
+  return openModal({ dismissWith: null, setup({ card: modal, close }) {
     let currentLaterality = laterality ?? "bilateral";
-
-    const overlay = document.createElement("div");
-    overlay.className = "modalOverlay";
-
-    const modal = document.createElement("div");
-    modal.className = "modalCard";
 
     const initialRepsTuple = normalizeTuple(initialReps);
     const initialWeightTuple = normalizeTuple(initialWeight);
@@ -51,23 +42,22 @@ export function openSessionSetModal({
         ? (initialWeightTuple.left ?? "")
         : (typeof initialWeight === "number" ? initialWeight : (initialWeightTuple.left ?? ""));
 
-    const lateralityLabel = escapeHtml(t("repGroup.lateralityLabel") || "Laterality");
-    const bilateralLabel = escapeHtml(t("repGroup.laterality.bilateral") || "Bilateral");
-    const unilateralLabel = escapeHtml(t("repGroup.laterality.unilateral") || "Unilateral");
+    const lateralityLabel = escapeHtml(t("repGroup.lateralityLabel"));
+    const bilateralLabel = escapeHtml(t("repGroup.laterality.bilateral"));
+    const unilateralLabel = escapeHtml(t("repGroup.laterality.unilateral"));
 
     modal.innerHTML = `
       <h3>
         ${escapeHtml(
       mode === "create"
-        ? (t("session.addSet") || "Add set")
+        ? t("session.addSet")
         : t("session.currentSet.done")
     )}
       </h3>
 
       <p class="muted">
         ${escapeHtml(
-      t("session.currentSet.subtitle") ||
-      "Enter what you actually performed to track your progress."
+      t("session.currentSet.subtitle")
     )}
       </p>
 
@@ -103,7 +93,7 @@ export function openSessionSetModal({
       <div data-section="unilateral-reps" ${currentLaterality === "bilateral" ? 'style="display:none"' : ""}>
         <div class="row">
           <label>
-            ${escapeHtml(t("session.enterRepsLeft") || `${t("session.reps")} (L)`)}
+            ${escapeHtml(t("session.enterRepsLeft"))}
             <input
               type="number"
               min="1"
@@ -113,7 +103,7 @@ export function openSessionSetModal({
             />
           </label>
           <label>
-            ${escapeHtml(t("session.enterRepsRight") || `${t("session.reps")} (R)`)}
+            ${escapeHtml(t("session.enterRepsRight"))}
             <input
               type="number"
               min="1"
@@ -164,7 +154,7 @@ export function openSessionSetModal({
       </div>
 
       <label>
-        ${escapeHtml(t("session.rest"))} (${escapeHtml(t("session.seconds") || "seconds")})
+        ${escapeHtml(t("session.rest"))} (${escapeHtml(t("session.seconds"))})
         <input
           type="number"
           min="0"
@@ -187,31 +177,19 @@ export function openSessionSetModal({
           data-action="confirm"
           aria-label="${escapeHtml(
           mode === "create"
-            ? (t("session.addSet.confirm") || "Add set")
+            ? t("session.addSet.confirm")
             : t("session.currentSet.done")
         )}"
         >
           <span class="currentSetDoneIcon" aria-hidden="true">✓</span>
           ${escapeHtml(
           mode === "create"
-            ? (t("session.addSet.confirm") || "Add set")
+            ? t("session.addSet.confirm")
             : t("session.currentSet.done")
         )}
         </button>
       </div>
     `;
-
-    overlay.appendChild(modal);
-    document.body.appendChild(overlay);
-
-    function onKeyDown(e) {
-      if (e.key === "Escape") {
-        e.preventDefault();
-        close(null);
-      }
-    }
-
-    document.addEventListener("keydown", onKeyDown);
 
     const errorEl = modal.querySelector(".modalError");
     const confirmBtn = modal.querySelector('[data-action="confirm"]');
@@ -295,8 +273,7 @@ export function openSessionSetModal({
       markInvalid(repsInput, invalid);
       if (invalid && live) {
         showError(
-          t("session.error.invalidReps") ||
-          "Reps must be a positive whole number."
+          t("session.error.invalidReps")
         );
       }
       return !invalid;
@@ -318,8 +295,7 @@ export function openSessionSetModal({
 
       if ((lInvalid || rInvalid || bothEmpty) && live) {
         showError(
-          t("session.error.invalidReps") ||
-          "Reps must be a positive whole number."
+          t("session.error.invalidReps")
         );
       }
 
@@ -342,8 +318,7 @@ export function openSessionSetModal({
       markInvalid(input, invalid);
       if (invalid && live) {
         showError(
-          t("session.error.invalidWeight") ||
-          "Weight must be zero or a positive number."
+          t("session.error.invalidWeight")
         );
       }
       return !invalid;
@@ -362,8 +337,7 @@ export function openSessionSetModal({
 
       if (invalid && live) {
         showError(
-          t("session.error.invalidRest") ||
-          "Rest must be zero or a positive whole number."
+          t("session.error.invalidRest")
         );
       }
 
@@ -401,12 +375,6 @@ export function openSessionSetModal({
     weightLeftInput?.addEventListener("input", () => { validateAll(true); syncConfirmState(); });
     weightRightInput?.addEventListener("input", () => { validateAll(true); syncConfirmState(); });
     restInput?.addEventListener("input", () => { validateAll(true); syncConfirmState(); });
-
-    function close(result) {
-      document.removeEventListener("keydown", onKeyDown);
-      overlay.remove();
-      resolve(result);
-    }
 
     modal.querySelector('[data-action="cancel"]').onclick = () => close(null);
 
@@ -462,5 +430,5 @@ export function openSessionSetModal({
     };
 
     syncConfirmState();
-  });
+  } });
 }

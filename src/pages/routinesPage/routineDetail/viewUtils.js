@@ -1,17 +1,8 @@
 // pages/routineDetail/viewUtils.js
 
-export function escapeHtml(s) {
-    return String(s)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-}
-
-export function escapeHtmlAttr(s) {
-    return escapeHtml(s).replaceAll("\n", " ");
-}
+// Re-exported so importers here keep one import line, but there is now a single
+// implementation (ui/dom.js) rather than two copies free to drift apart.
+export { escapeHtml, escapeHtmlAttr } from "../../../ui/dom.js";
 
 export function flashInvalid(inputEl) {
     inputEl.focus();

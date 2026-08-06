@@ -16,6 +16,12 @@
     /* lighter blue */
     --danger: #ff6b6b;
     --border: rgba(255, 255, 255, 0.10);
+    /* Translucent lifts used for nested panels. Kept as tokens because the same
+       three tints were hand-written 19 times across five stylesheets, so the
+       "raise a surface one step" decision had no single place to live. */
+    --surface-1: rgba(255, 255, 255, 0.02);
+    --surface-2: rgba(255, 255, 255, 0.03);
+    --surface-3: rgba(255, 255, 255, 0.04);
     --shadow: 0 12px 34px rgba(0, 0, 0, 0.55);
     --radius: 14px;
     --radius-sm: 10px;
@@ -89,7 +95,7 @@ header {
     justify-content: center;
     text-decoration: none;
     border: 1px solid var(--border);
-    background: rgba(255, 255, 255, 0.04);
+    background: var(--surface-3);
     color: var(--text);
     padding: 10px 14px;
     min-height: 44px;
@@ -229,7 +235,7 @@ select {
     padding: 10px 12px;
     border-radius: var(--radius-md);
     border: 1px solid var(--border);
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--surface-2);
     color: var(--text);
     outline: none;
     line-height: 1.4;
@@ -283,6 +289,15 @@ textarea {
 
 .uHidden {
     display: none;
+}
+
+/* Hidden but still occupying its box, so neighbours do not shift. */
+.uInvisible {
+    visibility: hidden;
+}
+
+.uGrow {
+    flex: 1;
 }
 
 .uFlexRowWrap {
@@ -566,6 +581,18 @@ select {
     margin-top: 16px;
 }
 
+/* Extra breathing room when the actions follow a dense block (tables, stats). */
+.modalActions--spaced {
+    margin-top: 20px;
+}
+
+/* Charts are laid out by their viewBox; the box just needs to fill its column. */
+.lineChart {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
 .input--error {
     border-color: var(--danger, #ef4444);
 }
@@ -618,7 +645,7 @@ select {
 
 .notifToggle[data-enabled="false"] {
     color: var(--muted);
-    background: rgba(255, 255, 255, 0.04);
+    background: var(--surface-3);
     border-color: rgba(255, 255, 255, 0.14);
 }
 
@@ -640,7 +667,7 @@ select {
     border: 1px solid var(--border);
     border-radius: 14px;
     padding: 14px;
-    background: rgba(255, 255, 255, 0.02);
+    background: var(--surface-1);
 }
 
 .storageOption--active {

@@ -2,6 +2,7 @@
 
 import { t } from "/src/internationalization/i18n.js";
 import { escapeHtml } from "/src/ui/dom.js";
+import { bindActions, openModal } from "/src/ui/modal.js";
 import { formatMs } from "/src/utils/numberFormat.js";
 
 // --- helpers ---
@@ -189,18 +190,18 @@ function motivationalLine(stats, durationMs) {
     const minutes = Math.round(durationMs / 60000);
     const { totalSets, totalVolume } = stats;
 
-    if (totalSets === 0) return t("session.summary.motivational.justStarted") || "Every session counts. See you next time! \uD83D\uDCAA";
-    if (totalVolume > 5000) return t("session.summary.motivational.beast") || "Absolute beast mode. \uD83D\uDD25";
-    if (totalVolume > 2000) return t("session.summary.motivational.strong") || "Seriously strong effort. \uD83D\uDCAA";
-    if (minutes > 60) return t("session.summary.motivational.endurance") || "Over an hour of work. That's dedication. \u23F1\uFE0F";
-    if (totalSets >= 15) return t("session.summary.motivational.volume") || "High-volume session. Your body will thank you. \uD83D\uDCAF";
-    return t("session.summary.motivational.done") || "Workout done. Keep showing up! \uD83D\uDC4A";
+    if (totalSets === 0) return t("session.summary.motivational.justStarted");
+    if (totalVolume > 5000) return t("session.summary.motivational.beast");
+    if (totalVolume > 2000) return t("session.summary.motivational.strong");
+    if (minutes > 60) return t("session.summary.motivational.endurance");
+    if (totalSets >= 15) return t("session.summary.motivational.volume");
+    return t("session.summary.motivational.done");
 }
 
 // --- modal ---
 
 export function openWorkoutSummaryModal({ routine, sessionStartIso, durationMs, resolveExerciseName }) {
-    return new Promise((resolve) => {
+    return openModal({ className: "workoutSummaryModal", setup({ card: modal, close }) {
         const stats = computeSessionStats(routine, sessionStartIso, { resolveExerciseName });
         const { totalVolume, totalReps, totalSets, exercises } = stats;
         const prDetection = computeSessionPRs(routine, sessionStartIso, { resolveExerciseName });
@@ -214,12 +215,6 @@ export function openWorkoutSummaryModal({ routine, sessionStartIso, durationMs, 
             ? (totalVolume / 1000).toFixed(1) + " t"
             : Math.round(totalVolume) + " kg";
 
-        const overlay = document.createElement("div");
-        overlay.className = "modalOverlay";
-
-        const modal = document.createElement("div");
-        modal.className = "modalCard workoutSummaryModal";
-
         const exerciseRows = exercises.map((ex) => `
             <tr>
                 <td>${escapeHtml(ex.name)}</td>
@@ -231,9 +226,9 @@ export function openWorkoutSummaryModal({ routine, sessionStartIso, durationMs, 
 
         const prRows = (prDetection?.byExercise ?? []).map((item) => {
             const badges = [
-                item.weightPr ? (t("session.summary.pr.weight") || "Weight") : null,
-                item.repsPr ? (t("session.summary.pr.reps") || "Reps") : null,
-                item.volumePr ? (t("session.summary.pr.volume") || "Volume") : null,
+                item.weightPr ? t("session.summary.pr.weight") : null,
+                item.repsPr ? t("session.summary.pr.reps") : null,
+                item.volumePr ? t("session.summary.pr.volume") : null,
             ].filter(Boolean);
 
             return `
@@ -247,26 +242,26 @@ export function openWorkoutSummaryModal({ routine, sessionStartIso, durationMs, 
         modal.innerHTML = `
             <div class="summaryHeader">
                 <div class="summaryIcon" aria-hidden="true">\u2705</div>
-                <h3>${escapeHtml(t("session.summary.title") || "Workout complete!")}</h3>
+                <h3>${escapeHtml(t("session.summary.title"))}</h3>
                 <p class="muted summaryMotivational">${escapeHtml(motivationalLine(stats, durationMs))}</p>
             </div>
 
             <div class="summaryKpis">
                 <div class="summaryKpi">
                     <span class="summaryKpiValue">${escapeHtml(formatMs(durationMs))}</span>
-                    <span class="summaryKpiLabel muted">${escapeHtml(t("session.summary.duration") || "Duration")}</span>
+                    <span class="summaryKpiLabel muted">${escapeHtml(t("session.summary.duration"))}</span>
                 </div>
                 <div class="summaryKpi">
                     <span class="summaryKpiValue">${totalSets}</span>
-                    <span class="summaryKpiLabel muted">${escapeHtml(t("session.summary.sets") || "Sets done")}</span>
+                    <span class="summaryKpiLabel muted">${escapeHtml(t("session.summary.sets"))}</span>
                 </div>
                 <div class="summaryKpi">
                     <span class="summaryKpiValue">${totalReps}</span>
-                    <span class="summaryKpiLabel muted">${escapeHtml(t("session.summary.totalReps") || "Total reps")}</span>
+                    <span class="summaryKpiLabel muted">${escapeHtml(t("session.summary.totalReps"))}</span>
                 </div>
                 <div class="summaryKpi">
                     <span class="summaryKpiValue">${escapeHtml(fmtVol)}</span>
-                    <span class="summaryKpiLabel muted">${escapeHtml(t("session.summary.volume") || "Volume lifted")}</span>
+                    <span class="summaryKpiLabel muted">${escapeHtml(t("session.summary.volume"))}</span>
                 </div>
             </div>
 
@@ -275,7 +270,7 @@ export function openWorkoutSummaryModal({ routine, sessionStartIso, durationMs, 
                 <span class="summaryComparisonIcon" aria-hidden="true">${comparison.icon}</span>
                 <span class="summaryComparisonText">
                     ${escapeHtml(
-                        (t("session.summary.comparison") || "Like lifting {count} {thing}")
+                        t("session.summary.comparison")
                             .replace("{count}", String(comparison.count))
                             .replace("{thing}", comparisonLabel)
                     )}
@@ -289,58 +284,39 @@ export function openWorkoutSummaryModal({ routine, sessionStartIso, durationMs, 
                     <summary class="summaryPrSummary">
                         <span class="summaryPrIcon" aria-hidden="true">\uD83C\uDFC6</span>
                         <span>${escapeHtml(
-                            (t("session.summary.prsSummary") || "{count} new PR(s)")
+                            t("session.summary.prsSummary")
                                 .replace("{count}", String(prDetection.totalPrs))
                         )}</span>
                     </summary>
                     <ul class="summaryPrList">${prRows}</ul>
                 </details>
-                ` : `<p class="muted summaryPrNone">${escapeHtml(t("session.summary.pr.none") || "No new PRs in this session.")}</p>`}
+                ` : `<p class="muted summaryPrNone">${escapeHtml(t("session.summary.pr.none"))}</p>`}
             </div>
 
             ${exercises.length > 0 ? `
             <div class="summaryBreakdown">
-                <p class="summaryBreakdownTitle muted">${escapeHtml(t("session.summary.breakdown") || "Breakdown")}</p>
+                <p class="summaryBreakdownTitle muted">${escapeHtml(t("session.summary.breakdown"))}</p>
                 <table class="summaryTable">
                     <thead>
                         <tr>
-                            <th>${escapeHtml(t("session.exercise") || "Exercise")}</th>
-                            <th>${escapeHtml(t("session.sets") || "Sets")}</th>
-                            <th>${escapeHtml(t("session.reps") || "Reps")}</th>
-                            <th>${escapeHtml(t("session.summary.volume") || "Volume")}</th>
+                            <th>${escapeHtml(t("session.exercise"))}</th>
+                            <th>${escapeHtml(t("session.sets"))}</th>
+                            <th>${escapeHtml(t("session.reps"))}</th>
+                            <th>${escapeHtml(t("session.summary.volume"))}</th>
                         </tr>
                     </thead>
                     <tbody>${exerciseRows}</tbody>
                 </table>
             </div>
-            ` : `<p class="muted" style="text-align:center; margin-top:12px;">${escapeHtml(t("session.summary.noData") || "No sets recorded this session.")}</p>`}
+            ` : `<p class="muted" style="text-align:center; margin-top:12px;">${escapeHtml(t("session.summary.noData"))}</p>`}
 
-            <div class="modalActions" style="margin-top:20px;">
-                <button type="button" class="btn summaryCloseBtn" data-action="close" style="flex:1;">
-                    ${escapeHtml(t("session.summary.close") || "Close")}
+            <div class="modalActions modalActions--spaced">
+                <button type="button" class="btn summaryCloseBtn uGrow" data-action="close">
+                    ${escapeHtml(t("session.summary.close"))}
                 </button>
             </div>
         `;
 
-        overlay.appendChild(modal);
-        document.body.appendChild(overlay);
-
-        function close() {
-            overlay.remove();
-            resolve();
-        }
-
-        modal.querySelector('[data-action="close"]').onclick = close;
-
-        overlay.addEventListener("click", (e) => {
-            if (e.target === overlay) close();
-        });
-
-        document.addEventListener("keydown", function onKey(e) {
-            if (e.key === "Escape") {
-                document.removeEventListener("keydown", onKey);
-                close();
-            }
-        });
-    });
+        bindActions(modal, { close: () => close() });
+    } });
 }

@@ -2,104 +2,18 @@ import { escapeHtml } from "../../ui/dom.js";
 import { buildProfileExportV1, downloadProfileJson } from "../../export/profileExport.js";
 import { importProfileFromExport } from "../../import/profileImport.js";
 import { t } from "../../internationalization/i18n.js";
+import { formatDateTime, formatValue, parseOptionalNumber, toInputDateTime } from "../../ui/format.js";
+import { lineChartSvg } from "../../ui/components/lineChart.js";
+import { buildDailyMax } from "./measurementMetrics.js";
 import { mountWorkoutCalendar } from "../../ui/components/workoutCalendar.js";
 import { mountBackupSection } from "./backupSection.js";
 
-function toInputDateTimeValue(date = new Date()) {
-    const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
-    return local.toISOString().slice(0, 16);
-}
 
-function parseOptionalNumber(value) {
-    const trimmed = String(value ?? "").trim();
-    if (!trimmed) return null;
-    const parsed = Number(trimmed);
-    return Number.isFinite(parsed) ? parsed : null;
-}
 
-function formatValue(value, suffix) {
-    if (value == null) return t("common.dash");
-    return `${value}${suffix}`;
-}
 
-function formatRecordedAt(value) {
-    if (!value) return t("common.dash");
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return value;
-    return new Intl.DateTimeFormat(undefined, {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-    }).format(date);
-}
 
-function getDayKey(value) {
-    return String(value || "").slice(0, 10);
-}
 
-function buildDailyMax(entries, field) {
-    const daily = new Map();
-    entries.forEach((entry) => {
-        const value = entry[field];
-        if (value == null) return;
-        const key = getDayKey(entry.recordedAt);
-        const current = daily.get(key);
-        if (current == null || value > current) {
-            daily.set(key, value);
-        }
-    });
 
-    return Array.from(daily.entries())
-        .sort((a, b) => a[0].localeCompare(b[0]))
-        .map(([day, value]) => ({ day, value }));
-}
-
-function lineChartSvg(points, color, unit) {
-    if (!points.length) {
-        return `<div class="note">${escapeHtml(t("profileHistory.noDataYet"))}</div>`;
-    }
-
-    const width = 320;
-    const height = 140;
-    const padL = 30;
-    const padR = 12;
-    const padT = 12;
-    const padB = 24;
-    const min = Math.min(...points.map((point) => point.value));
-    const max = Math.max(...points.map((point) => point.value));
-    const range = max - min || 1;
-    const plotW = width - padL - padR;
-    const plotH = height - padT - padB;
-
-    const coords = points.map((point, index) => {
-        const x = padL + (plotW * (points.length === 1 ? 0.5 : index / (points.length - 1)));
-        const y = padT + (plotH * (1 - ((point.value - min) / range)));
-        return { ...point, x, y };
-    });
-
-    const polyline = coords.map((point) => `${point.x},${point.y}`).join(" ");
-    const dots = coords.map((point) => `
-        <circle cx="${point.x}" cy="${point.y}" r="3.5" fill="${color}">
-          <title>${escapeHtml(point.day)}: ${escapeHtml(String(point.value))}${escapeHtml(unit)}</title>
-        </circle>
-    `).join("");
-    const startLabel = escapeHtml(coords[0].day.slice(5));
-    const endLabel = escapeHtml(coords[coords.length - 1].day.slice(5));
-
-    return `
-    <svg viewBox="0 0 ${width} ${height}" role="img" aria-label="${escapeHtml(t("profile.chart.dailyMaxAria"))}" style="width:100%; height:auto; display:block;">
-        <line x1="${padL}" y1="${padT}" x2="${padL}" y2="${height - padB}" stroke="var(--border)" />
-        <line x1="${padL}" y1="${height - padB}" x2="${width - padR}" y2="${height - padB}" stroke="var(--border)" />
-        <text x="${padL}" y="${padT - 2}" fill="var(--muted)" font-size="10">${escapeHtml(String(max))}${escapeHtml(unit)}</text>
-        <text x="${padL}" y="${height - padB + 14}" fill="var(--muted)" font-size="10">${startLabel}</text>
-        <text x="${width - padR}" y="${height - padB + 14}" text-anchor="end" fill="var(--muted)" font-size="10">${endLabel}</text>
-        <polyline fill="none" stroke="${color}" stroke-width="2.5" points="${polyline}" />
-        ${dots}
-      </svg>
-    `;
-}
 
 function metricCard({ title, valueSuffix, color, entries, field }) {
     const points = buildDailyMax(entries, field);
@@ -111,7 +25,7 @@ function metricCard({ title, valueSuffix, color, entries, field }) {
           <h3 style="margin:0; font-size:15px;">${escapeHtml(title)}</h3>
           <strong style="font-size:18px; color:${color};">${escapeHtml(formatValue(latest, valueSuffix))}</strong>
         </div>
-        ${lineChartSvg(points, color, valueSuffix)}
+        ${lineChartSvg(points, { color, unit: valueSuffix, ariaLabel: t("profile.chart.dailyMaxAria") })}
                 <p class="note" style="margin:0;">${escapeHtml(t("profile.chart.maxPerDayNote"))}</p>
       </article>
     `;
@@ -122,7 +36,7 @@ function entryRow(entry) {
       <div class="card" data-entry-id="${escapeHtml(entry.id)}" style="padding:12px; display:grid; gap:8px;">
         <div style="display:flex; justify-content:space-between; gap:10px; align-items:flex-start;">
           <div>
-            <strong>${escapeHtml(formatRecordedAt(entry.recordedAt))}</strong>
+            <strong>${escapeHtml(formatDateTime(entry.recordedAt))}</strong>
                         <div class="note">${escapeHtml(t("profile.weightLabel"))}: ${escapeHtml(formatValue(entry.weightKg, " kg"))} · ${escapeHtml(t("profile.bodyFatLabel"))}: ${escapeHtml(formatValue(entry.bodyFatPct, "%"))} · ${escapeHtml(t("profile.muscleLabel"))}: ${escapeHtml(formatValue(entry.muscleKg, " kg"))}</div>
           </div>
                     <button class="btn danger" type="button" data-action="delete-entry">${escapeHtml(t("common.delete"))}</button>
@@ -157,7 +71,7 @@ export function mountProfilePage({ profileStore, workoutSessionStore }) {
 
     function resetForm() {
         form.reset();
-        recordedAtInput.value = toInputDateTimeValue();
+        recordedAtInput.value = toInputDateTime();
     }
 
     function render() {
@@ -178,7 +92,7 @@ export function mountProfilePage({ profileStore, workoutSessionStore }) {
     form.addEventListener("submit", (event) => {
         event.preventDefault();
 
-        const recordedAt = recordedAtInput.value || toInputDateTimeValue();
+        const recordedAt = recordedAtInput.value || toInputDateTime();
         const weightKg = parseOptionalNumber(weightInput.value);
         const bodyFatPct = parseOptionalNumber(bodyFatInput.value);
         const muscleKg = parseOptionalNumber(muscleInput.value);

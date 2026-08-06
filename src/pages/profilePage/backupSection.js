@@ -5,6 +5,8 @@
 // whole-app concern that merely happens to live on the profile screen.
 
 import { t } from "../../internationalization/i18n.js";
+import { formatDateTime } from "../../ui/format.js";
+import { setHidden, show } from "../../ui/dom.js";
 import { storage } from "../../services/services.js";
 import {
     buildFullBackupV1,
@@ -32,15 +34,8 @@ import {
     setLastDriveBackupAt,
 } from "../../services/cloudBackupPreference.js";
 
-function formatWhen(iso) {
-    if (!iso) return null;
-    const date = new Date(iso);
-    if (Number.isNaN(date.getTime())) return null;
-    return new Intl.DateTimeFormat(undefined, {
-        year: "numeric", month: "short", day: "numeric",
-        hour: "2-digit", minute: "2-digit",
-    }).format(date);
-}
+// null rather than a dash: callers branch on "is there a date at all".
+const formatWhen = (iso) => formatDateTime(iso, null);
 
 export function mountBackupSection() {
     const sectionEl = document.getElementById("backupSection");
@@ -76,7 +71,7 @@ export function mountBackupSection() {
         // No client ID configured -> the Drive option does not exist in this build.
         // Hide the whole card rather than showing a dead one, and stop promising
         // "two places" in the intro when only local storage is on offer.
-        if (driveCardEl) driveCardEl.classList.toggle("uHidden", !driveAvailable);
+        setHidden(driveCardEl, !driveAvailable);
 
         if (introEl) {
             const key = driveAvailable ? "backup.where.title" : "backup.where.titleLocalOnly";
@@ -87,14 +82,12 @@ export function mountBackupSection() {
 
         if (!driveAvailable) return;
 
-        if (driveControlsEl) driveControlsEl.classList.remove("uHidden");
+        show(driveControlsEl);
 
         const enabled = isDriveBackupEnabled();
 
-        if (connectBtn) connectBtn.classList.toggle("uHidden", enabled);
-        for (const btn of [saveBtn, restoreBtn, disconnectBtn]) {
-            btn?.classList.toggle("uHidden", !enabled);
-        }
+        setHidden(connectBtn, enabled);
+        for (const btn of [saveBtn, restoreBtn, disconnectBtn]) setHidden(btn, !enabled);
 
         for (const btn of [connectBtn, saveBtn, restoreBtn, disconnectBtn]) {
             if (btn) btn.disabled = busy;

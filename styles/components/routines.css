@@ -24,7 +24,7 @@
 }
 
 .routineRow:hover {
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--surface-2);
 }
 
 .routineRow[draggable="true"] {
@@ -128,7 +128,7 @@
     align-items: center;
     justify-content: center;
     border: 1px solid var(--border);
-    background: rgba(255, 255, 255, 0.04);
+    background: var(--surface-3);
     color: var(--text);
     border-radius: 999px;
     cursor: pointer;

@@ -37,7 +37,7 @@ export function setupRoutineImport({ triggerEl, routineStore, exerciseStore, nav
             const { existingRoutine } = parseRoutineExport({ rawText: text, routineStore });
 
             if (existingRoutine) {
-                const msg = (t("routines.import.confirmUpdate") || "This will update the existing routine \"{name}\". History will be preserved. Continue?")
+                const msg = t("routines.import.confirmUpdate")
                     .replace("{name}", existingRoutine.name);
                 if (!confirm(msg)) return;
             }

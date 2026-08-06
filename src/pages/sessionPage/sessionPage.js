@@ -143,7 +143,7 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
         inp.style.display = "none";
         const textEl = currentSectionEl.querySelector('[data-action="start-edit-desc"]');
         if (textEl) {
-            const placeholder = t("session.seriesDesc.placeholder") || "Add notes…";
+            const placeholder = t("session.seriesDesc.placeholder");
             textEl.textContent = inp.value || placeholder;
             textEl.classList.toggle("currentSeriesDescText--empty", !inp.value);
             textEl.style.display = "";
@@ -210,11 +210,7 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
     }
 
     function confirmLeaveSession() {
-        const msg =
-            t("confirm.leaveSession") ||
-            t("confirm.leaveWorkout") ||
-            "Leave workout session?";
-        return confirm(msg);
+        return confirm(t("confirm.leaveSession"));
     }
 
     setLeaveGuard(({ fromPath, toPath }) => {
@@ -359,7 +355,7 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
             ? `⏳ ${formatMs(restRemainingLiveMs)}`
             : `⏱ ${formatMs(setElapsedMs)}`;
 
-        const restTxt = restRunning ? (t("session.rest") || "Rest") : "";
+        const restTxt = restRunning ? t("session.rest") : "";
 
         const body = [
             timerTxt,
@@ -371,15 +367,12 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
             .filter(Boolean)
             .join(" - ");
 
-        const actionTitle =
-            t("session.notification.setDone") ||
-            t("session.currentSet.complete") ||
-            "Set done";
+        const actionTitle = t("session.notification.setDone");
 
         navigator.serviceWorker.controller.postMessage({
             type: "SESSION_UPDATE",
             payload: {
-                title: t("session.title") || "Workout session",
+                title: t("session.title"),
                 body,
                 restRunning,
                 actionTitle,
@@ -790,7 +783,7 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
         if (!valueEl || !labelEl) return;
 
         if (restRunning) {
-            labelEl.textContent = t("session.currentSet.restTimer") || "Rest timer";
+            labelEl.textContent = t("session.currentSet.restTimer");
 
             if ((restRemainingMs ?? 0) <= 0) {
                 endRestAndResumeSet({ resetSet: true });
@@ -833,7 +826,7 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
             return;
         }
 
-        labelEl.textContent = t("session.currentSet.timer") || "Set timer";
+        labelEl.textContent = t("session.currentSet.timer");
         valueEl.textContent = formatMs(setElapsedMs);
     }
 
@@ -914,8 +907,7 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
 
         const routine = getSessionRoutine();
         if (routine && !isWorkoutComplete(routine)) {
-            const msg = t("confirm.finishIncompleteSession")
-                || "Finish this workout now? Pending sets will be left undone.";
+            const msg = t("confirm.finishIncompleteSession");
             if (!confirm(msg)) return;
         }
 
@@ -927,8 +919,7 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
     btnStop?.addEventListener("click", () => {
         if (!hasInitiated) return;
 
-        const msg = t("confirm.stopSession")
-            || "Stop this workout? It will stay unfinished and you can resume it later.";
+        const msg = t("confirm.stopSession");
         if (!confirm(msg)) return;
 
         if (running) pauseTimer();
@@ -1049,8 +1040,7 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
         const rg = routine?.series?.[seriesIdx]?.repGroups?.[repIdx];
         if (!rg || isRepGroupRemoved(rg.id)) return;
 
-        const msg = t("confirm.removeSetFromSession")
-            || "Remove this set from today's session? The routine itself won't change.";
+        const msg = t("confirm.removeSetFromSession");
         if (!confirm(msg)) return;
 
         hasInitiated = true;
@@ -1181,7 +1171,7 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
 
         const name = resolveExerciseName(s);
         const seriesDesc = s?.description != null ? String(s.description) : "";
-        const descPlaceholder = t("session.seriesDesc.placeholder") || "Add notes…";
+        const descPlaceholder = t("session.seriesDesc.placeholder");
         const descDisplayText = seriesDesc || descPlaceholder;
         const descEmptyClass = seriesDesc ? "" : " currentSeriesDescText--empty";
         const descTextHtml = `<span class="currentSeriesDescText${descEmptyClass}" data-action="start-edit-desc">${escapeHtml(descDisplayText)}</span>`;
@@ -1189,7 +1179,7 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
                             class="currentSeriesDescInput"
                             data-action="edit-series-desc"
                             placeholder="${escapeHtml(descPlaceholder)}"
-                            aria-label="${escapeHtml(t("session.seriesDesc.aria") || "Exercise notes")}"
+                            aria-label="${escapeHtml(t("session.seriesDesc.aria"))}"
                             spellcheck="true"
                             rows="1"
                             style="display:none"
@@ -1199,8 +1189,8 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
         let rg = groups[currentRepGroupIndex] || null;
         if (rg && isRepGroupRemoved(rg.id)) rg = null;
 
-        const weightLabel = t("session.weight") || "Weight";
-        const repsLabel = t("session.reps") || "Reps";
+        const weightLabel = t("session.weight");
+        const repsLabel = t("session.reps");
 
         let currentSetHtml = "";
         if (rg) {
@@ -1209,18 +1199,18 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
             const weightTxt = formatSideValue(weight);
             const repsTxt = formatSideValue(reps);
 
-            const timerLabel = t("session.currentSet.timer") || "Set timer";
+            const timerLabel = t("session.currentSet.timer");
             const hasStarted = startEpochMs != null;
             const canComplete = hasStarted && running && setRunning && !restRunning;
             const isDisabled = !canComplete;
 
             const btnLabel = !hasStarted
-                ? (t("session.currentSet.startToEnable") || "Start workout to complete sets")
+                ? t("session.currentSet.startToEnable")
                 : (!running
-                    ? (t("session.currentSet.resumeToEnable") || "Resume workout to complete sets")
+                    ? t("session.currentSet.resumeToEnable")
                     : (restRunning
-                        ? (t("session.currentSet.restTimer") || "Rest timer")
-                        : (t("session.currentSet.complete") || "Complete set")
+                        ? t("session.currentSet.restTimer")
+                        : t("session.currentSet.complete")
                     )
                 );
 
@@ -1237,16 +1227,16 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
                             type="button"
                             class="skipRestBtn"
                             data-action="skip-rest"
-                            aria-label="${escapeHtml(t("session.rest.skip") || "Skip rest")}"
+                            aria-label="${escapeHtml(t("session.rest.skip"))}"
                             >
-                            ${escapeHtml(t("session.rest.skip") || "Skip rest")}
+                            ${escapeHtml(t("session.rest.skip"))}
                             </button>
                         ` : ""}
                     </div>
 
                     <div class="currentSetMetrics">
                     <div class="currentSetMetricsTop">
-                        <span class="currentSetBadge">${escapeHtml(t("session.set") || "Set")} ${currentRepGroupIndex + 1}</span>
+                        <span class="currentSetBadge">${escapeHtml(t("session.set"))} ${currentRepGroupIndex + 1}</span>
                     </div>
 
                     <div style="margin-top:8px; display:flex; gap:14px; flex-wrap:wrap;">
@@ -1318,7 +1308,7 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
                         class="addSetBtn"
                         data-action="add-set"
                         data-insert-idx="${repIdx}"
-                        aria-label="${escapeHtml(t("session.addSet") || "Add set")}"
+                        aria-label="${escapeHtml(t("session.addSet"))}"
                         style="
                         min-width:44px;
                         height:64px;
@@ -1340,7 +1330,7 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
                         type="button"
                         data-action="focus-current-rep"
                         data-rep-idx="${repIdx}"
-                        aria-label="${escapeHtml((t("session.set") || "Set"))} ${repIdx + 1}"
+                        aria-label="${escapeHtml(t("session.set"))} ${repIdx + 1}"
                         style="
                         min-width: 64px;
                         height: 64px;
@@ -1408,7 +1398,7 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
                 class="addSetBtn"
                 data-action="add-set"
                 data-insert-idx="${groups.length}"
-                aria-label="${escapeHtml(t("session.addSet") || "Add set")}"
+                aria-label="${escapeHtml(t("session.addSet"))}"
                 style="
                     min-width:44px;
                     height:64px;
@@ -1425,20 +1415,20 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
                 </button>
             `;
 
-        const allSetsLabel = escapeHtml(t("session.allSets") || "All sets");
+        const allSetsLabel = escapeHtml(t("session.allSets"));
 
         currentSectionEl.style.display = "";
         currentSectionEl.innerHTML = `
             <div class="currentExerciseHeader">
                 <div class="currentExerciseTitleWrap">
-                <div class="currentExerciseLabel">${escapeHtml(t("session.currentExercise") || "Current exercise")}</div>
+                <div class="currentExerciseLabel">${escapeHtml(t("session.currentExercise"))}</div>
                 <div class="currentExerciseNameLine">
                     <span class="currentExerciseName">${escapeHtml(name)}</span> ${descTextHtml}
                 </div>
                 </div>
 
                 <div class="currentExerciseIdx">
-                ${escapeHtml((t("session.exercise") || "Exercise"))} ${currentSeriesIndex + 1}/${series.length}
+                ${escapeHtml(t("session.exercise"))} ${currentSeriesIndex + 1}/${series.length}
                 </div>
             </div>
             ${descTextareaHtml}
@@ -1449,7 +1439,7 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
 
             <div class="allSetsLabel">${allSetsLabel}</div>
             <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
-                ${flow || `<span class="muted">${escapeHtml(t("session.noSets") || "No sets")}</span>`}
+                ${flow || `<span class="muted">${escapeHtml(t("session.noSets"))}</span>`}
             </div>
         `;
 
@@ -1475,12 +1465,12 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
         btn.disabled = !canComplete;
 
         const label = !hasStarted
-            ? (t("session.currentSet.startToEnable") || "Start workout to complete sets")
+            ? t("session.currentSet.startToEnable")
             : (!running
-                ? (t("session.currentSet.resumeToEnable") || "Resume workout to complete sets")
+                ? t("session.currentSet.resumeToEnable")
                 : (restRunning
-                    ? (t("session.currentSet.restTimer") || "Rest timer")
-                    : (t("session.currentSet.complete") || "Complete set")
+                    ? t("session.currentSet.restTimer")
+                    : t("session.currentSet.complete")
                 )
             );
 
@@ -1719,9 +1709,9 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
         const groups = Array.isArray(s?.repGroups) ? s.repGroups : [];
         if (!groups.length) return "";
 
-        const weightLabel = t("session.weight") || "Weight";
-        const repsLabel = t("session.reps") || "Reps";
-        const removeSetLabel = t("session.removeSet") || "Remove set from today's session";
+        const weightLabel = t("session.weight");
+        const repsLabel = t("session.reps");
+        const removeSetLabel = t("session.removeSet");
 
         const itemsHtml = groups
             .map((rg, repIdx) => {
@@ -1780,7 +1770,7 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
 
         return `
       <div class="repGroupList" role="list">
-        ${itemsHtml || `<p class="muted" style="margin:6px 0 0;">${escapeHtml(t("session.noSets") || "No sets")}</p>`}
+        ${itemsHtml || `<p class="muted" style="margin:6px 0 0;">${escapeHtml(t("session.noSets"))}</p>`}
       </div>
     `;
     }
@@ -1908,7 +1898,7 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
                 const visibleRepCount = (Array.isArray(s?.repGroups) ? s.repGroups : [])
                     .filter((g) => !isRepGroupRemoved(g?.id)).length;
                 const countChip = visibleRepCount > 0
-                    ? `<span class="chip">${visibleRepCount} ${escapeHtml(t("session.sets") || "sets")}</span>`
+                    ? `<span class="chip">${visibleRepCount} ${escapeHtml(t("session.sets"))}</span>`
                     : "";
 
                 const seriesRestAfter =
@@ -1923,7 +1913,7 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
 
                 const isExpanded = expandedSeries.has(idx);
 
-                const removeSeriesLabel = t("session.removeSeries") || "Remove exercise from today's session";
+                const removeSeriesLabel = t("session.removeSeries");
 
                 return `
         <div class="seriesBlock" data-index="${displayIdx}" data-series-idx="${idx}" draggable="true" style="cursor:grab;">
@@ -2000,8 +1990,7 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
 
             const resumable = readResumableState(routineId);
             if (resumable) {
-                const msg = t("confirm.resumeSession")
-                    || "Resume your unfinished workout for this routine?";
+                const msg = t("confirm.resumeSession");
                 if (confirm(msg)) {
                     restoreSessionState(resumable);
                 } else {

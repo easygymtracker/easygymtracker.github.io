@@ -7,7 +7,7 @@ import { createProfileStore } from "./store/profileStore.js";
 import { createWorkoutSessionStore } from "./store/workoutSessionStore.js";
 import { registerServiceWorker } from "./app/serviceWorkerBootstrap.js";
 import { setupRoutineImport } from "./app/routineImportBootstrap.js";
-import { createStyleRouter } from "./app/styleRouter.js?v=20260805a";
+import { createStyleRouter } from "./app/styleRouter.js?v=20260806a";
 
 import { mountSessionPage } from "./pages/sessionPage/sessionPage.js";
 import { mountRoutinesPage } from "./pages/routinesPage/routinesPage.js";
@@ -119,7 +119,7 @@ const pages = {
 
 const PUBLIC_ROUTES = new Set(["home", "features", "privacy", "terms", "about"]);
 const SITE_URL = "https://easygymtracker.github.io";
-const STYLE_VERSION = "20260805a";
+const STYLE_VERSION = "20260806a";
 const styleRouter = createStyleRouter({
     routeToStyles: {
         // Every marketing route uses the .landingHero/.landingGrid layout, so they

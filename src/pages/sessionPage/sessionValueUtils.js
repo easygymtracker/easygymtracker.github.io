@@ -1,27 +1,11 @@
-export function normalizeWeight(weight) {
-    if (weight === null) return null;
-    if (typeof weight === "number") return weight;
-    return { left: weight?.left ?? null, right: weight?.right ?? null };
-}
+// Reps and weights share one shape (number | {left, right}); the generic
+// handling lives in ui/sidedValue.js. These aliases keep the reading names the
+// session code already uses.
+import { isSameSided, normalizeSided } from "../../ui/sidedValue.js";
 
-export function normalizeReps(reps) {
-    if (reps === null) return null;
-    if (typeof reps === "number") return reps;
-    return { left: reps?.left ?? null, right: reps?.right ?? null };
-}
-
-export function isSameWeight(a, b) {
-    const left = normalizeWeight(a);
-    const right = normalizeWeight(b);
-
-    if (left === null && right === null) return true;
-    if (typeof left === "number" && typeof right === "number") return left === right;
-    if (typeof left === "object" && typeof right === "object") {
-        return left.left === right.left && left.right === right.right;
-    }
-
-    return false;
-}
+export const normalizeWeight = normalizeSided;
+export const normalizeReps = normalizeSided;
+export const isSameWeight = isSameSided;
 
 export function resolveExerciseName(seriesItem, exerciseStore, unknownLabel) {
     const id = seriesItem?.exerciseId;

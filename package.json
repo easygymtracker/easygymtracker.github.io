@@ -7,6 +7,7 @@
     "test": "node --test \"tests/unit/*.test.mjs\"",
     "test:e2e": "node tests/e2e/sessionResume.e2e.mjs",
     "test:e2e:backup": "node tests/e2e/backupConflict.e2e.mjs",
+    "test:e2e:ui": "node tests/e2e/sharedUi.e2e.mjs",
     "prerender": "node scripts/prerender.js"
   }
 }

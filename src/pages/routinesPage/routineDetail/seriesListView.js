@@ -64,8 +64,8 @@ export function createSeriesListView({
                     </div>
                     <div class="rowActions">
                         <span class="chip">${escapeHtml(repGroupCountLabel(repGroupCount))}</span>
-                        <button class="btn" data-action="view-history" data-index="${i}" title="${escapeHtml(t('exerciseHistory.viewHistory') || 'History')}">
-                            ${escapeHtml(t('exerciseHistory.viewHistory') || 'History')}
+                        <button class="btn" data-action="view-history" data-index="${i}" title="${escapeHtml(t('exerciseHistory.viewHistory'))}">
+                            ${escapeHtml(t('exerciseHistory.viewHistory'))}
                         </button>
                         <button class="btn" data-action="edit-series" data-index="${i}">
                             ${escapeHtml(t("common.edit"))}

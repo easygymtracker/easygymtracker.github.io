@@ -1,38 +1,22 @@
 // src/pages/exerciseHistoryPage/exerciseHistoryPage.js
 
 import { t } from "/src/internationalization/i18n.js";
-import { escapeHtml } from "/src/ui/dom.js";
+import { escapeHtml, hide, show } from "/src/ui/dom.js";
+import { formatDateTime, formatDateWithWeekday, toInputDateTime } from "/src/ui/format.js";
+import { bindActions, openModal } from "/src/ui/modal.js";
+import { isSided as isLR } from "/src/ui/sidedValue.js";
 import { navigate } from "/src/router.js";
 
 // ─── date helpers ─────────────────────────────────────────────────────────────
-
-function toInputDateTimeLocal(iso) {
-    const d = iso ? new Date(iso) : new Date();
-    if (Number.isNaN(d.getTime())) return "";
-    const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
-    return local.toISOString().slice(0, 16);
-}
 
 function toIsoFromLocal(localStr) {
     if (!localStr) return null;
     return new Date(localStr).toISOString();
 }
 
-function formatDateTime(iso) {
-    if (!iso) return "—";
-    const d = new Date(iso);
-    if (Number.isNaN(d.getTime())) return iso;
-    return new Intl.DateTimeFormat(undefined, {
-        year: "numeric", month: "short", day: "numeric",
-        hour: "2-digit", minute: "2-digit",
-    }).format(d);
-}
 
 // ─── value helpers ────────────────────────────────────────────────────────────
 
-function isLR(v) {
-    return v !== null && typeof v === "object" && ("left" in v || "right" in v);
-}
 
 function formatReps(reps) {
     if (reps == null) return "—";
@@ -114,7 +98,7 @@ function gatherRepGroupOptions(exerciseId, routineStore) {
                 const label = [
                     routine.name,
                     series.description ? `· ${series.description}` : null,
-                    `· ${t("exerciseHistory.setN") || "Set"} ${rgIdx + 1}`,
+                    `· ${t("exerciseHistory.setN")} ${rgIdx + 1}`,
                     `(${rg.laterality})`,
                 ].filter(Boolean).join(" ");
                 options.push({
@@ -160,7 +144,7 @@ function computeStats(entries) {
 // ─── simple SVG sparkline ─────────────────────────────────────────────────────
 
 function sparklineSvg(points, color, yUnit, label) {
-    if (!points.length) return `<p class="muted" style="font-size:0.85rem;">${escapeHtml(t("exerciseHistory.noChartData") || "No data yet.")}</p>`;
+    if (!points.length) return `<p class="muted" style="font-size:0.85rem;">${escapeHtml(t("exerciseHistory.noChartData"))}</p>`;
 
     const W = 360, H = 110, pL = 36, pR = 8, pT = 10, pB = 20;
     const min = Math.min(...points.map(p => p.v));
@@ -243,8 +227,6 @@ export function mountExerciseHistoryPage({ routineStore, exerciseStore }) {
 
     // ── helpers ──────────────────────────────────────────────────────────────
 
-    function show(el) { el?.classList.remove("uHidden"); }
-    function hide(el) { el?.classList.add("uHidden"); }
 
     function rerender() {
         if (currentExerciseId) renderPage(currentExerciseId);
@@ -308,7 +290,7 @@ export function mountExerciseHistoryPage({ routineStore, exerciseStore }) {
         routineStore.update(routine);
 
         // reset form
-        if (addDateIn) addDateIn.value = toInputDateTimeLocal(null);
+        if (addDateIn) addDateIn.value = toInputDateTime(null);
         if (addRepsIn) addRepsIn.value = "";
         if (addRepsLeftIn) addRepsLeftIn.value = "";
         if (addRepsRightIn) addRepsRightIn.value = "";
@@ -332,7 +314,7 @@ export function mountExerciseHistoryPage({ routineStore, exerciseStore }) {
             .map((o, i) => `<option value="${i}">${escapeHtml(o.label)}</option>`)
             .join("");
 
-        if (addDateIn) addDateIn.value = toInputDateTimeLocal(null);
+        if (addDateIn) addDateIn.value = toInputDateTime(null);
         updateAddFormLaterality();
         show(addSection);
         addDateIn?.focus();
@@ -359,13 +341,7 @@ export function mountExerciseHistoryPage({ routineStore, exerciseStore }) {
         editingEntry = entryMeta;
         const isUni = laterality === "unilateral";
 
-        const overlay = document.createElement("div");
-        overlay.className = "modalOverlay";
-
-        const modal = document.createElement("div");
-        modal.className = "modalCard exHistEditModal";
-
-        const dateVal = toInputDateTimeLocal(entry.dateTime);
+        const dateVal = toInputDateTime(entry.dateTime);
 
         let repsHtml, weightHtml;
         if (isUni) {
@@ -375,7 +351,7 @@ export function mountExerciseHistoryPage({ routineStore, exerciseStore }) {
             const wR = isLR(entry.weight) ? (entry.weight.right ?? "") : "";
             repsHtml = `
                 <div class="field">
-                    <label>${escapeHtml(t("exerciseHistory.addEntry.repsTuple") || "Reps (left / right)")}</label>
+                    <label>${escapeHtml(t("exerciseHistory.addEntry.repsTuple"))}</label>
                     <div class="tupleInputGrid">
                         <input data-field="repsLeft" type="number" min="1" step="1" value="${rL}" />
                         <input data-field="repsRight" type="number" min="1" step="1" value="${rR}" />
@@ -383,7 +359,7 @@ export function mountExerciseHistoryPage({ routineStore, exerciseStore }) {
                 </div>`;
             weightHtml = `
                 <div class="field">
-                    <label>${escapeHtml(t("exerciseHistory.addEntry.weightTuple") || "Weight (left / right kg)")}</label>
+                    <label>${escapeHtml(t("exerciseHistory.addEntry.weightTuple"))}</label>
                     <div class="tupleInputGrid">
                         <input data-field="weightLeft" type="number" min="0" step="0.5" value="${wL}" />
                         <input data-field="weightRight" type="number" min="0" step="0.5" value="${wR}" />
@@ -394,72 +370,71 @@ export function mountExerciseHistoryPage({ routineStore, exerciseStore }) {
             const w = typeof entry.weight === "number" ? entry.weight : "";
             repsHtml = `
                 <div class="field">
-                    <label>${escapeHtml(t("exerciseHistory.addEntry.reps") || "Reps")}</label>
+                    <label>${escapeHtml(t("exerciseHistory.addEntry.reps"))}</label>
                     <input data-field="reps" type="number" min="1" step="1" value="${r}" />
                 </div>`;
             weightHtml = `
                 <div class="field">
-                    <label>${escapeHtml(t("exerciseHistory.addEntry.weight") || "Weight (kg)")}</label>
+                    <label>${escapeHtml(t("exerciseHistory.addEntry.weight"))}</label>
                     <input data-field="weight" type="number" min="0" step="0.5" value="${w}" />
                 </div>`;
         }
 
-        modal.innerHTML = `
+        openModal({
+            className: "exHistEditModal",
+            setup({ card: modal, close }) {
+                modal.innerHTML = `
             <div class="exHistEditHeader">
-                <h3>${escapeHtml(t("exerciseHistory.editEntry") || "Edit entry")}</h3>
+                <h3>${escapeHtml(t("exerciseHistory.editEntry"))}</h3>
             </div>
             <div class="form formCompact">
                 <div class="field">
-                    <label>${escapeHtml(t("exerciseHistory.addEntry.date") || "Date")}</label>
+                    <label>${escapeHtml(t("exerciseHistory.addEntry.date"))}</label>
                     <input data-field="dateTime" type="datetime-local" value="${escapeHtml(dateVal)}" required />
                 </div>
                 ${repsHtml}
                 ${weightHtml}
                 <div class="actions actionsStart">
-                    <button class="btn primary" data-action="save-edit">${escapeHtml(t("common.save") || "Save")}</button>
-                    <button class="btn" data-action="cancel-edit">${escapeHtml(t("common.cancel") || "Cancel")}</button>
+                    <button class="btn primary" data-action="save-edit">${escapeHtml(t("common.save"))}</button>
+                    <button class="btn" data-action="cancel-edit">${escapeHtml(t("common.cancel"))}</button>
                 </div>
             </div>
         `;
 
-        overlay.appendChild(modal);
-        document.body.appendChild(overlay);
+                bindActions(modal, {
+                    "cancel-edit": () => close(false),
+                    "save-edit": () => {
+                        const dateTimeIso = toIsoFromLocal(modal.querySelector('[data-field="dateTime"]')?.value);
+                        if (!dateTimeIso) return;
 
-        function closeModal() { overlay.remove(); editingEntry = null; }
+                        let newReps, newWeight;
+                        if (isUni) {
+                            newReps = { left: parseOptional(modal.querySelector('[data-field="repsLeft"]')?.value), right: parseOptional(modal.querySelector('[data-field="repsRight"]')?.value) };
+                            newWeight = { left: parseOptional(modal.querySelector('[data-field="weightLeft"]')?.value), right: parseOptional(modal.querySelector('[data-field="weightRight"]')?.value) };
+                        } else {
+                            newReps = parseOptional(modal.querySelector('[data-field="reps"]')?.value);
+                            newWeight = parseOptional(modal.querySelector('[data-field="weight"]')?.value);
+                        }
 
-        modal.querySelector('[data-action="cancel-edit"]').onclick = closeModal;
-        overlay.addEventListener("click", e => { if (e.target === overlay) closeModal(); });
-        document.addEventListener("keydown", function onKey(e) {
-            if (e.key === "Escape") { document.removeEventListener("keydown", onKey); closeModal(); }
+                        // Re-fetch routine (may have been modified elsewhere)
+                        const r2 = routineStore.getById(routineId);
+                        if (!r2) return;
+                        const s2 = r2.series.find(s => s.id === seriesId);
+                        if (!s2) return;
+                        const rg2 = s2.repGroups.find(g => g.id === repGroupId);
+                        if (!rg2) return;
+
+                        rg2.history[entryIndex] = { dateTime: dateTimeIso, reps: newReps, weight: newWeight };
+                        routineStore.update(r2);
+
+                        close(true);
+                    },
+                });
+            },
+        }).then((saved) => {
+            editingEntry = null;
+            if (saved) rerender();
         });
-
-        modal.querySelector('[data-action="save-edit"]').onclick = () => {
-            const dateTimeIso = toIsoFromLocal(modal.querySelector('[data-field="dateTime"]')?.value);
-            if (!dateTimeIso) return;
-
-            let newReps, newWeight;
-            if (isUni) {
-                newReps   = { left: parseOptional(modal.querySelector('[data-field="repsLeft"]')?.value),   right: parseOptional(modal.querySelector('[data-field="repsRight"]')?.value) };
-                newWeight = { left: parseOptional(modal.querySelector('[data-field="weightLeft"]')?.value), right: parseOptional(modal.querySelector('[data-field="weightRight"]')?.value) };
-            } else {
-                newReps   = parseOptional(modal.querySelector('[data-field="reps"]')?.value);
-                newWeight = parseOptional(modal.querySelector('[data-field="weight"]')?.value);
-            }
-
-            // Re-fetch routine (may have been modified elsewhere)
-            const r2 = routineStore.getById(routineId);
-            if (!r2) return;
-            const s2 = r2.series.find(s => s.id === seriesId);
-            if (!s2) return;
-            const rg2 = s2.repGroups.find(g => g.id === repGroupId);
-            if (!rg2) return;
-
-            rg2.history[entryIndex] = { dateTime: dateTimeIso, reps: newReps, weight: newWeight };
-            routineStore.update(r2);
-
-            closeModal();
-            rerender();
-        };
     }
 
     // ── entry list rendering ─────────────────────────────────────────────────
@@ -485,7 +460,7 @@ export function mountExerciseHistoryPage({ routineStore, exerciseStore }) {
                 const dayHeader = document.createElement("div");
                 dayHeader.className = "exHistDayHeader";
                 dayHeader.textContent = day
-                    ? new Intl.DateTimeFormat(undefined, { weekday: "short", year: "numeric", month: "short", day: "numeric" }).format(new Date(day))
+                    ? formatDateWithWeekday(day)
                     : "—";
                 listEl.appendChild(dayHeader);
             }
@@ -493,7 +468,7 @@ export function mountExerciseHistoryPage({ routineStore, exerciseStore }) {
             const source = [
                 e.routineName,
                 e.seriesDesc ? `· ${e.seriesDesc}` : null,
-                `· ${t("exerciseHistory.setN") || "Set"} ${e.repGroupIndex + 1}`,
+                `· ${t("exerciseHistory.setN")} ${e.repGroupIndex + 1}`,
             ].filter(Boolean).join(" ");
 
             const card = document.createElement("div");
@@ -504,12 +479,12 @@ export function mountExerciseHistoryPage({ routineStore, exerciseStore }) {
                     <span class="exHistEntrySource muted">${escapeHtml(source)}</span>
                 </div>
                 <div class="exHistEntryValues">
-                    <span class="chip">${escapeHtml(formatReps(e.reps))} ${escapeHtml(t("session.reps") || "reps")}</span>
+                    <span class="chip">${escapeHtml(formatReps(e.reps))} ${escapeHtml(t("session.reps"))}</span>
                     <span class="chip">${escapeHtml(formatWeight(e.weight))}</span>
                 </div>
                 <div class="exHistEntryActions">
-                    <button class="btn" data-action="edit" data-index="${i}">${escapeHtml(t("common.edit") || "Edit")}</button>
-                    <button class="btn danger" data-action="delete" data-index="${i}">${escapeHtml(t("common.remove") || "Delete")}</button>
+                    <button class="btn" data-action="edit" data-index="${i}">${escapeHtml(t("common.edit"))}</button>
+                    <button class="btn danger" data-action="delete" data-index="${i}">${escapeHtml(t("common.remove"))}</button>
                 </div>
             `;
             listEl.appendChild(card);
@@ -526,7 +501,7 @@ export function mountExerciseHistoryPage({ routineStore, exerciseStore }) {
             if (btn.dataset.action === "edit") {
                 openEditModal(entry);
             } else if (btn.dataset.action === "delete") {
-                const ok = confirm(t("exerciseHistory.confirmDelete") || "Remove this entry?");
+                const ok = confirm(t("exerciseHistory.confirmDelete"));
                 if (!ok) return;
 
                 const routine = routineStore.getById(entry.routineId);
@@ -559,19 +534,19 @@ export function mountExerciseHistoryPage({ routineStore, exerciseStore }) {
         statsEl.innerHTML = `
             <div class="summaryKpi">
                 <span class="summaryKpiValue">${stats.totalSets}</span>
-                <span class="summaryKpiLabel muted">${escapeHtml(t("exerciseHistory.stats.totalSets") || "Total sets")}</span>
+                <span class="summaryKpiLabel muted">${escapeHtml(t("exerciseHistory.stats.totalSets"))}</span>
             </div>
             <div class="summaryKpi">
                 <span class="summaryKpiValue">${stats.totalSessions}</span>
-                <span class="summaryKpiLabel muted">${escapeHtml(t("exerciseHistory.stats.sessions") || "Sessions")}</span>
+                <span class="summaryKpiLabel muted">${escapeHtml(t("exerciseHistory.stats.sessions"))}</span>
             </div>
             <div class="summaryKpi">
                 <span class="summaryKpiValue">${escapeHtml(fmtVol)}</span>
-                <span class="summaryKpiLabel muted">${escapeHtml(t("exerciseHistory.stats.totalVolume") || "Total volume")}</span>
+                <span class="summaryKpiLabel muted">${escapeHtml(t("exerciseHistory.stats.totalVolume"))}</span>
             </div>
             <div class="summaryKpi">
                 <span class="summaryKpiValue">${stats.bestWeight > 0 ? stats.bestWeight + " kg" : "—"}</span>
-                <span class="summaryKpiLabel muted">${escapeHtml(t("exerciseHistory.stats.bestWeight") || "Best weight")}</span>
+                <span class="summaryKpiLabel muted">${escapeHtml(t("exerciseHistory.stats.bestWeight"))}</span>
             </div>
         `;
     }
@@ -586,12 +561,12 @@ export function mountExerciseHistoryPage({ routineStore, exerciseStore }) {
 
         chartsEl.innerHTML = `
             <div class="exHistChartCard">
-                <p class="exHistChartLabel muted">${escapeHtml(t("exerciseHistory.chart.weight") || "Best weight per day")}</p>
-                ${sparklineSvg(weightPoints, "var(--accent, #f59e0b)", " kg", t("exerciseHistory.chart.weight") || "Weight")}
+                <p class="exHistChartLabel muted">${escapeHtml(t("exerciseHistory.chart.weight"))}</p>
+                ${sparklineSvg(weightPoints, "var(--accent, #f59e0b)", " kg", t("exerciseHistory.chart.weight"))}
             </div>
             <div class="exHistChartCard">
-                <p class="exHistChartLabel muted">${escapeHtml(t("exerciseHistory.chart.volume") || "Volume per day")}</p>
-                ${sparklineSvg(volPoints, "var(--primary, #6366f1)", " kg", t("exerciseHistory.chart.volume") || "Volume")}
+                <p class="exHistChartLabel muted">${escapeHtml(t("exerciseHistory.chart.volume"))}</p>
+                ${sparklineSvg(volPoints, "var(--primary, #6366f1)", " kg", t("exerciseHistory.chart.volume"))}
             </div>
         `;
     }
@@ -602,7 +577,7 @@ export function mountExerciseHistoryPage({ routineStore, exerciseStore }) {
         const exercise = exerciseStore.getById(exerciseId);
 
         if (!exercise) {
-            titleEl.textContent = t("exerciseHistory.title") || "Exercise History";
+            titleEl.textContent = t("exerciseHistory.title");
             hide(statsEl); hide(chartsEl); hide(listEl); hide(addSection);
             show(notFoundEl);
             return;
@@ -645,7 +620,7 @@ export function mountExerciseHistoryPage({ routineStore, exerciseStore }) {
                 toolbar = document.createElement("div");
                 toolbar.id = "exHistToolbar";
                 toolbar.className = "actions actionsStart";
-                toolbar.innerHTML = `<button class="btn primary" id="btnExHistOpenAdd" type="button">${escapeHtml(t("exerciseHistory.addEntry.title") || "Add entry")}</button>`;
+                toolbar.innerHTML = `<button class="btn primary" id="btnExHistOpenAdd" type="button">${escapeHtml(t("exerciseHistory.addEntry.title"))}</button>`;
                 const historyList = document.getElementById("exerciseHistoryList");
                 historyList?.parentElement?.insertBefore(toolbar, historyList);
 
@@ -653,7 +628,7 @@ export function mountExerciseHistoryPage({ routineStore, exerciseStore }) {
             } else {
                 // Update button label (locale may have changed)
                 const addBtn = toolbar.querySelector("#btnExHistOpenAdd");
-                if (addBtn) addBtn.textContent = t("exerciseHistory.addEntry.title") || "Add entry";
+                if (addBtn) addBtn.textContent = t("exerciseHistory.addEntry.title");
             }
 
             renderPage(currentExerciseId);

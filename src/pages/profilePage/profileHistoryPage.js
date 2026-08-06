@@ -1,98 +1,15 @@
 import { escapeHtml } from "../../ui/dom.js";
 import { t } from "../../internationalization/i18n.js";
+import { formatDateTime, formatValue, parseOptionalNumber, toInputDateTime } from "../../ui/format.js";
+import { lineChartSvg } from "../../ui/components/lineChart.js";
+import { buildDailyMax } from "./measurementMetrics.js";
 
-function toInputDateTimeValue(value) {
-    const date = value ? new Date(value) : new Date();
-    const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
-    return local.toISOString().slice(0, 16);
-}
 
-function parseOptionalNumber(value) {
-    const trimmed = String(value ?? "").trim();
-    if (!trimmed) return null;
-    const parsed = Number(trimmed);
-    return Number.isFinite(parsed) ? parsed : null;
-}
 
-function formatValue(value, suffix = "") {
-    if (value == null) return t("common.dash");
-    return `${value}${suffix}`;
-}
 
-function formatRecordedAt(value) {
-    if (!value) return t("common.dash");
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return value;
-    return new Intl.DateTimeFormat(undefined, {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-    }).format(date);
-}
 
-function getDayKey(value) {
-    return String(value || "").slice(0, 10);
-}
 
-function buildDailyMax(entries, field) {
-    const daily = new Map();
-    entries.forEach((entry) => {
-        const value = entry[field];
-        if (value == null) return;
-        const key = getDayKey(entry.recordedAt);
-        const current = daily.get(key);
-        if (current == null || value > current) {
-            daily.set(key, value);
-        }
-    });
 
-    return Array.from(daily.entries())
-        .sort((a, b) => a[0].localeCompare(b[0]))
-        .map(([day, value]) => ({ day, value }));
-}
-
-function lineChartSvg(points, color, unit) {
-    if (!points.length) {
-        return `<div class="note">${escapeHtml(t("profileHistory.noDataYet"))}</div>`;
-    }
-
-    const width = 340;
-    const height = 150;
-    const padL = 30;
-    const padR = 12;
-    const padT = 12;
-    const padB = 24;
-    const min = Math.min(...points.map((point) => point.value));
-    const max = Math.max(...points.map((point) => point.value));
-    const range = max - min || 1;
-    const plotW = width - padL - padR;
-    const plotH = height - padT - padB;
-
-    const coords = points.map((point, index) => {
-        const x = padL + (plotW * (points.length === 1 ? 0.5 : index / (points.length - 1)));
-        const y = padT + (plotH * (1 - ((point.value - min) / range)));
-        return { ...point, x, y };
-    });
-
-    const polyline = coords.map((point) => `${point.x},${point.y}`).join(" ");
-    const dots = coords.map((point) => `
-      <circle cx="${point.x}" cy="${point.y}" r="3.5" fill="${color}">
-        <title>${escapeHtml(point.day)}: ${escapeHtml(String(point.value))}${escapeHtml(unit)}</title>
-      </circle>
-    `).join("");
-
-    return `
-    <svg viewBox="0 0 ${width} ${height}" role="img" aria-label="${escapeHtml(t("profileHistory.metricTrendAria"))}" style="width:100%; height:auto; display:block;">
-        <line x1="${padL}" y1="${padT}" x2="${padL}" y2="${height - padB}" stroke="var(--border)" />
-        <line x1="${padL}" y1="${height - padB}" x2="${width - padR}" y2="${height - padB}" stroke="var(--border)" />
-        <text x="${padL}" y="${padT - 2}" fill="var(--muted)" font-size="10">${escapeHtml(String(max))}${escapeHtml(unit)}</text>
-        <polyline fill="none" stroke="${color}" stroke-width="2.5" points="${polyline}" />
-        ${dots}
-      </svg>
-    `;
-}
 
 function average(entries, field) {
     const values = entries
@@ -118,8 +35,8 @@ function statsHtml(entries) {
     return `
       <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:10px;">
                 <article class="card" style="padding:10px;"><strong>${entries.length}</strong><div class="note">${escapeHtml(t("profileHistory.stats.entries"))}</div></article>
-                <article class="card" style="padding:10px;"><strong>${escapeHtml(formatRecordedAt(newest?.recordedAt))}</strong><div class="note">${escapeHtml(t("profileHistory.stats.latestRecord"))}</div></article>
-                <article class="card" style="padding:10px;"><strong>${escapeHtml(formatRecordedAt(oldest?.recordedAt))}</strong><div class="note">${escapeHtml(t("profileHistory.stats.oldestRecord"))}</div></article>
+                <article class="card" style="padding:10px;"><strong>${escapeHtml(formatDateTime(newest?.recordedAt))}</strong><div class="note">${escapeHtml(t("profileHistory.stats.latestRecord"))}</div></article>
+                <article class="card" style="padding:10px;"><strong>${escapeHtml(formatDateTime(oldest?.recordedAt))}</strong><div class="note">${escapeHtml(t("profileHistory.stats.oldestRecord"))}</div></article>
                 <article class="card" style="padding:10px;"><strong>${escapeHtml(formatValue(avgWeight, " kg"))}</strong><div class="note">${escapeHtml(t("profileHistory.stats.avgWeight"))}</div></article>
                 <article class="card" style="padding:10px;"><strong>${escapeHtml(formatValue(avgFat, "%"))}</strong><div class="note">${escapeHtml(t("profileHistory.stats.avgBodyFat"))}</div></article>
                 <article class="card" style="padding:10px;"><strong>${escapeHtml(formatValue(avgMuscle, " kg"))}</strong><div class="note">${escapeHtml(t("profileHistory.stats.avgMuscle"))}</div></article>
@@ -142,7 +59,7 @@ function chartsHtml(entries) {
               <h3 style="margin:0; font-size:15px;">${escapeHtml(metric.title)}</h3>
               <strong style="font-size:18px; color:${metric.color};">${escapeHtml(formatValue(metric.latest, metric.suffix))}</strong>
             </div>
-            ${lineChartSvg(points, metric.color, metric.suffix)}
+            ${lineChartSvg(points, { color: metric.color, unit: metric.suffix, ariaLabel: t("profileHistory.metricTrendAria"), width: 340, height: 150 })}
           </article>
         `;
     }).join("");
@@ -152,7 +69,7 @@ function tableRowsHtml(entries) {
     return entries.map((entry, index) => `
       <tr data-entry-id="${escapeHtml(entry.id)}">
         <td style="padding:8px; border-bottom:1px solid var(--border);">${index + 1}</td>
-        <td style="padding:8px; border-bottom:1px solid var(--border);">${escapeHtml(formatRecordedAt(entry.recordedAt))}</td>
+        <td style="padding:8px; border-bottom:1px solid var(--border);">${escapeHtml(formatDateTime(entry.recordedAt))}</td>
         <td style="padding:8px; border-bottom:1px solid var(--border);">${escapeHtml(formatValue(entry.weightKg))}</td>
         <td style="padding:8px; border-bottom:1px solid var(--border);">${escapeHtml(formatValue(entry.bodyFatPct))}</td>
         <td style="padding:8px; border-bottom:1px solid var(--border);">${escapeHtml(formatValue(entry.muscleKg))}</td>
@@ -181,12 +98,12 @@ export function mountProfileHistoryPage({ profileStore }) {
     function clearForm() {
         form.reset();
         idInput.value = "";
-        recordedAtInput.value = toInputDateTimeValue();
+        recordedAtInput.value = toInputDateTime();
     }
 
     function fillForm(entry) {
         idInput.value = entry.id;
-        recordedAtInput.value = toInputDateTimeValue(entry.recordedAt);
+        recordedAtInput.value = toInputDateTime(entry.recordedAt);
         weightInput.value = entry.weightKg ?? "";
         fatInput.value = entry.bodyFatPct ?? "";
         muscleInput.value = entry.muscleKg ?? "";
@@ -242,7 +159,7 @@ export function mountProfileHistoryPage({ profileStore }) {
         }
 
         profileStore.updateEntry(id, {
-            recordedAt: recordedAtInput.value || toInputDateTimeValue(),
+            recordedAt: recordedAtInput.value || toInputDateTime(),
             weightKg,
             bodyFatPct,
             muscleKg,
