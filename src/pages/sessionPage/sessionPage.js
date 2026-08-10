@@ -478,9 +478,20 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
 
     // --- Resumable session state -------------------------------------------
 
+    /**
+     * Curating the session (adding or removing exercises/sets) is worth keeping
+     * across a reload even though the workout has not started. Kept separate from
+     * hasInitiated so shaping today's plan does not put the session "in progress":
+     * no Finish/Stop, no leave guard, no notifications, no timer.
+     */
+    function hasSessionEdits() {
+        return addedSeries.length > 0 || removedSeriesIds.size > 0 || removedRepGroupIds.size > 0;
+    }
+
     function persistActiveSessionState() {
         if (!workoutSessionStore?.setActiveState) return;
-        if (!hasInitiated || !currentRoutineId) return;
+        if (!currentRoutineId) return;
+        if (!hasInitiated && !hasSessionEdits()) return;
 
         const nowMs = Date.now();
         lastActivePersistTs = nowMs;
@@ -527,7 +538,10 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
         elapsedMs = Math.max(0, Number(state.elapsedMs) || 0);
         startEpochMs = Date.now() - elapsedMs;
         running = false;
-        hasInitiated = true;
+        // A snapshot that only holds session edits was never started, so restoring
+        // it must not present a running workout. startedAtIso is set by startTimer
+        // and by nothing else, which makes it the reliable "was it started" marker.
+        hasInitiated = Boolean(sessionStartedAtIso) || elapsedMs > 0;
 
         // addedSeries must be restored above before building this view, or the
         // resumed cursor/order would be computed against the wrong series count.
@@ -1010,15 +1024,7 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
         const s = routine?.series?.[seriesIdx];
         if (!s || isSeriesRemoved(s.id)) return;
 
-        const msg = t("confirm.removeSeriesFromSession", { name: resolveExerciseName(s) })
-            || `Remove "${resolveExerciseName(s)}" from today's session? The routine itself won't change.`;
-        if (!confirm(msg)) return;
-
-        // Curating the session is itself "starting" it: without this, a removal made
-        // before pressing Start wouldn't persist (persistActiveSessionState requires
-        // hasInitiated) and would be silently lost on reload.
-        hasInitiated = true;
-        syncSessionActionButtons();
+        if (!confirm(t("confirm.removeSeriesFromSession", { name: resolveExerciseName(s) }))) return;
 
         removedSeriesIds.add(s.id);
         (s.repGroups ?? []).forEach((rg, repIdx) => {
@@ -1043,9 +1049,6 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
         const msg = t("confirm.removeSetFromSession");
         if (!confirm(msg)) return;
 
-        hasInitiated = true;
-        syncSessionActionButtons();
-
         removedRepGroupIds.add(rg.id);
         markRepDone(seriesIdx, repIdx);
         recomputeCompletedSeries(routine);
@@ -1053,6 +1056,74 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
         if (currentSeriesIndex === seriesIdx && currentRepGroupIndex === repIdx) {
             advanceToNext(routine);
         }
+
+        persistActiveSessionState();
+        renderCurrent();
+    }
+
+    /**
+     * Edit any set from the list, whenever — not just the one the cursor is on.
+     *
+     * Two meanings depending on state, because "8 reps" means different things
+     * before and after you lift them:
+     *   - not logged yet -> adjust the plan (target reps/weight/rest)
+     *   - already logged this session -> correct what was recorded, in place
+     * Neither marks the set done or advances the cursor; this is editing, not
+     * completing, so the workout keeps its position.
+     */
+    async function editRepGroupInSession(seriesIdx, repIdx) {
+        const persistedRoutine = getCurrentRoutine();
+        if (!persistedRoutine) return;
+
+        const addedIdx = isAddedSeriesIndex(persistedRoutine, seriesIdx);
+        const s = addedIdx
+            ? getAddedSeriesByIndex(persistedRoutine, seriesIdx)
+            : persistedRoutine.series?.[seriesIdx];
+
+        const rg = s?.repGroups?.[repIdx];
+        if (!rg || isRepGroupRemoved(rg.id)) return;
+
+        // Only an entry from *this* session is ours to rewrite; an older one is
+        // history and must stay untouched.
+        const latest = rg.getLatestHistory?.() ?? null;
+        const recorded =
+            isRepDone(seriesIdx, repIdx) &&
+                latest?.dateTime &&
+                sessionStartedAtIso &&
+                latest.dateTime >= sessionStartedAtIso
+                ? latest
+                : null;
+
+        const performed = await openSessionSetModal({
+            exerciseName: resolveExerciseName(s),
+            setIndex: repIdx + 1,
+            laterality: rg.laterality,
+            initialReps: recorded?.reps ?? rg.targetReps,
+            initialWeight: recorded?.weight ?? rg.targetWeight,
+            initialRestSeconds: rg.restSecondsAfter ?? 0,
+        });
+
+        if (!performed || !performed.changed) return;
+
+        if (performed.laterality && performed.laterality !== rg.laterality) {
+            rg.laterality = performed.laterality;
+        }
+
+        persistRepGroupTargets(rg, {
+            reps: performed.reps,
+            weight: performed.weight,
+            restSecondsAfterOverride: performed.restSecondsAfter ?? null,
+        });
+
+        // Reusing the original timestamp makes upsertHistory replace that entry
+        // rather than append a second one for the same set.
+        if (recorded) {
+            rg.upsertHistory(recorded.dateTime, { reps: performed.reps, weight: performed.weight });
+        }
+
+        // Added exercises live only in the snapshot; routine ones write through.
+        if (!addedIdx) routineStore.update(persistedRoutine);
+        if (hasInitiated) upsertWorkoutSessionSnapshot({ finalize: false });
 
         persistActiveSessionState();
         renderCurrent();
@@ -1112,17 +1183,16 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
             ],
         });
 
-        // Adding to the session is itself "starting" it — same reasoning as removal,
-        // so this persists and shows Finish/Stop even before the timer is started.
-        hasInitiated = true;
-        syncSessionActionButtons();
-
         addedSeries.push(newSeries);
         const newIndex = realSeriesCount(persistedRoutine) + addedSeries.length - 1;
         if (Array.isArray(sessionSeriesOrder)) sessionSeriesOrder.push(newIndex);
 
-        currentSeriesIndex = newIndex;
-        currentRepGroupIndex = 0;
+        // Only jump to it mid-workout. Before starting, moving the cursor would make
+        // Start begin on the exercise just added instead of the first pending one.
+        if (hasInitiated) {
+            currentSeriesIndex = newIndex;
+            currentRepGroupIndex = 0;
+        }
         expandedSeries.add(newIndex);
 
         if (addExerciseInput) addExerciseInput.value = "";
@@ -1712,6 +1782,7 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
         const weightLabel = t("session.weight");
         const repsLabel = t("session.reps");
         const removeSetLabel = t("session.removeSet");
+        const editSetLabel = t("session.editSet");
 
         const itemsHtml = groups
             .map((rg, repIdx) => {
@@ -1754,6 +1825,15 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
                 <div class="repGroupActions">
                   <button
                     type="button"
+                    class="editSetBtn"
+                    data-action="edit-rep-group"
+                    data-series-idx="${seriesIdx}"
+                    data-rep-idx="${repIdx}"
+                    title="${escapeHtml(editSetLabel)}"
+                    aria-label="${escapeHtml(editSetLabel)}"
+                  >✎</button>
+                  <button
+                    type="button"
                     class="removeFromSessionBtn"
                     data-action="remove-rep-group"
                     data-series-idx="${seriesIdx}"
@@ -1778,6 +1858,14 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
     listEl.addEventListener("click", (e) => {
         // Checked first: these buttons live inside .seriesItem/.repGroupItem, so
         // the generic row handlers below would otherwise also fire on this click.
+        const editRepGroupBtn = e.target.closest('[data-action="edit-rep-group"]');
+        if (editRepGroupBtn) {
+            const sIdx = Number(editRepGroupBtn.dataset.seriesIdx);
+            const rIdx = Number(editRepGroupBtn.dataset.repIdx);
+            if (Number.isFinite(sIdx) && Number.isFinite(rIdx)) editRepGroupInSession(sIdx, rIdx);
+            return;
+        }
+
         const removeSeriesBtn = e.target.closest('[data-action="remove-series"]');
         if (removeSeriesBtn) {
             const sIdx = Number(removeSeriesBtn.dataset.seriesIdx);
@@ -1990,8 +2078,12 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
 
             const resumable = readResumableState(routineId);
             if (resumable) {
-                const msg = t("confirm.resumeSession");
-                if (confirm(msg)) {
+                // Only an actually-started workout is worth interrupting for. A
+                // snapshot holding just session edits (an exercise added, a set
+                // dropped) is restored silently — nothing was in progress.
+                const wasStarted = Boolean(resumable.startedAtIso) || Number(resumable.elapsedMs) > 0;
+
+                if (!wasStarted || confirm(t("confirm.resumeSession"))) {
                     restoreSessionState(resumable);
                 } else {
                     clearActiveSessionState();
