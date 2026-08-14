@@ -2083,10 +2083,16 @@ export function mountSessionPage({ routineStore, exerciseStore, profileStore, wo
                 // dropped) is restored silently — nothing was in progress.
                 const wasStarted = Boolean(resumable.startedAtIso) || Number(resumable.elapsedMs) > 0;
 
-                if (!wasStarted || confirm(t("confirm.resumeSession"))) {
+                // `resume` comes from the on-load "unfinished workout" notification,
+                // where the user already confirmed — asking again here would be a
+                // redundant second prompt.
+                const alreadyConfirmed = Boolean(params?.resume);
+
+                // Declining does NOT discard: the snapshot stays in storage so the
+                // user can still pick it up later (from the notification or by
+                // starting this routine again). Only an explicit "Discard" clears it.
+                if (alreadyConfirmed || !wasStarted || confirm(t("confirm.resumeSession"))) {
                     restoreSessionState(resumable);
-                } else {
-                    clearActiveSessionState();
                 }
             }
 

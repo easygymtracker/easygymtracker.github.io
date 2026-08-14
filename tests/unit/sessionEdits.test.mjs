@@ -122,7 +122,16 @@ test("restoring derives 'started' from the snapshot instead of assuming it", () 
 
 test("only a started session interrupts with the resume prompt", () => {
     assert.match(page, /const wasStarted = Boolean\(resumable\.startedAtIso\) \|\| Number\(resumable\.elapsedMs\) > 0;/);
-    assert.match(page, /if \(!wasStarted \|\| confirm\(t\("confirm\.resumeSession"\)\)\)/);
+    assert.match(page, /if \(alreadyConfirmed \|\| !wasStarted \|\| confirm\(t\("confirm\.resumeSession"\)\)\)/);
+});
+
+test("declining the resume prompt no longer discards the snapshot", () => {
+    const start = page.indexOf("const resumable = readResumableState(routineId);");
+    const end = page.indexOf("\n            }", start);
+    const body = page.slice(start, end);
+
+    assert.doesNotMatch(body, /\}\s*else\s*\{\s*\n\s*clearActiveSessionState\(\);/,
+        "Cancel must leave the stored snapshot alone so it can still be resumed later");
 });
 
 test("adding before Start does not move the cursor onto the new exercise", () => {

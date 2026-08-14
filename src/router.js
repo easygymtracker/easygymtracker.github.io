@@ -89,12 +89,12 @@ function parseCurrentRoute() {
     }
 
     if (parts[0] === "session" && parts[1]) {
-        return { name: "session", params: { routineId: parts[1] } };
+        return { name: "session", params: { routineId: parts[1], resume: query.get("resume") === "1" } };
     }
 
     if (parts[0] === "session") {
         const routineId = query.get("routineId");
-        if (routineId) return { name: "session", params: { routineId } };
+        if (routineId) return { name: "session", params: { routineId, resume: query.get("resume") === "1" } };
     }
 
     return { name: "home", params: {} };

@@ -22,6 +22,7 @@ import { areNotificationsEnabled, setNotificationsEnabled } from "./services/not
 import { clearSessionNotification } from "./services/sessionNotifications.js";
 import { hasSeenOnboardingTour, markOnboardingTourSeen } from "./services/onboardingTour.js";
 import { openOnboardingTour } from "./ui/components/onboardingTourModal.js";
+import { openResumeSessionModal } from "./ui/components/resumeSessionModal.js";
 import { isGoogleDriveConfigured } from "./config/googleDrive.js";
 
 registerServiceWorker();
@@ -388,6 +389,45 @@ function applyRouteSeo(name) {
     document.title = title;
 }
 
+// -----------------------------------------------------------------------------
+// Unfinished-workout notification (shown once, on app load)
+// -----------------------------------------------------------------------------
+/** @returns {boolean} whether an unfinished-workout modal was opened. */
+function notifyStoppedSessionIfAny() {
+    const state = workoutSessionStore.getActiveState();
+    if (!state) return false;
+
+    // A snapshot holding only session edits (an exercise added, a set dropped)
+    // was never actually started, so there is nothing to interrupt the user for.
+    const wasStarted = Boolean(state.startedAtIso) || Number(state.elapsedMs) > 0;
+    if (!wasStarted) return false;
+
+    const routine = state.routineId ? routineStore.getById(state.routineId) : null;
+    if (!routine) {
+        // The routine it belonged to is gone; there's nothing sensible to resume.
+        workoutSessionStore.clearActiveState();
+        return false;
+    }
+
+    openResumeSessionModal({
+        routineName: routine.name || routine.description || "",
+        elapsedMs: Number(state.elapsedMs) || 0,
+    }).then((action) => {
+        if (action === "resume") {
+            navigate(`/session?routineId=${encodeURIComponent(state.routineId)}&resume=1`);
+        } else if (action === "discard") {
+            if (confirm(t("confirm.discardSession"))) {
+                workoutSessionStore.clearActiveState();
+            }
+        }
+        // "dismiss" (or Escape/backdrop): leave the snapshot as-is for next time.
+    });
+
+    return true;
+}
+
+let hasCheckedStoppedSession = false;
+
 startRouter({
     defaultPath: "/",
     onRoute({ name, params }) {
@@ -402,9 +442,19 @@ startRouter({
             page.render(params);
         }
 
+        // Checked once per app load, right after the initial route renders. The
+        // session page handles its own routine's resumability, so skip here to
+        // avoid a double prompt when landing directly on it.
+        let stoppedSessionShown = false;
+        if (!hasCheckedStoppedSession) {
+            hasCheckedStoppedSession = true;
+            if (name !== "session") stoppedSessionShown = notifyStoppedSessionIfAny();
+        }
+
         // First time reaching the actual app (not the marketing pages): show the
-        // guided tour once. Skipping/finishing/closing it all mark it seen.
-        if (name === "routines" && !hasSeenOnboardingTour()) {
+        // guided tour once. Skipping/finishing/closing it all mark it seen. Deferred
+        // when the unfinished-workout modal is already up so the two never stack.
+        if (name === "routines" && !hasSeenOnboardingTour() && !stoppedSessionShown) {
             openOnboardingTour().then(markOnboardingTourSeen);
         }
     },
